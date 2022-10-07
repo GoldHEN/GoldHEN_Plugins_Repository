@@ -1,26 +1,29 @@
-// Universally removes framerate limit for games using
+// Fliprate Remover: Universally removes framerate limit for games using
 // system library `sceVideoOutSetFlipRate`
-// may not be used with games that have fixed timestep
+// may not be used with games that have fixed timestep.
 
-#include "Common.h"
+// Author: illusion0001 @ https://github.com/illusion0001
+// Repository: https://github.com/illusion0001/ps4-plugins
+
+#include <Common.h>
 #include <orbis/VideoOut.h>
+#include "../../common/plugin_common.h"
 
 HOOK_INIT(sceVideoOutSetFlipRate);
 
-int sceVideoOutSetFlipRate_hook(int handle, int fliprate){
-// printf("sceVideoOutSetFlipRate(int handle = 0x%08x, int fliprate = 0x%08x);\n", handle, fliprate);
+s32 sceVideoOutSetFlipRate_hook(s32 handle, s32 fliprate){
     return 0;
 }
 
 extern "C" {
-    int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
-        klog("[GoldHEN] module_start\n");
+    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
+        final_printf("[GoldHEN] module_start\n");
         HOOK32(sceVideoOutSetFlipRate);
         return 0;
     }
 
-    int __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
-        klog("[GoldHEN] module_stop\n");
+    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
+        final_printf("[GoldHEN] module_stop\n");
         UNHOOK(sceVideoOutSetFlipRate);
         return 0;
     }

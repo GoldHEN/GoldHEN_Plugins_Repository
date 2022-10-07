@@ -1,32 +1,34 @@
-// Removes watermark from Screenshot using Share button
+// No Share Watermark: Removes watermark from Screenshot using Share button.
+// Author: illusion0001 @ https://github.com/illusion0001
+// Repository: https://github.com/illusion0001/ps4-plugins
 
-#include "Common.h"
+#include <Common.h>
 #include <orbis/Sysmodule.h>
 #include <orbis/ScreenShot.h>
+#include "../../common/plugin_common.h"
 
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
 
-int sceScreenShotSetOverlayImage_hook(){
+s32 sceScreenShotSetOverlayImage_hook(){
     return 0;
 }
 
-int sceScreenShotSetOverlayImageWithOrigin_hook(){
+s32 sceScreenShotSetOverlayImageWithOrigin_hook(){
     return 0;
 }
 
 extern "C" {
-    int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
-        klog("[GoldHEN] module_start\n");
-        uint16_t ScreenshotID = 0x9c;
-        sceSysmoduleLoadModule(ScreenshotID);
+    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
+        final_printf("[GoldHEN] module_start\n");
+        sceSysmoduleLoadModule(0x009c);
         HOOK(sceScreenShotSetOverlayImage);
         HOOK(sceScreenShotSetOverlayImageWithOrigin);
         return 0;
     }
 
-    int __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
-        klog("[GoldHEN] module_stop\n");
+    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
+        final_printf("[GoldHEN] module_stop\n");
         UNHOOK(sceScreenShotSetOverlayImage);
         UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
         return 0;

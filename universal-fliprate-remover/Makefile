@@ -8,7 +8,7 @@ LIBS 		 := -lSceVideoOut -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodul
 # You likely won't need to touch anything below this point.
 # Root vars
 TOOLCHAIN 	:= $(OO_PS4_TOOLCHAIN)
-GOLDHEN_SDK := $(GOLDHEN_SDK)
+GH_SDK		:= $(GOLDHEN_SDK)
 PROJDIR   	:= source
 INTDIR    	:= build
 INCLUDEDIR  := include
@@ -21,7 +21,7 @@ OBJS        := $(patsubst $(PROJDIR)/%.c, $(INTDIR)/%.o, $(CFILES)) $(patsubst $
 STUBOBJS    := $(patsubst $(PROJDIR)/%.c, $(INTDIR)/%.o, $(CFILES)) $(patsubst $(PROJDIR)/%.cpp, $(INTDIR)/%.o.stub, $(CPPFILES)) $(patsubst $(COMMONDIR)/%.cpp, $(INTDIR)/%.o.stub, $(COMMONFILES))
 
 # Define final C/C++ flags
-CFLAGS      := --target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -c $(EXTRAFLAGS) -isysroot $(TOOLCHAIN) -isystem $(TOOLCHAIN)/$(INCLUDEDIR) -I$(GH_SDK)/include -O3
+CFLAGS      := $(FINAL) --target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -c $(EXTRAFLAGS) -isysroot $(TOOLCHAIN) -isystem $(TOOLCHAIN)/$(INCLUDEDIR) -I$(GH_SDK)/include -O3
 CXXFLAGS    := $(CFLAGS) -isystem $(TOOLCHAIN)/$(INCLUDEDIR)/c++/v1
 LDFLAGS     := -m elf_x86_64 -pie --script $(TOOLCHAIN)/link.x -e _init --eh-frame-hdr -L$(TOOLCHAIN)/lib -L$(GH_SDK) $(LIBS) 
 
@@ -66,7 +66,6 @@ $(INTDIR)/%.o.stub: $(PROJDIR)/%.cpp
 .PHONY: clean
 .DEFAULT_GOAL := all
 
-# all: $(TARGET) $(TARGETSTUB)
 all: $(TARGET)
 
 clean:
