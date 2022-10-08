@@ -1,0 +1,33 @@
+name: Build modules
+
+on: [ push, pull_request, workflow_dispatch ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download OpenOrbis Toolchain
+      env:
+        GH_SDK: ${{ secrets.GH_SDK_URL }}
+      run: |
+        curl -fLO $GH_SDK
+        curl -fLO https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
+        tar xf toolchain.tar.gz
+        7za x sceKernelOpen_HookSDK.7z
+        echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
+        echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
+        sudo apt install lld
+
+    - name: Build
+      run: |
+        FINAL="FINAL=-DFINAL"
+        cd no-share-watermark
+        make clean && make
+        cd ../universal-fliprate-remover
+        make clean && make
+        cd ../game-patch
+        make clean && make

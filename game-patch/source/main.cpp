@@ -247,11 +247,12 @@ void patch_data1(const char *type, u64 addr, const char *value) {
     return;
 }
 
+// http://www.cse.yorku.ca/~oz/hash.html
 u64 hash(const char *str) {
     u64 hash = 5381;
     u32 c;
-    while (c = *str++)
-        hash = ((hash << 5) + hash) + c;
+    while ((c = *str++))
+        hash = hash * 33 ^ c;
     return hash;
 }
 
@@ -272,7 +273,7 @@ s32 Read_File(const char *File, char **Data, size_t *Size, int extra) {
     s32 pos = 0;
     s32 fd = 0;
 
-    debug_printf("Reading File \"%s\"...\n", File);
+    debug_printf("Reading File \"%s\"\n", File);
 
     fd = sceKernelOpen(File, 0, 0777);
     if (fd < 0) {
@@ -333,9 +334,9 @@ int Write_File(const char *File, unsigned char *Data, size_t Size) {
         debug_printf("Failed to make file \"%s\"\n", File);
         return 0;
     }
-    debug_printf("Writing File \"%s\" %i...\n", File, Size);
+    debug_printf("Writing File \"%s\" %li\n", File, Size);
     ssize_t written = sceKernelWrite(fd, Data, Size);
-    debug_printf("Written File \"%s\" %i...\n", File, written);
+    debug_printf("Written File \"%s\" %li\n", File, written);
     sceKernelClose(fd);
     return 1;
 }

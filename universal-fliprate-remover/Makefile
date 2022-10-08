@@ -1,17 +1,17 @@
 # Library metadata.
-TARGET := ../dll/fliprate-remover.prx
+TARGET     := ../dll/fliprate-remover.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.
-LIBS 		 := -lSceVideoOut -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
+LIBS := -lSceVideoOut -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
 
 # You likely won't need to touch anything below this point.
 # Root vars
-TOOLCHAIN 	:= $(OO_PS4_TOOLCHAIN)
-GH_SDK		:= $(GOLDHEN_SDK)
-PROJDIR   	:= source
-INTDIR    	:= build
-INCLUDEDIR  := include
+TOOLCHAIN     := $(OO_PS4_TOOLCHAIN)
+GH_SDK        := $(GOLDHEN_SDK)
+PROJDIR       := source
+INTDIR        := build
+INCLUDEDIR    := include
 
 # Define objects to build
 CFILES      := $(wildcard $(PROJDIR)/*.c)
@@ -32,16 +32,16 @@ _unused     := $(shell mkdir -p $(INTDIR))
 UNAME_S     := $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
-		CC      := clang
-		CCX     := clang++
-		LD      := ld.lld
-		CDIR    := linux
+        CC      := clang
+        CCX     := clang++
+        LD      := ld.lld
+        CDIR    := linux
 endif
 ifeq ($(UNAME_S),Darwin)
-		CC      := /usr/local/opt/llvm/bin/clang
-		CCX     := /usr/local/opt/llvm/bin/clang++
-		LD      := /usr/local/opt/llvm/bin/ld.lld
-		CDIR    := macos
+        CC      := /usr/local/opt/llvm/bin/clang
+        CCX     := /usr/local/opt/llvm/bin/clang++
+        LD      := /usr/local/opt/llvm/bin/ld.lld
+        CDIR    := macos
 endif
 
 $(TARGET): $(INTDIR) $(OBJS)

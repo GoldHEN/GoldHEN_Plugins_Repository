@@ -8,12 +8,9 @@ fi
 
 cd no-share-watermark
 make clean && make $FINAL
-cd ..
-cd universal-fliprate-remover
+cd ../universal-fliprate-remover
+make clean && make $FINAL
+cd ../game-patch
 make clean && make $FINAL
 cd ..
-cd game-patch
-make clean && make $FINAL
-cd ..
-curl -T dll/game-patch.prx ftp://192.168.1.192:2121/data/GoldHEN/test.prx
-ls dll
+# curl -T dll/game-patch.prx ftp://192.168.1.192:2121/data/GoldHEN/test.prx
