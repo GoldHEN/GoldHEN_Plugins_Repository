@@ -478,13 +478,11 @@ module_start(s64 argc, const void *args) {
         memcpy(titleid, procInfo.titleid, 16);
         memcpy(game_elf, procInfo.name, 32);
         memcpy(game_ver, procInfo.version, 8);
-        final_printf("pid: %d\n"
-                     "name: %s\n"
-                     "titleid: %s\n"
-                     "version: %s\n"
-                     "base_address: 0x%lx\n",
-                     procInfo.pid, procInfo.name, procInfo.titleid,
-                     procInfo.version, procInfo.base_address);
+        final_printf("pid: %d\n", procInfo.pid);
+        final_printf("executable name: %s\n", procInfo.name);
+        final_printf("title id: %s\n", procInfo.titleid);
+        final_printf("app version: %s\n", procInfo.version);
+        final_printf("base address: 0x%lx\n", procInfo.base_address);
     }
     const char *gpudump_name = "gpudump.elf";
     pid = procInfo.pid;
@@ -492,8 +490,11 @@ module_start(s64 argc, const void *args) {
         final_printf("Omitting %s\n", gpudump_name);
         return 0;
     }
-    get_key_init();
-    final_printf("opreation completed\n");
+    u8 ret = get_key_init();
+    if (!ret) {
+        final_printf("get_key_init() failed with 0x%02x\n", ret);
+        return 1;
+    }
     return 0;
 }
 
