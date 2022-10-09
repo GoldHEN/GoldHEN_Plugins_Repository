@@ -396,7 +396,7 @@ u8 get_key_init() {
             u64 hashout = patch_hash_calc(  gameTitle,
                                             gameName,
                                             gameAppver,
-                                            titleid,
+                                            input_file,
                                             gameAppElf);
             for (patch_lists = json_getChild(patch_List_Items);
                  patch_lists != 0; patch_lists = json_getSibling(patch_lists)) {
