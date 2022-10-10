@@ -1,9 +1,9 @@
 # Library metadata.
-TARGET     := ../dll/game-patch.prx
+TARGET     := ../../dll/no-share-watermark.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.
-LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
+LIBS := -lSceScreenShot -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
 
 # You likely won't need to touch anything below this point.
 # Root vars

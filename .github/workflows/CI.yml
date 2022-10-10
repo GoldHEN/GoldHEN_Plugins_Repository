@@ -1,6 +1,14 @@
 name: Build modules
 
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  push:
+    paths:
+      - '**/*.c'
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.yml'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,25 +17,24 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Download OpenOrbis Toolchain
       env:
         GH_SDK: ${{ secrets.GH_SDK_URL }}
       run: |
-        curl -fLO $GH_SDK
-        curl -fLO https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
+        curl -fLOs $GH_SDK
+        curl -fLOs https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
         tar xf toolchain.tar.gz
-        7za x sceKernelOpen_HookSDK.7z
+        7za x sceKernelOpen_HookSDK.7z > a
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
         echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
         sudo apt install lld
 
     - name: Build
       run: |
+        clang -v
         FINAL="FINAL=-DFINAL"
-        cd no-share-watermark
-        make clean && make
-        cd ../universal-fliprate-remover
-        make clean && make
-        cd ../game-patch
-        make clean && make
+        cd plugin-src
+        for dir in ./*; do (cd "$dir" && make $FINAL); done

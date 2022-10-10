@@ -5,7 +5,7 @@
 #include <Common.h>
 #include <orbis/Sysmodule.h>
 #include <orbis/ScreenShot.h>
-#include "../../common/plugin_common.h"
+#include "../../../common/plugin_common.h"
 
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);

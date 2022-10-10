@@ -7,7 +7,7 @@
 
 #include <Common.h>
 #include <orbis/VideoOut.h>
-#include "../../common/plugin_common.h"
+#include "../../../common/plugin_common.h"
 
 HOOK_INIT(sceVideoOutSetFlipRate);
 

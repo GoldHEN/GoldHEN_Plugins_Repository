@@ -4,9 +4,9 @@ GoldHEN Plugins for PlayStation 4.
 
 ## Plugins
 
-- [no-share-watermark](/no-share-watermark) Removes watermark from PS4 Screenshots when using Share Button
-- [universal-fliprate-remover](/no-share-watermark) Removes framerate limit for games using system library `sceVideoOutSetFlipRate`
-- [game-patch](/game-patch) Patches game before boot.
+- [no-share-watermark](/plugin-src/no-share-watermark) Removes watermark from PS4 Screenshots when using Share Button
+- [universal-fliprate-remover](/plugin-src/no-share-watermark) Removes framerate limit for games using system library `sceVideoOutSetFlipRate`
+- [game-patch](/plugin-src/game-patch) Patches game before boot.
 
 ## Requirement
 

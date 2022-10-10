@@ -5,7 +5,7 @@
 #include "../include/patch.h"
 #include "tiny-json.h"
 #include <Common.h>
-#include "../../common/plugin_common.h"
+#include "../../../common/plugin_common.h"
 
 const u32 max_tokens = 4096;
 
