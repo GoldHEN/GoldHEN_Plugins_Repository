@@ -11,10 +11,12 @@ HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
 
 s32 sceScreenShotSetOverlayImage_hook(){
+    final_printf("sceScreenShotSetOverlayImage patched\n");
     return 0;
 }
 
 s32 sceScreenShotSetOverlayImageWithOrigin_hook(){
+    final_printf("sceScreenShotSetOverlayImageWithOrigin patched\n");
     return 0;
 }
 
