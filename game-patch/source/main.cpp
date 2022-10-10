@@ -51,6 +51,11 @@ const char *key_app_addr = "addr";
 const char *key_app_value = "value";
 const char *key_patch_list = "patch_list";
 
+const char *base_path = "/data/GoldHEN";
+const char *base_path_patch = "/data/GoldHEN/patches";
+const char *base_path_patch_json = "/data/GoldHEN/patches/json";
+const char *base_path_patch_settings = "/data/GoldHEN/patches/settings";
+
 json_t const *json_key_title;
 json_t const *json_key_app_ver;
 json_t const *json_key_patch_ver;
@@ -467,11 +472,27 @@ u8 get_key_init() {
     return 0;
 }
 
+void make_folders(){
+    if (mkdir(base_path, 0777) < 0) {
+        final_printf("Creating %s failed, does it already exist?\n", base_path);
+    }
+    if (mkdir(base_path_patch, 0777) < 0) {
+        final_printf("Creating %s failed, does it already exist?\n", base_path_patch);
+    }
+    if (mkdir(base_path_patch_json, 0777) < 0) {
+        final_printf("Creating %s failed, does it already exist?\n", base_path_patch_json);
+    }
+    if (mkdir(base_path_patch_settings, 0777) < 0) {
+        final_printf("Creating %s failed, does it already exist?\n", base_path_patch_settings);
+    }
+}
+
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(s64 argc, const void *args) {
     patch_items = 0;
     final_printf("[GoldHEN] module_start\n");
+    make_folders();
     pid = 0;
     proc_info procInfo;
     if (!sys_sdk_proc_info(&procInfo)) {
