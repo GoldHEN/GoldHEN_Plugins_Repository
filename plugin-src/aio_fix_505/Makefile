@@ -16,7 +16,7 @@ TOOLCHAIN 	:= $(OO_PS4_TOOLCHAIN)
 GH_SDK        := $(GOLDHEN_SDK)
 PROJDIR   	:= source
 INTDIR    	:= build
-INCLUDEDIR  := include_cpp
+INCLUDEDIR  := include
 
 # Define objects to build
 CFILES      := $(wildcard $(PROJDIR)/*.c)

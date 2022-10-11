@@ -7,6 +7,7 @@ on:
       - '**/*.cpp'
       - '**/*.h'
       - '**/*.yml'
+      - '**/Makefile'
   pull_request:
   workflow_dispatch:
 
