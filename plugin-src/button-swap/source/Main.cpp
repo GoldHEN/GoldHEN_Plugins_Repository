@@ -1,5 +1,5 @@
-
 #include "Common.h"
+#include "../../../common/plugin_common.h"
 
 int32_t (*sceSystemServiceParamGetInt)(int32_t paramId, int32_t *value);
 
@@ -22,7 +22,7 @@ int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
-    printf("[GoldHEN] module_start\n");
+    final_printf("[GoldHEN] module_start\n");
 
     int h = 0;
 
@@ -38,7 +38,7 @@ module_start(size_t argc, const void *args) {
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_stop(size_t argc, const void *args) {
-    klog("[GoldHEN] module_stop\n");
+    final_printf("[GoldHEN] module_stop\n");
 
     UNHOOK(sceSystemServiceParamGetInt);
 

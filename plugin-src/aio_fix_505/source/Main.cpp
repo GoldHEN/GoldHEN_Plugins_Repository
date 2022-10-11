@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "../../../common/plugin_common.h"
 
 Detour* Detour_sceKernelAioInitializeImpl = nullptr;
 Detour* Detour_sceKernelAioDeleteRequest = nullptr;
@@ -323,7 +324,7 @@ int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[],
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void* args) {
-    printf("[GoldHEN] <aio> module_start\n");
+    final_printf("[GoldHEN] <aio> module_start\n");
 
     int h = 0;
 
@@ -373,7 +374,7 @@ module_start(size_t argc, const void* args) {
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_stop(size_t argc, const void* args) {
-    klog("[GoldHEN] <aio> module_stop\n");
+    final_printf("[GoldHEN] <aio> module_stop\n");
 
     UNHOOK(sceKernelAioInitializeImpl);
     UNHOOK(sceKernelAioDeleteRequest);

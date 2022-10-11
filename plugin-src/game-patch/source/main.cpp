@@ -499,11 +499,14 @@ module_start(s64 argc, const void *args) {
         memcpy(titleid, procInfo.titleid, 16);
         memcpy(game_elf, procInfo.name, 32);
         memcpy(game_ver, procInfo.version, 8);
-        final_printf("pid: %d\n", procInfo.pid);
-        final_printf("executable name: %s\n", procInfo.name);
-        final_printf("title id: %s\n", procInfo.titleid);
-        final_printf("app version: %s\n", procInfo.version);
-        final_printf("base address: 0x%lx\n", procInfo.base_address);
+        final_printf("[+] process info\n");
+        final_printf("pid:%d\n", procInfo.pid);
+        final_printf("name:%s\n", procInfo.name);
+        final_printf("path:%s\n", procInfo.path);
+        final_printf("titleid:%s\n", procInfo.titleid);
+        final_printf("contentid:%s\n", procInfo.contentid);
+        final_printf("version:%s\n", procInfo.version);
+        final_printf("base_address:0x%lx\n", procInfo.base_address);
     }
     const char *gpudump_name = "gpudump.elf";
     pid = procInfo.pid;
