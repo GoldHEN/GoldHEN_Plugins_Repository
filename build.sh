@@ -1,16 +1,15 @@
 rm -rf dll/*.prx
-FINAL="FINAL=-DFINAL"
+
+echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
+echo "#define GIT_VER \"$(git branch --show-current)_1.$(git rev-list HEAD --count)\"" >> common/git_ver.h
+echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
+echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T (%Z %z)')\"" >> common/git_ver.h
 
 if [ $1 -gt "0" ]
 then
     FINAL="FINAL="
 fi
 
-cd no-share-watermark
-make clean && make $FINAL
-cd ../universal-fliprate-remover
-make clean && make $FINAL
-cd ../game-patch
-make clean && make $FINAL
-cd ..
-# curl -T dll/game-patch.prx ftp://192.168.1.192:2121/data/GoldHEN/test.prx
+FINAL="FINAL=-DFINAL"
+cd plugin-src
+for dir in ./*; do (cd "$dir" && make clean && make $FINAL); done

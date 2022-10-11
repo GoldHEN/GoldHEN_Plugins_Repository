@@ -35,12 +35,16 @@ jobs:
         ver="1.$(git rev-list HEAD --count)"
         echo "commit_ver=$ver" >> $GITHUB_ENV
 
-    - name: Build
+    - name: Set build information
       run: |
         echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
         echo "#define GIT_VER \"$(git branch --show-current)_1.$(git rev-list HEAD --count)\"" >> common/git_ver.h
         echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
+        echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T (%Z %z)')\"" >> common/git_ver.h
         cat common/git_ver.h
+
+    - name: Build
+      run: |
         clang -v
         FINAL="FINAL=-DFINAL"
         cd plugin-src

@@ -15,4 +15,7 @@
 #define debug_printf(a, args...) printf("[%s] (%s:%d) " a,  __func__,__FILE__, __LINE__, ##args)
 #endif
 #define final_printf(a, args...) printf("(%s:%d) " a, __FILE__, __LINE__, ##args)
-#define boot_ver() final_printf("commit: %s version: %s build: %i\n", GIT_COMMIT, GIT_VER, GIT_NUM)
+#define boot_ver() {\
+  final_printf("Commit: %s Branch: %s Build: %i\n", GIT_COMMIT, GIT_VER, GIT_NUM);\
+  final_printf("Built: %s\n", BUILD_DATE);\
+}
