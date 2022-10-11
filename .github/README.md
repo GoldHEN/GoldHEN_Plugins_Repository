@@ -20,7 +20,7 @@ Patches game before boot.
 
 Swap X and O around on Asia Region console.
 
-#### [AFS](/plugin-src/AFS)
+#### [Application File Redirector](/plugin-src/AFS)
 
 Redirect file calls to `/data/`
 
