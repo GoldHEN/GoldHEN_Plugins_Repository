@@ -8,3 +8,7 @@ Patches game before boot.
 - Extract it to `/data/GoldHEN/`
 - Enable patches in GoldHEN or Itemzflow settings.
 - Run your game.
+
+## Libraries used
+
+- [tiny-json](https://github.com/rafagafe/tiny-json)
