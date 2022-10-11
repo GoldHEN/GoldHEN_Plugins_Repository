@@ -39,3 +39,6 @@
 # Archives
 *.7z
 *.zip
+
+# Version file
+common/git_ver.h
