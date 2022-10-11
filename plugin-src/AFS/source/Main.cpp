@@ -1,3 +1,7 @@
+// Author: jocover @ https://github.com/jocover
+// Author: SiSTR0 @ https://github.com/SiSTR0
+// Repository: https://github.com/GoldHEN/GoldHEN_Plugins
+
 #include "Common.h"
 #include "../../../common/plugin_common.h"
 

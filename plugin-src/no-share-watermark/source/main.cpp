@@ -1,6 +1,6 @@
 // No Share Watermark: Removes watermark from Screenshot using Share button.
 // Author: illusion0001 @ https://github.com/illusion0001
-// Repository: https://github.com/illusion0001/ps4-plugins
+// Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
 #include <Common.h>
 #include <orbis/Sysmodule.h>
