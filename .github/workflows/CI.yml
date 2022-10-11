@@ -48,3 +48,4 @@ jobs:
         name: goldplugins_${{ env.commit_ver }}
         path: dll/*.prx
         if-no-files-found: error
+        retention-days: 7
