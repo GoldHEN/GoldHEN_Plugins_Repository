@@ -25,7 +25,8 @@ int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
-    final_printf("[GoldHEN] module_start\n");
+    final_printf("[GoldHEN] <button-swap> module_start\n");
+    boot_ver();
 
     int h = 0;
 

@@ -327,7 +327,8 @@ int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[],
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void* args) {
-    final_printf("[GoldHEN] <aio> module_start\n");
+    final_printf("[GoldHEN] <aio_fix_505> module_start\n");
+    boot_ver();
 
     int h = 0;
 

@@ -487,7 +487,8 @@ extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(s64 argc, const void *args) {
     patch_items = 0;
-    final_printf("[GoldHEN] module_start\n");
+    final_printf("[GoldHEN] <game-patch> module_start\n");
+    boot_ver();
     make_folders();
     pid = 0;
     proc_info procInfo;

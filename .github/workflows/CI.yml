@@ -37,6 +37,10 @@ jobs:
 
     - name: Build
       run: |
+        echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
+        echo "#define GIT_VER \"$(git branch --show-current)_1.$(git rev-list HEAD --count)\"" >> common/git_ver.h
+        echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
+        cat common/git_ver.h
         clang -v
         FINAL="FINAL=-DFINAL"
         cd plugin-src

@@ -35,8 +35,8 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
-    final_printf("[GoldHEN] module_start\n");
-
+    final_printf("[GoldHEN] <AFS> module_start\n");
+    boot_ver();
     proc_info procInfo;
 
     if (!sys_sdk_proc_info(&procInfo)) {
