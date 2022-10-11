@@ -11,7 +11,8 @@
 
 HOOK_INIT(sceVideoOutSetFlipRate);
 
-s32 sceVideoOutSetFlipRate_hook(){
+s32 sceVideoOutSetFlipRate_hook(int handle, int fliprate){
+    debug_printf("handle 0x%08x fliprate 0x%08x\n", handle, fliprate);
     return 0;
 }
 
