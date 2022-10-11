@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     :=  ../../dll/fliprate-remover.prx
+TARGET     :=  ../../bin/plugins/fliprate-remover.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.

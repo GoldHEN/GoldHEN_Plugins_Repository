@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     := ../../dll/button_swap.prx
+TARGET     := ../../bin/plugins/button_swap.prx
 TARGETSTUB := button_swap.so
 
 # Libraries linked into the ELF.

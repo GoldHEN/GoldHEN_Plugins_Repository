@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     := ../../dll/no-share-watermark.prx
+TARGET     := ../../bin/plugins/no-share-watermark.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.

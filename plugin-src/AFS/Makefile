@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     := ../../dll/afs.prx
+TARGET     := ../../bin/plugins/afs.prx
 TARGETSTUB := afs.so
 
 # Libraries linked into the ELF.

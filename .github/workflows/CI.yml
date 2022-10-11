@@ -54,6 +54,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}
-        path: dll/*.prx
+        path: bin/plugins/*.prx
         if-no-files-found: error
         retention-days: 7

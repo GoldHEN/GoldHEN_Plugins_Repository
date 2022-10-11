@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     := ../../dll/aio_fix_505.prx
+TARGET     := ../../bin/plugins/aio_fix_505.prx
 TARGETSTUB := aio_fix_505.so
 
 # Libraries linked into the ELF.

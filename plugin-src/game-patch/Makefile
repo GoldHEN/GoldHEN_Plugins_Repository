@@ -1,5 +1,5 @@
 # Library metadata.
-TARGET     := ../../dll/game-patch.prx
+TARGET     := ../../bin/plugins/game-patch.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.
