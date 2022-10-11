@@ -39,16 +39,9 @@ module_start(size_t argc, const void *args) {
     boot_ver();
     proc_info procInfo;
 
-    if (!sys_sdk_proc_info(&procInfo)) {
+    if (!sys_sdk_proc_info(&procInfo)){
         memcpy(titleid, procInfo.titleid, 16);
-        final_printf("[+] process info\n");
-        final_printf("pid:%d\n", procInfo.pid);
-        final_printf("name:%s\n", procInfo.name);
-        final_printf("path:%s\n", procInfo.path);
-        final_printf("titleid:%s\n", procInfo.titleid);
-        final_printf("contentid:%s\n", procInfo.contentid);
-        final_printf("version:%s\n", procInfo.version);
-        final_printf("base_address:0x%lx\n", procInfo.base_address);
+        print_proc_info();
     }
 
     possible_path = new char[500];

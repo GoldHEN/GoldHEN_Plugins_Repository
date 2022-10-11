@@ -472,56 +472,44 @@ u8 get_key_init() {
 }
 
 void make_folders(){
-    s32 ret = mkdir(base_path, 0777);
-    final_printf("mkdir(%s, 0777); // = %i", base_path, ret);
-    ret = mkdir(base_path_patch, 0777);
-    final_printf("mkdir(%s, 0777); // = %i", base_path_patch, ret);
-    ret = mkdir(base_path_patch_json, 0777);
-    final_printf("mkdir(%s, 0777); // = %i", base_path_patch_json, ret);
-    ret = mkdir(base_path_patch_settings, 0777);
-    final_printf("mkdir(%s, 0777); // = %i", base_path_patch_settings, ret);
+    mkdir(base_path, 0777);
+    mkdir(base_path_patch, 0777);
+    mkdir(base_path_patch_json, 0777);
+    mkdir(base_path_patch_settings, 0777);
     return;
 }
 
 extern "C" {
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_start(s64 argc, const void *args) {
-    patch_items = 0;
-    final_printf("[GoldHEN] <game-patch> module_start\n");
-    boot_ver();
-    make_folders();
-    pid = 0;
-    proc_info procInfo;
-    if (!sys_sdk_proc_info(&procInfo)) {
-        memcpy(titleid, procInfo.titleid, 16);
-        memcpy(game_elf, procInfo.name, 32);
-        memcpy(game_ver, procInfo.version, 8);
-        final_printf("[+] process info\n");
-        final_printf("pid:%d\n", procInfo.pid);
-        final_printf("name:%s\n", procInfo.name);
-        final_printf("path:%s\n", procInfo.path);
-        final_printf("titleid:%s\n", procInfo.titleid);
-        final_printf("contentid:%s\n", procInfo.contentid);
-        final_printf("version:%s\n", procInfo.version);
-        final_printf("base_address:0x%lx\n", procInfo.base_address);
-    }
-    const char *gpudump_name = "gpudump.elf";
-    pid = procInfo.pid;
-    if (strcmp(procInfo.name, gpudump_name) == 0) {
-        final_printf("Omitting %s\n", gpudump_name);
+    int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(s64 argc, const void *args) {
+        patch_items = 0;
+        final_printf("[GoldHEN] <game-patch> module_start\n");
+        boot_ver();
+        make_folders();
+        pid = 0;
+        proc_info procInfo;
+        if (!sys_sdk_proc_info(&procInfo)){
+            memcpy(titleid, procInfo.titleid, 16);
+            memcpy(game_elf, procInfo.name, 32);
+            memcpy(game_ver, procInfo.version, 8);
+            print_proc_info();
+        }
+        const char *gpudump_name = "gpudump.elf";
+        pid = procInfo.pid;
+        if (strcmp(procInfo.name, gpudump_name) == 0) {
+            final_printf("Omitting %s\n", gpudump_name);
+            return 0;
+        }
+        u8 ret = get_key_init();
+        if (!ret) {
+            final_printf("get_key_init() failed with 0x%02x\n", ret);
+            return 1;
+        }
         return 0;
     }
-    u8 ret = get_key_init();
-    if (!ret) {
-        final_printf("get_key_init() failed with 0x%02x\n", ret);
-        return 1;
-    }
-    return 0;
-}
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_stop(s64 argc, const void *args) {
-    final_printf("[GoldHEN] module_stop\n");
-    return 0;
-}
+    int __attribute__((weak)) __attribute__((visibility("hidden")))
+    module_stop(s64 argc, const void *args) {
+        final_printf("[GoldHEN] module_stop\n");
+        return 0;
+    }
 }

@@ -19,3 +19,14 @@
   final_printf("Commit: %s Branch: %s Build: %i\n", GIT_COMMIT, GIT_VER, GIT_NUM);\
   final_printf("Built: %s\n", BUILD_DATE);\
 }
+
+#define print_proc_info() {\
+  final_printf("process info\n");\
+  final_printf("pid:%d\n", procInfo.pid);\
+  final_printf("name:%s\n", procInfo.name);\
+  final_printf("path:%s\n", procInfo.path);\
+  final_printf("titleid:%s\n", procInfo.titleid);\
+  final_printf("contentid:%s\n", procInfo.contentid);\
+  final_printf("version:%s\n", procInfo.version);\
+  final_printf("base_address:0x%lx\n", procInfo.base_address);\
+}
