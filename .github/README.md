@@ -24,7 +24,23 @@ Swap X and O around on Asia Region console.
 
 Redirect file calls to `/data/`
 
-## Requirement
+# Building
+
+## Requirements
 
 - [GoldHEN Plugin SDK](https://github.com/GoldHEN/)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
+
+## Setup
+
+1. Export path to OpenOrbis SDK.
+
+```
+export OO_PS4_TOOLCHAIN=[directory of installation]
+```
+2. Export path to GoldHEN SDK.
+
+```
+export GOLDHEN_SDK=[directory of installation]
+```
+3. Run `./build.sh` You can find built binaries in `bin/plugins`.
