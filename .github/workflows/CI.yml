@@ -32,6 +32,8 @@ jobs:
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
         echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
         sudo apt install lld
+        ver="1.$(git rev-list HEAD --count)"
+        echo "commit_ver=$ver" >> $GITHUB_ENV
 
     - name: Build
       run: |
@@ -39,3 +41,10 @@ jobs:
         FINAL="FINAL=-DFINAL"
         cd plugin-src
         for dir in ./*; do (cd "$dir" && make $FINAL); done
+
+    - name: Push module artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: goldplugins_${{ env.commit_ver }}
+        path: dll/*.prx
+        if-no-files-found: error
