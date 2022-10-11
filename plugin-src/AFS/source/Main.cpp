@@ -7,7 +7,7 @@ char *possible_path;
 char titleid[16];
 
 int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
-    debug_printf("sceKernelOpen_hook: %s\n", path);
+    debug_printf("path: %s\n", path);
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
