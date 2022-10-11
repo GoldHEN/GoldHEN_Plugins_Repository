@@ -367,7 +367,7 @@ u8 get_key_init() {
 
     json_t const *patchItems = json_getProperty(json, "patch");
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
-        final_printf("patch not found\n");
+        Notify("Patch not found\n");
         return 1;
     }
 
@@ -435,20 +435,19 @@ u8 get_key_init() {
                     }
                     char settings_path[64];
                     snprintf(settings_path, sizeof(settings_path),
-                             "/data/GoldHEN/patches/settings/0x%016lx.txt",
-                             hashout);
+                             "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
                     char *buffer2;
                     u64 size2;
                     int res = Read_File(settings_path, &buffer2, &size2, 32);
                     if (res == 0x80020002) {
-                        unsigned char test[2] = {0x30, 0xa};
-                        Write_File(settings_path, test, sizeof(test));
-                        res = 0;
+                        final_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
+                        unsigned char false_data[2] = {0x30, 0xa};
+                        Write_File(settings_path, false_data, sizeof(false_data));
                     } else if (res == 0) {
                         if (buffer2[0] == 0x31 &&
                             strcmp(game_elf, gameAppElf) == 0 &&
                             strcmp(game_ver, gameAppver) == 0) {
-                            debug_printf("ver elf %s %s \n", game_ver, game_elf);
+                            debug_printf("game_ver: %s game_elf: %s gameAppElf: %s gameAppver: %s\n", game_ver, game_elf, gameAppElf, gameAppver);
                             debug_printf("setting %s true\n", settings_path);
                             patch_data1(gameType, addr_real, gameValue);
                             patch_items++;
@@ -473,18 +472,15 @@ u8 get_key_init() {
 }
 
 void make_folders(){
-    if (mkdir(base_path, 0777) < 0) {
-        final_printf("Creating %s failed, does it already exist?\n", base_path);
-    }
-    if (mkdir(base_path_patch, 0777) < 0) {
-        final_printf("Creating %s failed, does it already exist?\n", base_path_patch);
-    }
-    if (mkdir(base_path_patch_json, 0777) < 0) {
-        final_printf("Creating %s failed, does it already exist?\n", base_path_patch_json);
-    }
-    if (mkdir(base_path_patch_settings, 0777) < 0) {
-        final_printf("Creating %s failed, does it already exist?\n", base_path_patch_settings);
-    }
+    s32 ret = mkdir(base_path, 0777);
+    final_printf("mkdir(%s, 0777); // = %i", base_path, ret);
+    ret = mkdir(base_path_patch, 0777);
+    final_printf("mkdir(%s, 0777); // = %i", base_path_patch, ret);
+    ret = mkdir(base_path_patch_json, 0777);
+    final_printf("mkdir(%s, 0777); // = %i", base_path_patch_json, ret);
+    ret = mkdir(base_path_patch_settings, 0777);
+    final_printf("mkdir(%s, 0777); // = %i", base_path_patch_settings, ret);
+    return;
 }
 
 extern "C" {
