@@ -1,28 +1,46 @@
 # GoldHEN Plugins
-
 GoldHEN Plugins for PlayStation 4.
 
 ## Plugins
 
-#### [No Share Watermark](/plugin-src/no-share-watermark)
-
+#### No Share Watermark
 Removes watermark from PS4 Screenshots when using Share Button.
 
-#### [Fliprate Remover](/plugin-src/no-share-watermark)
-
+#### Fliprate Remover
 Removes framerate limit for games using system library `sceVideoOutSetFlipRate`.
 
-#### [Game Patch](/plugin-src/game-patch)
-
+#### Game Patch
 Patches game before boot.
 
-#### [Button Swap](/plugin-src/button-swap)
+<details>
+<summary>How To Use (Click to Expand)</summary>
 
+- Download zip from [console-game-patches](https://github.com/illusion0001/console-game-patches/raw/gh-pages/patch1.zip)
+- Extract it to `/data/GoldHEN/`
+- Patches can be enabled/disabled in following apps:
+  - GoldHEN Patch Settings
+  - GoldHEN Cheat Manager
+  - Itemzflow
+- Run your game.
+
+</details>
+
+#### Button Swap
 Swap X and O around on Asia Region console.
 
-#### [Application File Redirector](/plugin-src/AFS)
-
+#### Application File Redirector
 Redirect file calls to `/data/`
+
+<details>
+<summary>How To Use (Click to Expand)</summary>
+
+- Create a folder in `/data`
+  - `/data/GoldHEN/AFR/(title id)/app0`
+- Place files into newly created `app0` folder
+  - Example for `CUSA00001` `/app0/boot.txt` -> `/data/GoldHEN/AFR/CUSA00001/app0/boot.txt`
+- Run your game.
+
+</details>
 
 # Building
 
@@ -30,6 +48,10 @@ Redirect file calls to `/data/`
 
 - [GoldHEN Plugin SDK](https://github.com/GoldHEN/)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
+
+## Libraries used
+
+- [tiny-json](https://github.com/rafagafe/tiny-json)
 
 ## Setup
 

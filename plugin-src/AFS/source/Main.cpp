@@ -9,6 +9,7 @@ HOOK_INIT(sceKernelOpen);
 
 char *possible_path;
 char titleid[16];
+const u32 max_path = 512;
 
 int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
     debug_printf("path: %s\n", path);
@@ -17,15 +18,15 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
         path[4] == '0' && strlen(path) > 6) {
         int fd;
 
-        memset(possible_path, 0, 500);
-        strcpy(possible_path, "/data/");
+        memset(possible_path, 0, max_path);
+        strcpy(possible_path, "/data/GoldHEN/AFR/");
         strcat(possible_path, titleid);
         strcat(possible_path, "/");
         strcat(possible_path, path + 6);
 
         fd = Detour_sceKernelOpen->Stub<int>(possible_path, flags, mode);
 
-        // debug_printf("path:%s fd:%d\n", possible_path, fd);
+        debug_printf("possible_path: %s fd: %i\n", possible_path, fd);
         if (fd >= 0) return fd;
     }
 
@@ -44,7 +45,7 @@ module_start(size_t argc, const void *args) {
         print_proc_info();
     }
 
-    possible_path = new char[500];
+    possible_path = new char[max_path];
 
     HOOK32(sceKernelOpen);
 
