@@ -3,30 +3,10 @@
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
 #include "../include/patch.h"
-#include "tiny-json.h"
-#include <Common.h>
-#include "../../../common/plugin_common.h"
+#include "../include/utils.h"
+#include "../include/tiny-json.h"
 
-const u32 max_tokens = 4096;
-
-typedef struct {
-    json_t mem[max_tokens];
-    unsigned int nextFree;
-    jsonPool_t pool;
-} jsonStaticPool_t;
-
-static json_t *poolInit(jsonPool_t *pool) {
-    jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
-    spool->nextFree = 1;
-    return &spool->mem[0];
-}
-
-static json_t *poolAlloc(jsonPool_t *pool) {
-    jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
-    if (spool->nextFree >= sizeof spool->mem / sizeof spool->mem[0])
-        return 0;
-    return &spool->mem[spool->nextFree++];
-}
+const char* plugin_name = "GamePatch";
 
 const char *type_byte = "byte";
 const char *type_bytes16 = "bytes16";
@@ -80,88 +60,11 @@ u8 arr8[1];
 u8 arr16[2];
 u8 arr32[4];
 u8 arr64[8];
-u64 patch_items = 0;
 
 char titleid[16] = {0};
 char game_elf[32] = {0};
 char game_ver[8] = {0};
-
-void Notify(const char *FMT, ...) {
-    OrbisNotificationRequest Buffer;
-    va_list args;
-    va_start(args, FMT);
-    vsprintf(Buffer.message, FMT, args);
-    va_end(args);
-    final_printf("Buffer.message: %s\n", Buffer.message);
-    Buffer.type = OrbisNotificationRequestType::NotificationRequest;
-    Buffer.unk3 = 0;
-    Buffer.useIconImageUri = 1;
-    Buffer.targetId = -1;
-    strcpy(Buffer.iconUri, "cxml://psnotification/tex_icon_system");
-    sceKernelSendNotificationRequest(0, &Buffer, sizeof(Buffer), 0);
-}
-
-unsigned char *hexstrtochar2(const char *hexstr, s64 &size) {
-    // valid hex look up table.
-    const uint8_t hex_lut[] = {
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00};
-
-    uint32_t str_len = strlen(hexstr);
-    size_t data_len = ((str_len + 1) / 2) * sizeof(unsigned char);
-
-    size = (str_len) * sizeof(unsigned char);
-
-    unsigned char *data = (unsigned char *)malloc(size);
-    uint32_t j = 0; // hexstr position
-    uint32_t i = 0; // data position
-
-    if (str_len % 2 == 1) {
-        data[i] = (uint8_t)(hex_lut[0] << 4) | hex_lut[(uint8_t)hexstr[j]];
-        j = ++i;
-    }
-
-    for (; j < str_len; j += 2, i++) {
-        data[i] = (uint8_t)(hex_lut[(uint8_t)hexstr[j]] << 4) |
-                  hex_lut[(uint8_t)hexstr[j + 1]];
-    }
-
-    size = data_len;
-
-    return data;
-}
-
-int sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length,
-                uint64_t write = 1) {
-    // debug_printf("writing to memory at 0x%x\n", address);
-    return orbis_syscall(108 + 90, pid, address, data, length, write);
-}
-
 const char *hex_prefix = "0x";
-// https://stackoverflow.com/a/4770992
-bool prefix(const char *pre, const char *str) {
-    return strncmp(pre, str, strlen(pre)) == 0;
-}
 
 void patch_data1(const char *type, u64 addr, const char *value) {
     if (type) {
@@ -216,11 +119,11 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, bytearray, szb);
             return;
         } else if (strcmp(type, patch_type_str[kfloat32]) == 0) {
-            debug_printf("type: %s unsupported", type);
+            final_printf("type: %s unsupported", type);
             // strtod, atof crashes
             return;
         } else if (strcmp(type, patch_type_str[kfloat64]) == 0) {
-            debug_printf("type: %s unsupported", type);
+            final_printf("type: %s unsupported", type);
             // strtod, atof crashes
             return;
         } else if (strcmp(type, patch_type_str[kutf8]) == 0) {
@@ -252,102 +155,8 @@ void patch_data1(const char *type, u64 addr, const char *value) {
     return;
 }
 
-// http://www.cse.yorku.ca/~oz/hash.html
-u64 hash(const char *str) {
-    u64 hash = 5381;
-    u32 c;
-    while ((c = *str++))
-        hash = hash * 33 ^ c;
-    return hash;
-}
-
-u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
-                    const char *title_id, const char *elf = "") {
-    u64 output_hash = 0;
-    char hash_str[256];
-    snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
-             title_id, elf);
-    output_hash = hash(hash_str);
-    final_printf("input \"%s\"\n", hash_str);
-    final_printf("output: 0x%016lx\n", output_hash);
-    return output_hash;
-}
-
-s32 Read_File(const char *File, char **Data, size_t *Size, int extra) {
-    s32 res = 0;
-    s32 pos = 0;
-    s32 fd = 0;
-
-    debug_printf("Reading File \"%s\"\n", File);
-
-    fd = sceKernelOpen(File, 0, 0777);
-    if (fd < 0) {
-        debug_printf("sceKernelOpen() 0x%08x\n", fd);
-        res = fd;
-        goto term;
-    }
-
-    *Size = sceKernelLseek(fd, 0, SEEK_END);
-    if (*Size == 0) {
-        debug_printf("ERROR: File is empty %i\n", res);
-        res = -1;
-        goto term;
-    }
-
-    res = sceKernelLseek(fd, 0, SEEK_SET);
-    if (res < 0) {
-        debug_printf("sceKernelLseek() 0x%08x\n", res);
-        goto term;
-    }
-
-    *Data = (char *)malloc(*Size + extra);
-    if (*Data == NULL) {
-        debug_printf("ERROR: malloc()\n");
-        goto term;
-    }
-
-    res = sceKernelRead(fd, *Data, *Size);
-    if (res < 0) {
-        debug_printf("sceKernelRead() 0x%08x\n", res);
-        goto term;
-    }
-
-    res = sceKernelClose(fd);
-
-    if (res < 0) {
-        debug_printf("ERROR: sceKernelClose() 0x%08x\n", res);
-        goto term;
-    }
-
-    debug_printf("File %s has been read - Res: %d - Size: %jd\n", File, res,
-                 *Size);
-
-    return res;
-
-term:
-
-    if (fd != 0) {
-        sceKernelClose(fd);
-    }
-
-    return res;
-}
-
-int Write_File(const char *File, unsigned char *Data, size_t Size) {
-    int32_t fd = sceKernelOpen(File, 0x200 | 0x002, 0777);
-    if (fd < 0) {
-        debug_printf("Failed to make file \"%s\"\n", File);
-        return 0;
-    }
-    debug_printf("Writing File \"%s\" %li\n", File, Size);
-    ssize_t written = sceKernelWrite(fd, Data, Size);
-    debug_printf("Written File \"%s\" %li\n", File, written);
-    sceKernelClose(fd);
-    return 1;
-}
-
-u8 get_key_init() {
-    patch_items = 0;
+void get_key_init() {
+    u64 patch_items = 0;
     char *buffer;
     u64 size;
     char input_file[64];
@@ -356,19 +165,19 @@ u8 get_key_init() {
     int res = Read_File(input_file, &buffer, &size, 32);
     if (res) {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
-        return 1;
+        return;
     }
     json_t mem[max_tokens];
     json_t const *json = json_create(buffer, mem, sizeof mem / sizeof *mem);
     if (!json) {
         Notify("Too many tokens or bad file\n");
-        return 1;
+        return;
     }
 
     json_t const *patchItems = json_getProperty(json, "patch");
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
         Notify("Patch not found\n");
-        return 1;
+        return;
     }
 
     json_t const *patches;
@@ -413,7 +222,7 @@ u8 get_key_init() {
                         debug_printf("  %s: %s\n", key_app_type, gameType);
                     } else {
                         final_printf("  %s: not found\n", key_app_type);
-                        return 1;
+                        return;
                     }
                     char const *gameAddr =
                         json_getPropertyValue(patch_lists, key_app_addr);
@@ -423,7 +232,7 @@ u8 get_key_init() {
                                      addr_real);
                     } else {
                         final_printf("  %s: not found\n", key_app_addr);
-                        return 1;
+                        return;
                     }
                     char const *gameValue =
                         json_getPropertyValue(patch_lists, key_app_value);
@@ -431,7 +240,7 @@ u8 get_key_init() {
                         debug_printf("  %s: %s\n", key_app_value, gameValue);
                     } else {
                         final_printf("  %s: not found\n", key_app_value);
-                        return 1;
+                        return;
                     }
                     char settings_path[64];
                     snprintf(settings_path, sizeof(settings_path),
@@ -459,16 +268,10 @@ u8 get_key_init() {
             }
         }
     }
-    if (patch_items == 0) {
-        return 0;
+    if (patch_items > 0) {
+        Notify("%li Patch Lines Applied", patch_items);
     }
-    if (patch_items == 1) {
-        Notify("%li Patch Applied", patch_items);
-    }
-    if (patch_items > 1) {
-        Notify("%li Patches Applied", patch_items);
-    }
-    return 0;
+    return;
 }
 
 void make_folders(){
@@ -481,8 +284,7 @@ void make_folders(){
 
 extern "C" {
     int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(s64 argc, const void *args) {
-        patch_items = 0;
-        final_printf("[GoldHEN] <game-patch> module_start\n");
+        final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
         boot_ver();
         make_folders();
         pid = 0;
@@ -499,17 +301,13 @@ extern "C" {
             final_printf("Omitting %s\n", gpudump_name);
             return 0;
         }
-        u8 ret = get_key_init();
-        if (!ret) {
-            final_printf("get_key_init() failed with 0x%02x\n", ret);
-            return 1;
-        }
+        get_key_init();
         return 0;
     }
 
     int __attribute__((weak)) __attribute__((visibility("hidden")))
     module_stop(s64 argc, const void *args) {
-        final_printf("[GoldHEN] module_stop\n");
+        final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         return 0;
     }
 }
