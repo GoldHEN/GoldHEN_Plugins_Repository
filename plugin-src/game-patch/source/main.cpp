@@ -156,6 +156,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
 }
 
 void get_key_init() {
+    u64 patch_lines = 0;
     u64 patch_items = 0;
     char *buffer;
     u64 size;
@@ -185,25 +186,25 @@ void get_key_init() {
          patches = json_getSibling(patches)) {
         if (JSON_OBJ == json_getType(patches)) {
             char const *gameTitle = json_getPropertyValue(patches, key_title);
-            if (gameTitle)
-                final_printf("%s: %s\n", key_title, gameTitle);
+            if (!gameTitle)
+                final_printf("%s: not found\n", key_title);
             char const *gameAppver =
                 json_getPropertyValue(patches, key_app_ver);
-            if (gameAppver)
-                final_printf("%s: %s\n", key_app_ver, gameAppver);
+            if (!gameAppver)
+                final_printf("%s: not found\n", key_app_ver);
             char const *gameAppElf =
                 json_getPropertyValue(patches, key_app_elf);
-            if (gameAppElf)
-                final_printf("%s: %s\n", key_app_elf, gameAppElf);
+            if (!gameAppElf)
+                final_printf("%s: not found\n", key_app_elf);
             char const *gameName = json_getPropertyValue(patches, key_name);
-            if (gameName)
-                final_printf("%s: %s\n", key_name, gameName);
+            if (!gameName)
+                final_printf("%s: not found\n", key_name);
             char const *gameAuthor = json_getPropertyValue(patches, key_author);
-            if (gameAuthor)
-                final_printf("%s: %s\n", key_author, gameAuthor);
+            if (!gameAuthor)
+                final_printf("%s: not found\n", key_author);
             char const *gameNote = json_getPropertyValue(patches, key_note);
-            if (gameNote)
-                final_printf("%s: %s\n", key_note, gameNote);
+            if (!gameNote)
+                final_printf("%s: not found\n", key_note);
             json_t const *patch_List_Items =
                 json_getProperty(patches, key_patch_list);
             json_t const *patch_lists;
@@ -212,64 +213,60 @@ void get_key_init() {
                                             gameAppver,
                                             input_file,
                                             gameAppElf);
-            for (patch_lists = json_getChild(patch_List_Items);
-                 patch_lists != 0; patch_lists = json_getSibling(patch_lists)) {
-                if (JSON_OBJ == json_getType(patch_lists)) {
-                    u64 addr_real = 0;
-                    char const *gameType =
-                        json_getPropertyValue(patch_lists, key_app_type);
-                    if (gameType) {
-                        debug_printf("  %s: %s\n", key_app_type, gameType);
-                    } else {
-                        final_printf("  %s: not found\n", key_app_type);
-                        return;
-                    }
-                    char const *gameAddr =
-                        json_getPropertyValue(patch_lists, key_app_addr);
-                    if (gameAddr) {
-                        addr_real = strtoull(gameAddr, NULL, 16);
-                        debug_printf("  %s: 0x%08lx\n", key_app_addr,
-                                     addr_real);
-                    } else {
-                        final_printf("  %s: not found\n", key_app_addr);
-                        return;
-                    }
-                    char const *gameValue =
-                        json_getPropertyValue(patch_lists, key_app_value);
-                    if (gameValue) {
-                        debug_printf("  %s: %s\n", key_app_value, gameValue);
-                    } else {
-                        final_printf("  %s: not found\n", key_app_value);
-                        return;
-                    }
-                    char settings_path[64];
-                    snprintf(settings_path, sizeof(settings_path),
-                             "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
-                    char *buffer2;
-                    u64 size2;
-                    int res = Read_File(settings_path, &buffer2, &size2, 32);
-                    if (res == 0x80020002) {
-                        final_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
-                        unsigned char false_data[2] = {0x30, 0xa};
-                        Write_File(settings_path, false_data, sizeof(false_data));
-                    } else if (res == 0) {
-                        if (buffer2[0] == 0x31 &&
-                            strcmp(game_elf, gameAppElf) == 0 &&
-                            strcmp(game_ver, gameAppver) == 0) {
-                            debug_printf("game_ver: %s game_elf: %s gameAppElf: %s gameAppver: %s\n", game_ver, game_elf, gameAppElf, gameAppver);
-                            debug_printf("setting %s true\n", settings_path);
-                            patch_data1(gameType, addr_real, gameValue);
-                            patch_items++;
+            char settings_path[64];
+            snprintf(settings_path, sizeof(settings_path),
+                     "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
+            char *buffer2;
+            u64 size2;
+            int res = Read_File(settings_path, &buffer2, &size2, 32);
+            if (res == 0x80020002) {
+                final_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
+                unsigned char false_data[2] = {0x30, 0xa};
+                Write_File(settings_path, false_data, sizeof(false_data));
+            } else if (res == 0) {
+                if (buffer2[0] == 0x31 &&
+                    strcmp(game_elf, gameAppElf) == 0 &&
+                    strcmp(game_ver, gameAppver) == 0) {
+                    debug_printf("settings path: %s ret: 0x%08x\n",
+                                settings_path, res);
+                    patch_items++;
+                            for (patch_lists = json_getChild(patch_List_Items);
+                                patch_lists != 0; patch_lists = json_getSibling(patch_lists)) {
+                                if (JSON_OBJ == json_getType(patch_lists)) {
+                                    u64 addr_real = 0;
+                                    char const *gameType =
+                                        json_getPropertyValue(patch_lists, key_app_type);
+                                    if (!gameType) {
+                                        final_printf("  %s: not found\n", key_app_type);
+                                        return;
+                                    }
+                                    char const *gameAddr =
+                                        json_getPropertyValue(patch_lists, key_app_addr);
+                                    if (!gameAddr) {
+                                        final_printf("  %s: not found\n", key_app_addr);
+                                        return;
+                                    } else {
+                                        addr_real = strtoull(gameAddr, NULL, 16);
+                                    }
+                                    char const *gameValue =
+                                        json_getPropertyValue(patch_lists, key_app_value);
+                                    if (!gameValue) {
+                                        final_printf("  %s: not found\n", key_app_value);
+                                        return;
+                                    }
+                                    debug_printf("game_ver: %s game_elf: %s gameAppElf: %s gameAppver: %s\n", game_ver, game_elf, gameAppElf, gameAppver);
+                                    debug_printf("setting %s true\n", settings_path);
+                                    patch_data1(gameType, addr_real, gameValue);
+                                    patch_lines++;
+                                }
+                            }
                         }
                     }
-                    debug_printf("settings path: %s ret: 0x%08x\n",
-                                 settings_path, res);
                 }
             }
-        }
-    }
-    if (patch_items > 0) {
-        Notify("%li Patch Lines Applied", patch_items);
+    if (patch_lines > 0) {
+        Notify( "%li Patches Applied\n"
+                "%li Patch Lines Applied", patch_items, patch_lines);
     }
     return;
 }
@@ -290,9 +287,9 @@ extern "C" {
         pid = 0;
         proc_info procInfo;
         if (!sys_sdk_proc_info(&procInfo)){
-            memcpy(titleid, procInfo.titleid, 16);
-            memcpy(game_elf, procInfo.name, 32);
-            memcpy(game_ver, procInfo.version, 8);
+            memcpy(titleid, procInfo.titleid, sizeof(titleid));
+            memcpy(game_elf, procInfo.name, sizeof(game_elf));
+            memcpy(game_ver, procInfo.version, sizeof(game_ver));
             print_proc_info();
         }
         const char *gpudump_name = "gpudump.elf";
