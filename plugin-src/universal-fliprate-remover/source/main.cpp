@@ -9,6 +9,8 @@
 #include <orbis/VideoOut.h>
 #include "../../../common/plugin_common.h"
 
+const char* plugin_name = "fliprate-remover";
+
 HOOK_INIT(sceVideoOutSetFlipRate);
 
 s32 sceVideoOutSetFlipRate_hook(int handle, int fliprate){
@@ -18,14 +20,14 @@ s32 sceVideoOutSetFlipRate_hook(int handle, int fliprate){
 
 extern "C" {
     s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
-        final_printf("[GoldHEN] <universal-fliprate-remover> module_start\n");
+        final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         boot_ver();
         HOOK32(sceVideoOutSetFlipRate);
         return 0;
     }
 
     s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
-        final_printf("[GoldHEN] module_stop\n");
+        final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         UNHOOK(sceVideoOutSetFlipRate);
         return 0;
     }

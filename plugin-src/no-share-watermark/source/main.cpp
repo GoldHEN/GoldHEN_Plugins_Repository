@@ -7,6 +7,8 @@
 #include <orbis/ScreenShot.h>
 #include "../../../common/plugin_common.h"
 
+const char* plugin_name = "no-share-watermark";
+
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
 
@@ -22,7 +24,7 @@ s32 sceScreenShotSetOverlayImageWithOrigin_hook(){
 
 extern "C" {
     s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
-        final_printf("[GoldHEN] <no-share-watermark> module_start\n");
+        final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
         boot_ver();
         sceSysmoduleLoadModule(0x009c);
         HOOK(sceScreenShotSetOverlayImage);
@@ -31,7 +33,7 @@ extern "C" {
     }
 
     s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
-        final_printf("[GoldHEN] module_stop\n");
+        final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         UNHOOK(sceScreenShotSetOverlayImage);
         UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
         return 0;

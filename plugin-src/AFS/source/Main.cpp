@@ -5,6 +5,8 @@
 #include "Common.h"
 #include "../../../common/plugin_common.h"
 
+const char* plugin_name = "AFR";
+
 HOOK_INIT(sceKernelOpen);
 
 char *possible_path;
@@ -36,7 +38,7 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
 extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
-    final_printf("[GoldHEN] <AFS> module_start\n");
+    final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
     boot_ver();
     proc_info procInfo;
 
@@ -54,7 +56,7 @@ module_start(size_t argc, const void *args) {
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_stop(size_t argc, const void *args) {
-    final_printf("[GoldHEN] module_stop\n");
+    final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
 
     UNHOOK(sceKernelOpen);
 
