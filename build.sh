@@ -13,4 +13,4 @@ then
 fi
 
 cd plugin-src
-for dir in ./*; do (cd "$dir" && make clean && make $FINAL); done
+for dir in ./*; do (echo "$dir" && cd "$dir" && make clean && make $FINAL); done

@@ -48,7 +48,7 @@ jobs:
         clang -v
         FINAL="FINAL=-DFINAL"
         cd plugin-src
-        for dir in ./*; do (cd "$dir" && make $FINAL); done
+        for dir in ./*; do (echo "$dir" && cd "$dir" && make $FINAL); done
 
     - name: Push module artifact
       uses: actions/upload-artifact@v3
