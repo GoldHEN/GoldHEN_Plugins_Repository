@@ -53,7 +53,15 @@ jobs:
     - name: Push module artifact
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}
+        name: goldplugins_${{ env.commit_ver }}_prx
         path: bin/plugins/*.prx
+        if-no-files-found: error
+        retention-days: 7
+
+    - name: Push module artifact (original binary)
+      uses: actions/upload-artifact@v3
+      with:
+        name: goldplugins_${{ env.commit_ver }}_elf
+        path: bin/plugins/*.elf
         if-no-files-found: error
         retention-days: 7

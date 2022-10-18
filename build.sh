@@ -1,4 +1,4 @@
-rm -rf bin/plugins/*.prx
+rm -rf bin/plugins/*.prx bin/plugins/*.elf
 
 echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
 echo "#define GIT_VER \"$(git branch --show-current)_1.$(git rev-list HEAD --count)\"" >> common/git_ver.h

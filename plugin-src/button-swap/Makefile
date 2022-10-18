@@ -47,6 +47,7 @@ endif
 $(TARGET): $(INTDIR) $(OBJS)
 	$(LD) $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)
 	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
+	cp $(INTDIR)/$(PROJDIR).elf $(TARGET).elf
 
 $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
 	$(CC) $(INTDIR)/*.o.stub -o $(TARGETSTUB) -target x86_64-pc-linux-gnu -shared -fuse-ld=lld -ffreestanding -nostdlib -fno-builtin -L$(TOOLCHAIN)/lib $(LIBS)
