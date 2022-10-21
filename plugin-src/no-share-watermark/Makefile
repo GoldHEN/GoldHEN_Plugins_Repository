@@ -3,7 +3,7 @@ TARGET     := ../../bin/plugins/no-share-watermark.prx
 TARGETSTUB := test_stub.so
 
 # Libraries linked into the ELF.
-LIBS := -lSceScreenShot -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
+LIBS := -lSceScreenShot -lSceVideoRecording -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
 
 # You likely won't need to touch anything below this point.
 # Root vars
