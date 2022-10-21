@@ -46,7 +46,7 @@ Redirect file calls to `/data/`
 
 ## Requirements
 
-- [GoldHEN Plugin SDK](https://github.com/GoldHEN/)
+- [GoldHEN Plugin SDK](https://github.com/GoldHEN/GoldHEN_Plugins_SDK)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
 
 ## Libraries used
