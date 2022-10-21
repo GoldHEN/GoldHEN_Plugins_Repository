@@ -21,19 +21,28 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Checkout SDK
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.my_token }}
+        repository: GoldHEN/GoldHEN_Plugins_SDK
+        path: SDK
+
     - name: Download OpenOrbis Toolchain
-      env:
-        GH_SDK: ${{ secrets.GH_SDK_URL }}
       run: |
-        curl -fLOs $GH_SDK
         curl -fLOs https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
+        sudo apt install llvm lld
         tar xf toolchain.tar.gz
-        7za x sceKernelOpen_HookSDK.7z > a
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
-        echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
-        sudo apt install lld
         ver="1.$(git rev-list HEAD --count)"
         echo "commit_ver=$ver" >> $GITHUB_ENV
+
+    - name: Build SDK Lib
+      working-directory: SDK
+      run: |
+        clang -v
+        make
+        echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
 
     - name: Set build information
       run: |

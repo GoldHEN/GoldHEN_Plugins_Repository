@@ -26,13 +26,13 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
         strcat(possible_path, "/");
         strcat(possible_path, path + 6);
 
-        fd = Detour_sceKernelOpen->Stub<int>(possible_path, flags, mode);
+        fd = HOOK_CONTINUE(sceKernelOpen, int(*)(const char*, int, OrbisKernelMode), possible_path, flags, mode);
 
-        debug_printf("possible_path: %s fd: %i\n", possible_path, fd);
+        debug_printf("possible_path: %s fd: 0x%08x\n", possible_path, fd);
         if (fd >= 0) return fd;
     }
 
-    return HOOK_CONTINUE(sceKernelOpen, int, (path, flags, mode));
+    return HOOK_CONTINUE(sceKernelOpen, int(*)(const char*, int, OrbisKernelMode), path, flags, mode);
 }
 
 extern "C" {
