@@ -1,5 +1,7 @@
-// No Share Watermark: Removes watermark from Screenshot using Share button.
-// Author: illusion0001 @ https://github.com/illusion0001
+// No Share Block: Removes arbitrary limitations from share feature.
+// Authors:
+// illusion0001 @ https://github.com/illusion0001
+// Nikita Krapivin @ https://github.com/nkrapivin
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
 #include <Common.h>
@@ -8,7 +10,7 @@
 #include <orbis/VideoRecording.h>
 #include "../../../common/plugin_common.h"
 
-const char* plugin_name = "no-share-watermark";
+const char* plugin_name = "no-share-block";
 
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
@@ -30,7 +32,7 @@ int sceVideoRecordingSetInfo_hook(int iInfoType, const void *pInfoData, size_t u
         return 0; // SCE_OK
     }
 
-	// carry on...
+    // carry on...
     return HOOK_CONTINUE(sceVideoRecordingSetInfo, int(*)(int, const void*, size_t), iInfoType, pInfoData, ulInfoLen);
 }
 
@@ -39,10 +41,10 @@ extern "C" {
         final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
         boot_ver();
         sceSysmoduleLoadModule(0x009c);
-		sceSysmoduleLoadModule(0x0085);
+        sceSysmoduleLoadModule(0x0085);
         HOOK(sceScreenShotSetOverlayImage);
         HOOK(sceScreenShotSetOverlayImageWithOrigin);
-		HOOK(sceVideoRecordingSetInfo);
+        HOOK(sceVideoRecordingSetInfo);
         return 0;
     }
 
@@ -50,7 +52,7 @@ extern "C" {
         final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         UNHOOK(sceScreenShotSetOverlayImage);
         UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
-		UNHOOK(sceVideoRecordingSetInfo);
+        UNHOOK(sceVideoRecordingSetInfo);
         return 0;
     }
 }
