@@ -15,6 +15,7 @@ const char* plugin_name = "no-share-block";
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
 HOOK_INIT(sceVideoRecordingSetInfo);
+HOOK_INIT(sceScreenShotDisable);
 
 s32 sceScreenShotSetOverlayImage_hook(){
     final_printf("sceScreenShotSetOverlayImage patched\n");
@@ -26,14 +27,20 @@ s32 sceScreenShotSetOverlayImageWithOrigin_hook(){
     return 0;
 }
 
-int sceVideoRecordingSetInfo_hook(int iInfoType, const void *pInfoData, size_t ulInfoLen) {
-    if (iInfoType == 0x000D && pInfoData && sizeof(int) == ulInfoLen && 0x1 == *(int*)pInfoData) {
+s32 sceVideoRecordingSetInfo_hook(s32 iInfoType, const void *pInfoData, size_t ulInfoLen) {
+    if (iInfoType == 0x000D && pInfoData && sizeof(s32) == ulInfoLen && 0x1 == *(int*)pInfoData) {
+        final_printf("sceVideoRecordingSetInfo patched\n");
         // trying to block the recorder, nope...
         return 0; // SCE_OK
     }
 
     // carry on...
     return HOOK_CONTINUE(sceVideoRecordingSetInfo, int(*)(int, const void*, size_t), iInfoType, pInfoData, ulInfoLen);
+}
+
+s32 sceScreenShotDisable_hook(){
+    final_printf("sceScreenShotDisable patched\n");
+    return 0;
 }
 
 extern "C" {
@@ -45,6 +52,7 @@ extern "C" {
         HOOK(sceScreenShotSetOverlayImage);
         HOOK(sceScreenShotSetOverlayImageWithOrigin);
         HOOK(sceVideoRecordingSetInfo);
+        HOOK(sceScreenShotDisable);
         return 0;
     }
 
@@ -53,6 +61,7 @@ extern "C" {
         UNHOOK(sceScreenShotSetOverlayImage);
         UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
         UNHOOK(sceVideoRecordingSetInfo);
+        UNHOOK(sceScreenShotDisable);
         return 0;
     }
 }
