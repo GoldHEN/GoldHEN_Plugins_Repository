@@ -6,19 +6,19 @@
 
 const char* plugin_name = "async-io-fix";
 
-Detour* Detour_sceKernelAioInitializeImpl = nullptr;
-Detour* Detour_sceKernelAioDeleteRequest = nullptr;
-Detour* Detour_sceKernelAioDeleteRequests = nullptr;
-Detour* Detour_sceKernelAioPollRequest = nullptr;
-Detour* Detour_sceKernelAioPollRequests = nullptr;
-Detour* Detour_sceKernelAioCancelRequest = nullptr;
-Detour* Detour_sceKernelAioCancelRequests = nullptr;
-Detour* Detour_sceKernelAioWaitRequest = nullptr;
-Detour* Detour_sceKernelAioWaitRequests = nullptr;
-Detour* Detour_sceKernelAioSubmitReadCommands = nullptr;
-Detour* Detour_sceKernelAioSubmitReadCommandsMultiple = nullptr;
-Detour* Detour_sceKernelAioSubmitWriteCommands = nullptr;
-Detour* Detour_sceKernelAioSubmitWriteCommandsMultiple = nullptr;
+HOOK_INIT(sceKernelAioInitializeImpl);
+HOOK_INIT(sceKernelAioDeleteRequest);
+HOOK_INIT(sceKernelAioDeleteRequests);
+HOOK_INIT(sceKernelAioPollRequest);
+HOOK_INIT(sceKernelAioPollRequests);
+HOOK_INIT(sceKernelAioCancelRequest);
+HOOK_INIT(sceKernelAioCancelRequests);
+HOOK_INIT(sceKernelAioWaitRequest);
+HOOK_INIT(sceKernelAioWaitRequests);
+HOOK_INIT(sceKernelAioSubmitReadCommands);
+HOOK_INIT(sceKernelAioSubmitReadCommandsMultiple);
+HOOK_INIT(sceKernelAioSubmitWriteCommands);
+HOOK_INIT(sceKernelAioSubmitWriteCommandsMultiple);
 
 #define MAX_QUEUE 512
 #define SCE_KERNEL_AIO_STATE_SUBMITTED (1)

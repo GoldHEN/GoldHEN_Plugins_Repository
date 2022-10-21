@@ -13,7 +13,7 @@ HOOK_INIT(sceSystemServiceParamGetInt);
 int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
     int32_t ret = 0;
 
-    ret = HOOK_CONTINUE(sceSystemServiceParamGetInt, int32_t, (paramId, value));
+    ret = HOOK_CONTINUE(sceSystemServiceParamGetInt, int32_t(*)(int32_t, int32_t*), paramId, value);
 
     // swap X and O around in Asia PS4
 
