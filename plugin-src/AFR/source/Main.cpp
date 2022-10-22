@@ -9,9 +9,7 @@ const char *plugin_name = "AFR";
 
 HOOK_INIT(sceKernelOpen);
 
-char *possible_path;
 char titleid[16];
-const u32 max_path = 512;
 
 int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
     debug_printf("path: %s\n", path);
@@ -19,8 +17,9 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
         int fd;
+        char possible_path[512];
 
-        memset(possible_path, 0, max_path);
+        memset(possible_path, 0, sizeof(possible_path));
         strcpy(possible_path, "/data/GoldHEN/AFR/");
         strcat(possible_path, titleid);
         strcat(possible_path, "/");
@@ -51,8 +50,6 @@ module_start(size_t argc, const void *args) {
         print_proc_info();
     }
 
-    possible_path = new char[max_path];
-
     HOOK32(sceKernelOpen);
 
     return 0;
@@ -63,8 +60,6 @@ module_stop(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
 
     UNHOOK(sceKernelOpen);
-
-    delete possible_path;
 
     return 0;
 }
