@@ -49,10 +49,10 @@ extern "C" {
         boot_ver();
         sceSysmoduleLoadModule(0x009c);
         sceSysmoduleLoadModule(0x0085);
-        HOOK(sceScreenShotSetOverlayImage);
-        HOOK(sceScreenShotSetOverlayImageWithOrigin);
-        HOOK(sceVideoRecordingSetInfo);
-        HOOK(sceScreenShotDisable);
+        HOOK32(sceScreenShotSetOverlayImage);
+        HOOK32(sceScreenShotSetOverlayImageWithOrigin);
+        HOOK32(sceVideoRecordingSetInfo);
+        HOOK32(sceScreenShotDisable);
         return 0;
     }
 
