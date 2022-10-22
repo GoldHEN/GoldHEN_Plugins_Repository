@@ -1,6 +1,8 @@
 # Library metadata.
-TARGET     := ../../bin/plugins/afr.prx
-TARGETSTUB := afr.so
+BUILD_FOLDER := ../../bin/plugins
+OUTPUT_PRX   := afr
+TARGET       := $(BUILD_FOLDER)/prx/$(OUTPUT_PRX).prx
+TARGETSTUB   := afr.so
 
 # Libraries linked into the ELF.
 LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
@@ -47,7 +49,7 @@ endif
 $(TARGET): $(INTDIR) $(OBJS)
 	$(LD) $(TOOLCHAIN)/lib/crtlib.o $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)
 	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
-	cp $(INTDIR)/$(PROJDIR).elf $(TARGET).elf
+	cp $(INTDIR)/$(PROJDIR).elf $(BUILD_FOLDER)/elf/$(OUTPUT_PRX).elf
 
 $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
 	$(CC) $(INTDIR)/*.o.stub -o $(TARGETSTUB) -target x86_64-pc-linux-gnu -shared -fuse-ld=lld -ffreestanding -nostdlib -fno-builtin -L$(TOOLCHAIN)/lib $(LIBS)

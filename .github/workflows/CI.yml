@@ -63,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx
-        path: bin/plugins/*.prx
+        path: bin/plugins/prx/*.prx
         if-no-files-found: error
         retention-days: 7
 
@@ -71,6 +71,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_elf
-        path: bin/plugins/*.elf
+        path: bin/plugins/elf/*.elf
         if-no-files-found: error
         retention-days: 7
