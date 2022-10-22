@@ -34,4 +34,3 @@ for f in $FILES
     echo "$(sha256sum $f)" >> $BUILD/sha256.txt
     echo "$(md5sum $f)" >> $BUILD/md5.txt
   done
-cat $BUILD/sha256.txt $BUILD/md5.txt

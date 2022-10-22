@@ -42,3 +42,4 @@
 
 # Version file
 common/git_ver.h
+bin/**/*.txt
