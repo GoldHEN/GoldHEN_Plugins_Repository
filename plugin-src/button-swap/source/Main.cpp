@@ -4,7 +4,7 @@
 #include "Common.h"
 #include "../../../common/plugin_common.h"
 
-const char* plugin_name = "button-swap";
+const char *plugin_name = "button-swap";
 
 int32_t (*sceSystemServiceParamGetInt)(int32_t paramId, int32_t *value);
 
@@ -13,7 +13,8 @@ HOOK_INIT(sceSystemServiceParamGetInt);
 int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
     int32_t ret = 0;
 
-    ret = HOOK_CONTINUE(sceSystemServiceParamGetInt, int32_t(*)(int32_t, int32_t*), paramId, value);
+    ret = HOOK_CONTINUE(sceSystemServiceParamGetInt,
+                        int32_t(*)(int32_t, int32_t *), paramId, value);
 
     // swap X and O around in Asia PS4
 
@@ -37,7 +38,7 @@ module_start(size_t argc, const void *args) {
     sys_dynlib_dlsym(h, "sceSystemServiceParamGetInt",
                      &sceSystemServiceParamGetInt);
 
-    HOOK(sceSystemServiceParamGetInt);
+    HOOK32(sceSystemServiceParamGetInt);
 
     return 0;
 }

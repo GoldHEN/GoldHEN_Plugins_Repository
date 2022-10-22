@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "../../../common/plugin_common.h"
 
-const char* plugin_name = "AFR";
+const char *plugin_name = "AFR";
 
 HOOK_INIT(sceKernelOpen);
 
@@ -26,13 +26,17 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
         strcat(possible_path, "/");
         strcat(possible_path, path + 6);
 
-        fd = HOOK_CONTINUE(sceKernelOpen, int(*)(const char*, int, OrbisKernelMode), possible_path, flags, mode);
+        fd = HOOK_CONTINUE(sceKernelOpen,
+                           int (*)(const char *, int, OrbisKernelMode),
+                           possible_path, flags, mode);
 
         debug_printf("possible_path: %s fd: 0x%08x\n", possible_path, fd);
         if (fd >= 0) return fd;
     }
 
-    return HOOK_CONTINUE(sceKernelOpen, int(*)(const char*, int, OrbisKernelMode), path, flags, mode);
+    return HOOK_CONTINUE(sceKernelOpen,
+                         int (*)(const char *, int, OrbisKernelMode), path,
+                         flags, mode);
 }
 
 extern "C" {
@@ -42,14 +46,14 @@ module_start(size_t argc, const void *args) {
     boot_ver();
     proc_info procInfo;
 
-    if (!sys_sdk_proc_info(&procInfo)){
+    if (!sys_sdk_proc_info(&procInfo)) {
         memcpy(titleid, procInfo.titleid, 16);
         print_proc_info();
     }
 
     possible_path = new char[max_path];
 
-    HOOK(sceKernelOpen);
+    HOOK32(sceKernelOpen);
 
     return 0;
 }
