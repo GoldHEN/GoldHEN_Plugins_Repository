@@ -49,7 +49,7 @@ module_start(size_t argc, const void *args) {
 
     possible_path = new char[max_path];
 
-    HOOK32(sceKernelOpen);
+    HOOK(sceKernelOpen);
 
     return 0;
 }

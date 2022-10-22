@@ -37,7 +37,7 @@ module_start(size_t argc, const void *args) {
     sys_dynlib_dlsym(h, "sceSystemServiceParamGetInt",
                      &sceSystemServiceParamGetInt);
 
-    HOOK32(sceSystemServiceParamGetInt);
+    HOOK(sceSystemServiceParamGetInt);
 
     return 0;
 }

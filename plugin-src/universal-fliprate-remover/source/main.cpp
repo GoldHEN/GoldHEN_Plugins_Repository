@@ -22,7 +22,7 @@ extern "C" {
     s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
         final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
         boot_ver();
-        HOOK32(sceVideoOutSetFlipRate);
+        HOOK(sceVideoOutSetFlipRate);
         return 0;
     }
 
