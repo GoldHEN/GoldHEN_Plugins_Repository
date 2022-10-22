@@ -8,16 +8,7 @@
 
 const char* plugin_name = "GamePatch";
 
-const char *type_byte = "byte";
-const char *type_bytes16 = "bytes16";
-const char *type_bytes32 = "bytes32";
-const char *type_bytes64 = "bytes64";
-const char *type_bytes = "bytes";
-const char *type_float32 = "float32";
-const char *type_float64 = "float64";
-const char *type_utf8 = "utf8";
-const char *type_utf16 = "utf16";
-
+const char *key_patch = "patch";
 const char *key_title = "title";
 const char *key_app_ver = "app_ver";
 const char *key_patch_ver = "patch_ver";
@@ -54,13 +45,17 @@ char const *note_val;
 char const *app_titleid_val;
 char const *app_elf_val;
 
+char titleid[16] = {0};
+char game_elf[32] = {0};
+char game_ver[8] = {0};
+
 void get_key_init() {
     u64 patch_lines = 0;
     u64 patch_items = 0;
     char *buffer;
     u64 size;
     char input_file[64];
-    snprintf(input_file, sizeof(input_file), "/data/GoldHEN/patches/json/%s.json", titleid);
+    snprintf(input_file, sizeof(input_file), "%s/%s.json", base_path_patch_json, titleid);
     int res = Read_File(input_file, &buffer, &size, 32);
     if (res) {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
@@ -69,13 +64,13 @@ void get_key_init() {
     json_t mem[max_tokens];
     json_t const *json = json_create(buffer, mem, sizeof mem / sizeof *mem);
     if (!json) {
-        Notify("Too many tokens or bad file\n");
+        Notify("Too many tokens or bad file");
         return;
     }
 
-    json_t const *patchItems = json_getProperty(json, "patch");
+    json_t const *patchItems = json_getProperty(json, key_patch);
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
-        Notify("Patch not found\n");
+        Notify("Patch not found");
         return;
     }
 
@@ -190,10 +185,9 @@ extern "C" {
             memcpy(game_ver, procInfo.version, sizeof(game_ver));
             print_proc_info();
         }
-        const char *gpudump_name = "gpudump.elf";
         pid = procInfo.pid;
-        if (strcmp(procInfo.name, gpudump_name) == 0) {
-            final_printf("Omitting %s\n", gpudump_name);
+        if (procInfo.titleid[0] == 0) {
+            final_printf("procInfo.titleid == 0! Assuming %s is system process\n", procInfo.name);
             return 0;
         }
         get_key_init();

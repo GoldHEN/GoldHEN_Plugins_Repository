@@ -6,9 +6,6 @@ u8 arr16[2];
 u8 arr32[4];
 u8 arr64[8];
 
-char titleid[16] = {0};
-char game_elf[32] = {0};
-char game_ver[8] = {0};
 const char *hex_prefix = "0x";
 
 unsigned char *hexstrtochar2(const char *hexstr, s64 &size) {
@@ -57,12 +54,11 @@ unsigned char *hexstrtochar2(const char *hexstr, s64 &size) {
     }
 
     size = data_len;
-
     return data;
 }
 
 int sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length, uint64_t write) {
-    debug_printf("writing to memory at 0x%x\n", address);
+    debug_printf("writing to memory at 0x%lx\n", address);
     return orbis_syscall(108 + 90, pid, address, data, length, write);
 }
 
@@ -175,7 +171,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, value_, 2);
             return;
         } else {
-            debug_printf("type not found or unsupported");
+            final_printf("type not found or unsupported");
         }
     }
     return;
