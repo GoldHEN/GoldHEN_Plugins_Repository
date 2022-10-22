@@ -54,115 +54,13 @@ char const *note_val;
 char const *app_titleid_val;
 char const *app_elf_val;
 
-// memory stuff
-int pid = 0;
-u8 arr8[1];
-u8 arr16[2];
-u8 arr32[4];
-u8 arr64[8];
-
-char titleid[16] = {0};
-char game_elf[32] = {0};
-char game_ver[8] = {0};
-const char *hex_prefix = "0x";
-
-void patch_data1(const char *type, u64 addr, const char *value) {
-    if (type) {
-        int str_base = 16;
-        if (strcmp(type, patch_type_str[kbyte]) == 0) {
-            u8 real_value = 0;
-            if (prefix(hex_prefix, value)) {
-                real_value = strtol(value, NULL, str_base);
-            } else {
-                str_base = 10;
-                real_value = strtol(value, NULL, str_base);
-            }
-            memcpy(arr8, &real_value, sizeof(real_value));
-            sys_proc_rw(pid, addr, arr8, 1);
-            return;
-        } else if (strcmp(type, patch_type_str[kbytes16]) == 0) {
-            u16 real_value = 0;
-            if (prefix(hex_prefix, value)) {
-                real_value = strtol(value, NULL, str_base);
-            } else {
-                str_base = 10;
-                real_value = strtol(value, NULL, str_base);
-            }
-            memcpy(arr16, &real_value, sizeof(real_value));
-            sys_proc_rw(pid, addr, arr16, 2);
-            return;
-        } else if (strcmp(type, patch_type_str[kbytes32]) == 0) {
-            u32 real_value = 0;
-            if (prefix(hex_prefix, value)) {
-                real_value = strtol(value, NULL, str_base);
-            } else {
-                str_base = 10;
-                real_value = strtol(value, NULL, str_base);
-            }
-            memcpy(arr32, &real_value, sizeof(real_value));
-            sys_proc_rw(pid, addr, arr32, 4);
-            return;
-        } else if (strcmp(type, patch_type_str[kbytes64]) == 0) {
-            s64 real_value = 0;
-            if (prefix(hex_prefix, value)) {
-                real_value = strtoll(value, NULL, str_base);
-            } else {
-                str_base = 10;
-                real_value = strtoll(value, NULL, str_base);
-            }
-            memcpy(arr64, &real_value, sizeof(real_value));
-            sys_proc_rw(pid, addr, arr64, 8);
-            return;
-        } else if (strcmp(type, patch_type_str[kbytes]) == 0) {
-            s64 szb = 0;
-            u8 *bytearray = hexstrtochar2(value, szb);
-            sys_proc_rw(pid, addr, bytearray, szb);
-            return;
-        } else if (strcmp(type, patch_type_str[kfloat32]) == 0) {
-            final_printf("type: %s unsupported", type);
-            // strtod, atof crashes
-            return;
-        } else if (strcmp(type, patch_type_str[kfloat64]) == 0) {
-            final_printf("type: %s unsupported", type);
-            // strtod, atof crashes
-            return;
-        } else if (strcmp(type, patch_type_str[kutf8]) == 0) {
-            for (int i = 0; value[i] != '\0'; i++) {
-                u8 val_ = value[i];
-                u8 value_[1] = {val_};
-                sys_proc_rw(pid, addr, value_, 1);
-                addr++;
-            }
-            // null terminate string hack
-            u8 value_[1] = {0};
-            sys_proc_rw(pid, addr, value_, 1);
-            return;
-        } else if (strcmp(type, patch_type_str[kutf16]) == 0) {
-            for (int i = 0; value[i] != '\x00'; i++) {
-                u8 val_ = value[i];
-                u8 value_[2] = {val_, 0x00};
-                sys_proc_rw(pid, addr, value_, 2);
-                addr = addr + 2;
-            }
-            // null terminate string hack
-            u8 value_[2] = {0x00, 0x00};
-            sys_proc_rw(pid, addr, value_, 2);
-            return;
-        } else {
-            debug_printf("type not found or unsupported");
-        }
-    }
-    return;
-}
-
 void get_key_init() {
     u64 patch_lines = 0;
     u64 patch_items = 0;
     char *buffer;
     u64 size;
     char input_file[64];
-    snprintf(input_file, sizeof(input_file),
-             "/data/GoldHEN/patches/json/%s.json", titleid);
+    snprintf(input_file, sizeof(input_file), "/data/GoldHEN/patches/json/%s.json", titleid);
     int res = Read_File(input_file, &buffer, &size, 32);
     if (res) {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
