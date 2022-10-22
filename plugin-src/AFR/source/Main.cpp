@@ -46,12 +46,14 @@ module_start(size_t argc, const void *args) {
     proc_info procInfo;
 
     if (!sys_sdk_proc_info(&procInfo)) {
-        memcpy(titleid, procInfo.titleid, 16);
+        memcpy(titleid, procInfo.titleid, sizeof(titleid));
         print_proc_info();
     }
-
+    if (procInfo.titleid[0] == 0) {
+        final_printf("procInfo.titleid == 0! Assuming %s is system process\n", procInfo.name);
+        return 0;
+    }
     HOOK32(sceKernelOpen);
-
     return 0;
 }
 
