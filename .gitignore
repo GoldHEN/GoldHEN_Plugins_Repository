@@ -35,6 +35,7 @@
 *.bin
 *.elf
 *.oelf
+bin/*
 
 # Archives
 *.7z
@@ -42,4 +43,3 @@
 
 # Version file
 common/git_ver.h
-bin/**/*.txt
