@@ -31,7 +31,7 @@ FILE* fopen_hook(const char *path, const char *mode) {
                            FILE *(*)(const char *, const char *),
                            possible_path, mode);
 
-        debug_printf("possible_path: %s fp: 0x%08x len %li\n", possible_path, fp, strlen(possible_path));
+        debug_printf("possible_path: %s len %li\n", possible_path, strlen(possible_path));
         if (fp) return fp;
     }
 
