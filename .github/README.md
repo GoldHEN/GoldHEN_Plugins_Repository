@@ -35,9 +35,9 @@ Redirect file calls to `/data/`
 <summary>How To Use (Click to Expand)</summary>
 
 - Create a folder in `/data`
-  - `/data/GoldHEN/AFR/(title id)/app0`
-- Place files into newly created `app0` folder
-  - Example for `CUSA00001` `/app0/boot.txt` -> `/data/GoldHEN/AFR/CUSA00001/app0/boot.txt`
+  - `/data/GoldHEN/AFR/(title id)/`
+- Place files into newly created `(title id)` folder
+  - Example for `CUSA00001` `/app0/hello_afr.txt` -> `/data/GoldHEN/AFR/CUSA00001/hello_afr.txt`
 - Run your game.
 
 </details>
