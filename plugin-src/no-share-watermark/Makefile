@@ -1,7 +1,7 @@
 # Library metadata.
 BUILD_FOLDER := ../../bin/plugins
 OUTPUT_PRX   := no-share-watermark
-TARGET       := $(BUILD_FOLDER)/prx/$(OUTPUT_PRX).prx
+TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
 TARGETSTUB   := $(OUTPUT_PRX)_stub.so
 
 # Libraries linked into the ELF.
@@ -49,7 +49,7 @@ endif
 $(TARGET): $(INTDIR) $(OBJS)
 	$(LD) $(TOOLCHAIN)/lib/crtlib.o $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)
 	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
-	cp $(INTDIR)/$(PROJDIR).elf $(BUILD_FOLDER)/elf/$(OUTPUT_PRX).elf
+	cp $(INTDIR)/$(PROJDIR).elf $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
 
 $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
 	$(CC) $(INTDIR)/*.o.stub -o $(TARGETSTUB) -target x86_64-pc-linux-gnu -shared -fuse-ld=lld -ffreestanding -nostdlib -fno-builtin -L$(TOOLCHAIN)/lib $(LIBS)

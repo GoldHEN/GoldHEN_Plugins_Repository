@@ -48,18 +48,37 @@ jobs:
     - name: Build
       run: bash build.sh
 
-    - name: Push module artifact
+    - name: Build
+      run: bash build.sh 1
+
+    - name: Push module artifact (release)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_prx
-        path: bin/plugins/prx/*
+        name: goldplugins_${{ env.commit_ver }}_prx_final
+        path: bin/plugins/prx_final/*
         if-no-files-found: error
         retention-days: 7
 
-    - name: Push module artifact (original binary)
+    - name: Push module artifact (release original modules)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_elf
-        path: bin/plugins/elf/*
+        name: goldplugins_${{ env.commit_ver }}_elf_final
+        path: bin/plugins/elf_final/*
+        if-no-files-found: error
+        retention-days: 7
+
+    - name: Push module artifact (debug)
+      uses: actions/upload-artifact@v3
+      with:
+        name: goldplugins_${{ env.commit_ver }}_prx_debug
+        path: bin/plugins/prx_debug/*
+        if-no-files-found: error
+        retention-days: 7
+
+    - name: Push module artifact (debug original modules)
+      uses: actions/upload-artifact@v3
+      with:
+        name: goldplugins_${{ env.commit_ver }}_elf_debug
+        path: bin/plugins/elf_debug/*
         if-no-files-found: error
         retention-days: 7
