@@ -8,11 +8,40 @@
 const char *plugin_name = "AFR";
 
 HOOK_INIT(sceKernelOpen);
+HOOK_INIT(fopen);
 
 char titleid[16];
 
+FILE* fopen_hook(const char *path, const char *mode) {
+    debug_printf("path: %s len %li\n", path, strlen(path));
+    debug_printf("mode: %s\n", mode);
+
+    if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
+        path[4] == '0' && strlen(path) > 6) {
+        FILE* fp=NULL;
+        char possible_path[512];
+
+        memset(possible_path, 0, sizeof(possible_path));
+        strcpy(possible_path, "/data/GoldHEN/AFR/");
+        strcat(possible_path, titleid);
+        strcat(possible_path, "/");
+        strcat(possible_path, path + 6);
+
+        fp = HOOK_CONTINUE(fopen,
+                           FILE *(*)(const char *, const char *),
+                           possible_path, mode);
+
+        debug_printf("possible_path: %s fp: 0x%08x len %li\n", possible_path, fp, strlen(possible_path));
+        if (fp) return fp;
+    }
+
+        return HOOK_CONTINUE(fopen,
+                           FILE *(*)(const char *, const char *),
+                           path, mode);
+}
+
 int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
-    debug_printf("path: %s\n", path);
+    debug_printf("path: %s len %li\n", path, strlen(path));
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
@@ -29,7 +58,7 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
                            int (*)(const char *, int, OrbisKernelMode),
                            possible_path, flags, mode);
 
-        debug_printf("possible_path: %s fd: 0x%08x\n", possible_path, fd);
+        debug_printf("possible_path: %s fd: 0x%08x len %li\n", possible_path, fd, strlen(possible_path));
         if (fd >= 0) return fd;
     }
 
@@ -54,15 +83,15 @@ module_start(size_t argc, const void *args) {
         return 0;
     }
     HOOK32(sceKernelOpen);
+    HOOK32(fopen);
     return 0;
 }
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_stop(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
-
     UNHOOK(sceKernelOpen);
-
+    UNHOOK(fopen);
     return 0;
 }
 }
