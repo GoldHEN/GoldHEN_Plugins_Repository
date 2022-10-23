@@ -1,4 +1,4 @@
-#include "../include/patch.h"
+#include "patch.h"
 
 int pid = 0;
 u8 arr8[1];

@@ -2,9 +2,9 @@
 // Author: illusion0001 @ https://github.com/illusion0001
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
-#include "../include/patch.h"
-#include "../include/utils.h"
-#include "../include/tiny-json.h"
+#include "patch.h"
+#include "utils.h"
+#include "tiny-json.h"
 
 const char* plugin_name = "GamePatch";
 

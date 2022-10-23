@@ -1,4 +1,4 @@
-#include "../include/utils.h"
+#include "utils.h"
 
 const char* Notify_TexIcon = "cxml://psnotification/tex_icon_system";
 

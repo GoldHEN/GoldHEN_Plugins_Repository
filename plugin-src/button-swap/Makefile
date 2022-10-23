@@ -3,6 +3,7 @@ BUILD_FOLDER := ../../bin/plugins
 OUTPUT_PRX   := button_swap
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
 TARGETSTUB   := $(OUTPUT_PRX)_stub.so
+O_FLAG       := -O3
 
 # Libraries linked into the ELF.
 LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lSceSystemService
@@ -23,7 +24,7 @@ OBJS        := $(patsubst $(PROJDIR)/%.c, $(INTDIR)/%.o, $(CFILES)) $(patsubst $
 STUBOBJS    := $(patsubst $(PROJDIR)/%.c, $(INTDIR)/%.o, $(CFILES)) $(patsubst $(PROJDIR)/%.cpp, $(INTDIR)/%.o.stub, $(CPPFILES)) $(patsubst $(COMMONDIR)/%.cpp, $(INTDIR)/%.o.stub, $(COMMONFILES))
 
 # Define final C/C++ flags
-CFLAGS      := $(FINAL) --target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -c $(EXTRAFLAGS) -isysroot $(TOOLCHAIN) -isystem $(TOOLCHAIN)/$(INCLUDEDIR) -I$(GH_SDK)/include -O3
+CFLAGS      := $(FINAL) --target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -c $(EXTRAFLAGS) -isysroot $(TOOLCHAIN) -isystem $(TOOLCHAIN)/$(INCLUDEDIR) -I$(GH_SDK)/include -I$(INCLUDEDIR) $(O_FLAG)
 CXXFLAGS    := $(CFLAGS) -isystem $(TOOLCHAIN)/$(INCLUDEDIR)/c++/v1
 LDFLAGS     := -m elf_x86_64 -pie --script $(TOOLCHAIN)/link.x -e _init --eh-frame-hdr -L$(TOOLCHAIN)/lib -L$(GH_SDK) $(LIBS) 
 
@@ -61,10 +62,10 @@ $(INTDIR)/%.o: $(PROJDIR)/%.cpp
 	$(CCX) $(CXXFLAGS) -o $@ $<
 
 $(INTDIR)/%.o.stub: $(PROJDIR)/%.c
-	$(CC) -target x86_64-pc-linux-gnu -ffreestanding -nostdlib -fno-builtin -fPIC -O3 -s -c -o $@ $<
+	$(CC) -target x86_64-pc-linux-gnu -ffreestanding -nostdlib -fno-builtin -fPIC $(O_FLAG) -s -c -o $@ $<
 
 $(INTDIR)/%.o.stub: $(PROJDIR)/%.cpp
-	$(CCX) -target x86_64-pc-linux-gnu -ffreestanding -nostdlib -fno-builtin -fPIC -O3 -s -c -o $@ $<
+	$(CCX) -target x86_64-pc-linux-gnu -ffreestanding -nostdlib -fno-builtin -fPIC $(O_FLAG) -s -c -o $@ $<
 
 .PHONY: clean
 .DEFAULT_GOAL := all

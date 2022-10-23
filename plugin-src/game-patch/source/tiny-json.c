@@ -1,4 +1,3 @@
-
 /*
 
 <https://github.com/rafagafe/tiny-json>
@@ -29,7 +28,7 @@
 
 #include <string.h>
 #include <ctype.h>
-#include "../include/tiny-json.h"
+#include "tiny-json.h"
 
 /** Structure to handle a heap of JSON properties. */
 typedef struct jsonStaticPool_s {
