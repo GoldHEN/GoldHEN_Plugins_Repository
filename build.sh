@@ -1,21 +1,34 @@
 echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
 echo "#define GIT_VER \"$(git branch --show-current)\"" >> common/git_ver.h
 echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
-echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T (%Z %z)')\"" >> common/git_ver.h
+echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T')\"" >> common/git_ver.h
 
-FINAL="FINAL=-DFINAL=1 TYPE=_final"
-mkdir -p bin/plugins/prx_final bin/plugins/elf_final
+TYPE="_final"
+FINAL="FINAL=-DFINAL TYPE=$TYPE $O_FLAG"
+
+if [ $2 -gt "0" ]
+then
+    echo "[+] Building without compiler optimization"
+    O_FLAG="O_FLAG="
+fi
 
 if [ $1 -gt "0" ]
 then
-    mkdir -p bin/plugins/prx_debug bin/plugins/elf_debug
-    FINAL="FINAL= TYPE=_debug"
+    echo "[+] Building with Debug flag"
+    TYPE="_debug"
+    FINAL="FINAL= TYPE=$TYPE $O_FLAG"
 fi
+
+BUILD_PRX="bin/plugins/prx$TYPE"
+BUILD_ELF="bin/plugins/elf$TYPE"
+
+rm -rf $BUILD_PRX $BUILD_ELF
+mkdir -p $BUILD_PRX $BUILD_ELF
 
 cd plugin-src
 for dir in ./*
   do
-    echo "$dir"
+    echo "[+] build dir: $dir"
     cd "$dir"
     make clean $FINAL || exit 1
     make $FINAL || exit 1
@@ -24,20 +37,16 @@ for dir in ./*
 
 cd ..
 
-BUILD=bin/plugins/prx_final
+BUILD=$BUILD_PRX
+BUILD_MD5="md5.txt"
+BUILD_SHA256="sha256.txt"
 
-if [ $1 -gt "0" ]
-then
-    BUILD=bin/plugins/prx_debug
-fi
-
-touch $BUILD/md5.txt $BUILD/sha256.txt
-echo "MD5:" > $BUILD/md5.txt
-echo "SHA256:" > $BUILD/sha256.txt
+echo "MD5:" > $BUILD/$BUILD_MD5
+echo "SHA256:" > $BUILD/$BUILD_SHA256
 
 FILES="$BUILD/*.prx"
 for f in $FILES
   do
-    echo "$(sha256sum $f)" >> $BUILD/sha256.txt
-    echo "$(md5sum $f)" >> $BUILD/md5.txt
+    echo "$(sha256sum $f)" >> $BUILD/$BUILD_MD5
+    echo "$(md5sum $f)" >> $BUILD/$BUILD_SHA256
   done

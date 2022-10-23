@@ -46,10 +46,10 @@ jobs:
         echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
 
     - name: Build (Release)
-      run: bash build.sh
+      run: bash build.sh 0 0
 
     - name: Build (Debug)
-      run: bash build.sh 1
+      run: bash build.sh 1 0
 
     - name: Push module artifact (release prx)
       uses: actions/upload-artifact@v3
