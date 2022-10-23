@@ -83,7 +83,7 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
     snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
              title_id, elf);
     output_hash = hash(hash_str);
-    final_printf("input \"%s\"\n", hash_str);
+    final_printf("input: \"%s\"\n", hash_str);
     final_printf("output: 0x%016lx\n", output_hash);
     return output_hash;
 }
@@ -141,11 +141,11 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, bytearray, szb);
             return;
         } else if (strcmp(type, patch_type_str[kfloat32]) == 0) {
-            final_printf("type: %s unsupported", type);
+            final_printf("type: %s unsupported\n", type);
             // strtod, atof crashes
             return;
         } else if (strcmp(type, patch_type_str[kfloat64]) == 0) {
-            final_printf("type: %s unsupported", type);
+            final_printf("type: %s unsupported\n", type);
             // strtod, atof crashes
             return;
         } else if (strcmp(type, patch_type_str[kutf8]) == 0) {
@@ -171,7 +171,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, value_, 2);
             return;
         } else {
-            final_printf("type not found or unsupported");
+            final_printf("type not found or unsupported\n");
         }
     }
     return;
