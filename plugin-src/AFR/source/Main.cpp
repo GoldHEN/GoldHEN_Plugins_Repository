@@ -34,8 +34,8 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
     }
 
     return HOOK_CONTINUE(sceKernelOpen,
-                         int (*)(const char *, int, OrbisKernelMode), path,
-                         flags, mode);
+                         int (*)(const char *, int, OrbisKernelMode),
+                         path, flags, mode);
 }
 
 extern "C" {
