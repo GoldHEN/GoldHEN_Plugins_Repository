@@ -67,12 +67,11 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
                          path, flags, mode);
 }
 
-extern "C" {
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
     boot_ver();
-    proc_info procInfo;
+    struct proc_info procInfo;
 
     if (!sys_sdk_proc_info(&procInfo)) {
         memcpy(titleid, procInfo.titleid, sizeof(titleid));
@@ -93,5 +92,4 @@ module_stop(size_t argc, const void *args) {
     UNHOOK(sceKernelOpen);
     UNHOOK(fopen);
     return 0;
-}
 }

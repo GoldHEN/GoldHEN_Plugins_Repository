@@ -43,25 +43,23 @@ s32 sceScreenShotDisable_hook(){
     return 0;
 }
 
-extern "C" {
-    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
-        final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
-        boot_ver();
-        sceSysmoduleLoadModule(0x009c);
-        sceSysmoduleLoadModule(0x0085);
-        HOOK32(sceScreenShotSetOverlayImage);
-        HOOK32(sceScreenShotSetOverlayImageWithOrigin);
-        HOOK32(sceVideoRecordingSetInfo);
-        HOOK32(sceScreenShotDisable);
-        return 0;
-    }
+s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
+    final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
+    boot_ver();
+    sceSysmoduleLoadModule(0x009c);
+    sceSysmoduleLoadModule(0x0085);
+    HOOK32(sceScreenShotSetOverlayImage);
+    HOOK32(sceScreenShotSetOverlayImageWithOrigin);
+    HOOK32(sceVideoRecordingSetInfo);
+    HOOK32(sceScreenShotDisable);
+    return 0;
+}
 
-    s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
-        final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
-        UNHOOK(sceScreenShotSetOverlayImage);
-        UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
-        UNHOOK(sceVideoRecordingSetInfo);
-        UNHOOK(sceScreenShotDisable);
-        return 0;
-    }
+s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
+    final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
+    UNHOOK(sceScreenShotSetOverlayImage);
+    UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
+    UNHOOK(sceVideoRecordingSetInfo);
+    UNHOOK(sceScreenShotDisable);
+    return 0;
 }
