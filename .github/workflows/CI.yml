@@ -45,10 +45,10 @@ jobs:
         make
         echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
 
-    - name: Build
+    - name: Build (Release)
       run: bash build.sh
 
-    - name: Build
+    - name: Build (Debug)
       run: bash build.sh 1
 
     - name: Push module artifact (release)
