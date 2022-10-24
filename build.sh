@@ -4,7 +4,7 @@ echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
 echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T')\"" >> common/git_ver.h
 
 TYPE="_final"
-FINAL="FINAL=-DFINAL TYPE=$TYPE $O_FLAG"
+FINAL="FINAL=-D__FINAL__=1 TYPE=$TYPE $O_FLAG"
 
 if [ $2 -gt "0" ]
 then
@@ -16,7 +16,7 @@ if [ $1 -gt "0" ]
 then
     echo "[+] Building with Debug flag"
     TYPE="_debug"
-    FINAL="FINAL= TYPE=$TYPE $O_FLAG"
+    FINAL="FINAL=-D__FINAL__=0 TYPE=$TYPE $O_FLAG"
 fi
 
 BUILD_PRX="bin/plugins/prx$TYPE"
