@@ -310,7 +310,7 @@ int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[], in
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void* args) {
-    final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
+    final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
 
     int h = 0;
