@@ -141,12 +141,14 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, bytearray, szb);
             return;
         } else if (strcmp(type, "float32") == 0) {
-            final_printf("type: %s unsupported\n", type);
-            // strtod, atof crashes
+            float real_value = strtod(value, NULL);
+            memcpy(arr32, &real_value, sizeof(real_value));
+            sys_proc_rw(pid, addr, arr32, 4);
             return;
         } else if (strcmp(type, "float64") == 0) {
-            final_printf("type: %s unsupported\n", type);
-            // strtod, atof crashes
+            double real_value = strtod(value, NULL);
+            memcpy(arr32, &real_value, sizeof(real_value));
+            sys_proc_rw(pid, addr, arr32, 8);
             return;
         } else if (strcmp(type, "utf8") == 0) {
             for (int i = 0; value[i] != '\0'; i++) {
