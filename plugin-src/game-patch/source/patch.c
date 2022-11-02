@@ -57,9 +57,10 @@ unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
     return data;
 }
 
-int sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length) {
+void sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length) {
     debug_printf("writing to memory at 0x%lx\n", address);
-    return orbis_syscall(108 + 90, pid, address, data, length, 1);
+    orbis_syscall(108 + 90, pid, address, data, length, 1);
+    return;
 }
 
 // https://stackoverflow.com/a/4770992
@@ -91,6 +92,10 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
 void patch_data1(const char *type, u64 addr, const char *value) {
     if (type) {
         int str_base = 16;
+        memset(arr8,  0, sizeof(arr8));
+        memset(arr16, 0, sizeof(arr16));
+        memset(arr32, 0, sizeof(arr32));
+        memset(arr64, 0, sizeof(arr64));
         if (strcmp(type, "byte") == 0) {
             u8 real_value = 0;
             if (prefix(hex_prefix, value)) {
@@ -141,12 +146,14 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(pid, addr, bytearray, szb);
             return;
         } else if (strcmp(type, "float32") == 0) {
-            float real_value = strtod(value, NULL);
+            float real_value = 0;
+            real_value = strtod(value, NULL);
             memcpy(arr32, &real_value, sizeof(arr32));
             sys_proc_rw(pid, addr, arr32, sizeof(arr32));
             return;
         } else if (strcmp(type, "float64") == 0) {
-            double real_value = strtod(value, NULL);
+            double real_value = 0;
+            real_value = strtod(value, NULL);
             memcpy(arr64, &real_value, sizeof(arr64));
             sys_proc_rw(pid, addr, arr64, sizeof(arr64));
             return;
@@ -158,7 +165,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 addr++;
             }
             // null terminate string hack
-            u8 value_[1] = {0};
+            u8 value_[1] = { 0x00 };
             sys_proc_rw(pid, addr, value_, 1);
             return;
         } else if (strcmp(type, "utf16") == 0) {
