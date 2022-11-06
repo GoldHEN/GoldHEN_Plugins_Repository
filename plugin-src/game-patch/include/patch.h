@@ -34,7 +34,7 @@ extern char game_elf[32];
 extern char game_ver[8];
 
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size);
-void sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length);
+void sys_proc_rw(uint64_t address, void *data, uint64_t length);
 bool prefix(const char *pre, const char *str);
 u64 hash(const char *str);
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,

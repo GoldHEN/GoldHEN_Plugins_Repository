@@ -57,9 +57,20 @@ unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
     return data;
 }
 
-void sys_proc_rw(uint64_t pid, uint64_t address, void *data, uint64_t length) {
-    debug_printf("writing to memory at 0x%lx\n", address);
-    orbis_syscall(108 + 90, pid, address, data, length, 1);
+void sys_proc_rw(uint64_t address, void *data, uint64_t length) {
+    struct proc_rw process_rw_data;
+    process_rw_data.address = address;
+    process_rw_data.data = data;
+    process_rw_data.length = length;
+    process_rw_data.write_flags = 1;
+    #if(__FINAL__) == 0
+    debug_printf("process_rw_data: %p\n", &process_rw_data);
+    debug_printf("address: 0x%lx\n", process_rw_data.address);
+    debug_printf("hex_dump: ");
+    hex_dump(process_rw_data.data, process_rw_data.length);
+    debug_printf("length: 0x%lx\n", process_rw_data.length);
+    #endif
+    sys_sdk_proc_rw(&process_rw_data);
     return;
 }
 
@@ -84,8 +95,8 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
     snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
              title_id, elf);
     output_hash = hash(hash_str);
-    final_printf("input: \"%s\"\n", hash_str);
-    final_printf("output: 0x%016lx\n", output_hash);
+    debug_printf("input: \"%s\"\n", hash_str);
+    debug_printf("output: 0x%016lx\n", output_hash);
     return output_hash;
 }
 
@@ -105,7 +116,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 real_value = strtol(value, NULL, str_base);
             }
             memcpy(arr8, &real_value, sizeof(arr8));
-            sys_proc_rw(pid, addr, arr8, sizeof(arr8));
+            sys_proc_rw(addr, arr8, sizeof(arr8));
             return;
         } else if (strcmp(type, "bytes16") == 0) {
             u16 real_value = 0;
@@ -116,7 +127,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 real_value = strtol(value, NULL, str_base);
             }
             memcpy(arr16, &real_value, sizeof(arr16));
-            sys_proc_rw(pid, addr, arr16, sizeof(arr16));
+            sys_proc_rw(addr, arr16, sizeof(arr16));
             return;
         } else if (strcmp(type, "bytes32") == 0) {
             u32 real_value = 0;
@@ -127,7 +138,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 real_value = strtol(value, NULL, str_base);
             }
             memcpy(arr32, &real_value, sizeof(arr32));
-            sys_proc_rw(pid, addr, arr32, sizeof(arr32));
+            sys_proc_rw(addr, arr32, sizeof(arr32));
             return;
         } else if (strcmp(type, "bytes64") == 0) {
             s64 real_value = 0;
@@ -138,46 +149,46 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 real_value = strtoll(value, NULL, str_base);
             }
             memcpy(arr64, &real_value, sizeof(arr64));
-            sys_proc_rw(pid, addr, arr64, sizeof(arr64));
+            sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "bytes") == 0) {
             s64 szb = 0;
             u8 *bytearray = hexstrtochar2(value, &szb);
-            sys_proc_rw(pid, addr, bytearray, szb);
+            sys_proc_rw(addr, bytearray, szb);
             return;
         } else if (strcmp(type, "float32") == 0) {
             float real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr32, &real_value, sizeof(arr32));
-            sys_proc_rw(pid, addr, arr32, sizeof(arr32));
+            sys_proc_rw(addr, arr32, sizeof(arr32));
             return;
         } else if (strcmp(type, "float64") == 0) {
             double real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr64, &real_value, sizeof(arr64));
-            sys_proc_rw(pid, addr, arr64, sizeof(arr64));
+            sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "utf8") == 0) {
             for (int i = 0; value[i] != '\0'; i++) {
                 u8 val_ = value[i];
                 u8 value_[1] = {val_};
-                sys_proc_rw(pid, addr, value_, sizeof(value_));
+                sys_proc_rw(addr, value_, sizeof(value_));
                 addr++;
             }
             // null terminate string hack
             u8 value_[1] = { 0x00 };
-            sys_proc_rw(pid, addr, value_, 1);
+            sys_proc_rw(addr, value_, sizeof(value_));
             return;
         } else if (strcmp(type, "utf16") == 0) {
             for (int i = 0; value[i] != '\x00'; i++) {
                 u8 val_ = value[i];
                 u8 value_[2] = {val_, 0x00};
-                sys_proc_rw(pid, addr, value_, sizeof(value_));
+                sys_proc_rw(addr, value_, sizeof(value_));
                 addr = addr + 2;
             }
             // null terminate string hack
             u8 value_[2] = {0x00, 0x00};
-            sys_proc_rw(pid, addr, value_, sizeof(value_));
+            sys_proc_rw(addr, value_, sizeof(value_));
             return;
         } else {
             final_printf("type not found or unsupported\n");
