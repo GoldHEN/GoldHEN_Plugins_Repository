@@ -75,11 +75,6 @@ int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], int 
 /////hook code////
 
 int sceKernelAioInitializeImpl_hook(void* p, int size) {
-    id_index = 1;
-
-    id_state = (int*)malloc(sizeof(int) * MAX_QUEUE);
-
-    memset(id_state, 0, sizeof(sizeof(int) * MAX_QUEUE));
 
     return 0;
 }
@@ -192,8 +187,10 @@ int sceKernelAioWaitRequests_hook(SceKernelAioSubmitId id[], int num, int state[
 
 int sceKernelAioSubmitReadCommands_hook(SceKernelAioRWRequest req[], int size, int prio,
                                         SceKernelAioSubmitId* id) {
+
+    id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
+
     for (int i = 0; i < size; i++) {
-        id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
 
         ssize_t ret = sceKernelPread(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
 
@@ -201,15 +198,14 @@ int sceKernelAioSubmitReadCommands_hook(SceKernelAioRWRequest req[], int size, i
             req[i].result->state = SCE_KERNEL_AIO_STATE_ABORTED;
             req[i].result->returnValue = ret;
 
-            id_state[id_index] = SCE_KERNEL_AIO_STATE_ABORTED;
-
         } else {
             req[i].result->state = SCE_KERNEL_AIO_STATE_COMPLETED;
             req[i].result->returnValue = ret;
 
-            id_state[id_index] = SCE_KERNEL_AIO_STATE_COMPLETED;
         }
     }
+
+    id_state[id_index] = SCE_KERNEL_AIO_STATE_COMPLETED;
 
     *id = id_index;
 
@@ -312,6 +308,12 @@ int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void* args) {
     final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
     boot_ver();
+
+    id_index = 1;
+
+    id_state = (int*)malloc(sizeof(int) * MAX_QUEUE);
+
+    memset(id_state, 0, sizeof(sizeof(int) * MAX_QUEUE));
 
     int h = 0;
 
