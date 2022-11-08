@@ -9,13 +9,14 @@
 #define s32 int32_t
 #define s64 int64_t
 
-#ifdef FINAL
+#if (__FINAL__) == 1
 #define BUILD_TYPE "(Release)"
 #define debug_printf(a, args...)
 #else
 #define BUILD_TYPE "(Debug)"
 #define debug_printf(a, args...) printf("[%s] (%s:%d) " a,  __func__,__FILE__, __LINE__, ##args)
 #endif
+
 #define final_printf(a, args...) printf("(%s:%d) " a, __FILE__, __LINE__, ##args)
 #define boot_ver() {\
   final_printf("Commit: %s Branch: %s Build: %i %s\n", GIT_COMMIT, GIT_VER, GIT_NUM, BUILD_TYPE);\

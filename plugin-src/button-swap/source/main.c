@@ -22,7 +22,7 @@ int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_start(size_t argc, const void *args) {
-    final_printf("[GoldHEN] <%s> module_start\n", plugin_name);
+    final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     int h = 0;
     sys_dynlib_load_prx("libSceSystemService.sprx", &h);
@@ -33,7 +33,7 @@ module_start(size_t argc, const void *args) {
 
 int __attribute__((weak)) __attribute__((visibility("hidden")))
 module_stop(size_t argc, const void *args) {
-    final_printf("[GoldHEN] <%s> module_stop\n", plugin_name);
+    final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     UNHOOK(sceSystemServiceParamGetInt);
     return 0;
 }

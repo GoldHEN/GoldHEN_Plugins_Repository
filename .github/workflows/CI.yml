@@ -9,11 +9,20 @@ on:
       - '**/*.yml'
       - '**/Makefile'
       - '**/.sh'
+      - '**/.bat'
   pull_request:
+    paths:
+      - '**/*.c'
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.yml'
+      - '**/Makefile'
+      - '**/.sh'
+      - '**/.bat'
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
 
@@ -51,7 +60,7 @@ jobs:
     - name: Build (Debug)
       run: bash build.sh 1 0
 
-    - name: Push module artifact (release prx)
+    - name: Push module artifact (Release prx)
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_final
@@ -59,7 +68,7 @@ jobs:
         if-no-files-found: error
         retention-days: 7
 
-    - name: Push module artifact (release elf)
+    - name: Push module artifact (Release elf)
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_elf_final
@@ -67,7 +76,7 @@ jobs:
         if-no-files-found: error
         retention-days: 7
 
-    - name: Push module artifact (debug prx)
+    - name: Push module artifact (Debug prx)
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_debug
@@ -75,10 +84,44 @@ jobs:
         if-no-files-found: error
         retention-days: 7
 
-    - name: Push module artifact (debug elf)
+    - name: Push module artifact (Debug elf)
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_elf_debug
         path: bin/plugins/elf_debug/*
         if-no-files-found: error
         retention-days: 7
+
+  # only to check if build environment is working
+  build-win32:
+    runs-on: windows-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Checkout SDK
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.my_token }}
+        repository: GoldHEN/GoldHEN_Plugins_SDK
+        path: SDK
+
+    - name: Download OpenOrbis Toolchain
+      shell: bash
+      run: |
+        curl -fLOs https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
+        tar xf toolchain.tar.gz
+        echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
+        echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
+
+    - name: Build SDK Lib
+      working-directory: SDK
+      run: .\build_static.bat
+
+    - name: Build
+      run: |
+        .\build.bat
+        ls bin\plugins

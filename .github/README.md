@@ -46,14 +46,13 @@ Redirect file calls to `/data/`
 
 ## Requirements
 
-- [GoldHEN Plugin SDK](https://github.com/GoldHEN/GoldHEN_Plugins_SDK)
+- [LLVM 10+](https://llvm.org/)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
+- [GoldHEN Plugin SDK](https://github.com/GoldHEN/GoldHEN_Plugins_SDK)
 
-## Libraries used
+## Build
 
-- [tiny-json](https://github.com/rafagafe/tiny-json)
-
-## Setup
+### Linux
 
 1. Export path to OpenOrbis SDK.
 
@@ -66,3 +65,15 @@ export OO_PS4_TOOLCHAIN=[directory of installation]
 export GOLDHEN_SDK=[directory of installation]
 ```
 3. Run `./build.sh` You can find built binaries in `bin/plugins`.
+
+### Windows
+
+1. Set environment variable to OpenOrbis and GoldHEN SDK
+
+2. Run `build_static.bat` in GoldHEN SDK repository to build the library statically.
+
+3. Run `build.bat` to build all the modules at once.
+
+## Libraries used
+
+- [tiny-json](https://github.com/rafagafe/tiny-json)
