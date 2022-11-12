@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "../../../common/plugin_common.h"
 
-const char *plugin_name = "AFR";
+#define plugin_name "AFR"
 
 HOOK_INIT(sceKernelOpen);
 HOOK_INIT(fopen);

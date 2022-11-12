@@ -6,7 +6,7 @@
 #include "tiny-json.h"
 #include "utils.h"
 
-const char *plugin_name = "GamePatch";
+#define plugin_name "GamePatch"
 
 const char *key_patch = "patch";
 const char *key_title = "title";

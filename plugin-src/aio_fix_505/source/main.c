@@ -4,7 +4,7 @@
 #include "../../../common/plugin_common.h"
 #include "Common.h"
 
-const char* plugin_name = "async-io-fix";
+#define plugin_name "async-io-fix"
 
 HOOK_INIT(sceKernelAioInitializeImpl);
 HOOK_INIT(sceKernelAioDeleteRequest);

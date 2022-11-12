@@ -4,7 +4,7 @@
 #include "../../../common/plugin_common.h"
 #include "Common.h"
 
-const char *plugin_name = "button-swap";
+#define plugin_name "button-swap"
 
 int32_t (*sceSystemServiceParamGetInt)(int32_t paramId, int32_t *value);
 

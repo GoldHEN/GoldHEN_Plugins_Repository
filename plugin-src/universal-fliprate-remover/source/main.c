@@ -9,7 +9,7 @@
 #include <orbis/VideoOut.h>
 #include "../../../common/plugin_common.h"
 
-const char* plugin_name = "fliprate-remover";
+#define plugin_name "fliprate-remover"
 
 HOOK_INIT(sceVideoOutSetFlipRate);
 

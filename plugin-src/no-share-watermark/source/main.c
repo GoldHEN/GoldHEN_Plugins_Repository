@@ -10,7 +10,7 @@
 #include <orbis/VideoRecording.h>
 #include "../../../common/plugin_common.h"
 
-const char* plugin_name = "no-share-block";
+#define plugin_name "no-share-block"
 
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
