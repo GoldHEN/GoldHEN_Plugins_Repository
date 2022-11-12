@@ -160,7 +160,8 @@ bool ini_table_read_from_file(ini_table_s *table, const char *file) {
                 if (current_section == NULL) {
                     current_section = _ini_section_create(table, "");
                 }
-                buf[strlen(buf) - 1] = '\0';
+                if (buf[strlen(buf) - 1] == '\r') // seek one char backwards
+                    buf[strlen(buf) - 1] = '\0';
                 _ini_entry_create(current_section, buf, "");
             } else if (state == Comment) {
                 if (current_section == NULL) {
