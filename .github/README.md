@@ -2,43 +2,12 @@
 GoldHEN Plugins for PlayStation 4.
 
 ## Plugins
-
-#### Plugin Manager
-Manage installed plugins.
-
-```ini
-; Load all plugins in `GoldHEN_plugins` section
-[GoldHEN_plugins]
-/data/GoldHEN/plugins/example.prx
-/data/GoldHEN/plugins/example2.prx
-```
-
-#### No Share Blocks
-Removes arbitrary limitations when using Share Button in Games.
-
-#### Fliprate Remover
-Removes framerate limit for games using system library `sceVideoOutSetFlipRate`.
-
-#### Game Patch
-Patches game before boot.
-
-<details>
-<summary>How To Use (Click to Expand)</summary>
-
-- Download zip from [console-game-patches](https://github.com/illusion0001/console-game-patches/raw/gh-pages/patch1.zip)
-- Extract it to `/data/GoldHEN/`
-- Patches can be enabled/disabled in following apps:
-  - GoldHEN Patch Settings
-  - GoldHEN Cheat Manager
-  - Itemzflow
-- Run your game.
-
-</details>
-
-#### Button Swap
-Swap X and O around on Asia Region console.
-
 #### Application File Redirector
+
+Author(s):
+- [SiSTR0](https://github.com/SiSTR0)
+- [jocover](https://github.com/jocover)
+
 Redirect file calls to `/data/`
 
 <details>
@@ -51,6 +20,66 @@ Redirect file calls to `/data/`
 - Run your game.
 
 </details>
+
+#### Button Swap
+
+Author(s):
+- [jocover](https://github.com/jocover)
+
+Swap X and O around on Asia Region console.
+
+#### Fliprate Remover
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+
+Removes framerate limit for games using system library `sceVideoOutSetFlipRate`.
+
+#### Game Patch
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+
+Patches game before boot.
+
+##### Libraries used
+
+- [tiny-json](https://github.com/rafagafe/tiny-json)
+
+<details>
+<summary>How To Use (Click to Expand)</summary>
+
+- Download zip from [GoldHEN_Patch_Repository](https://github.com/GoldHEN/GoldHEN_Patch_Repository/raw/gh-pages/patch1.zip)
+- Extract it to `/data/GoldHEN/`
+- Patches can be configured via:
+  - GoldHEN Patch Settings
+  - GoldHEN Cheat Manager
+  - Itemzflow Game Manager
+- Run your game.
+
+</details>
+
+#### Plugin Manager
+
+Author(s):
+- [Ctn123](https://github.com/Ctn123)
+
+Manage installed plugins.
+
+```ini
+; Load all plugins in `GoldHEN_plugins` section
+[GoldHEN_plugins]
+/data/GoldHEN/plugins/example.prx
+/data/GoldHEN/plugins/example2.prx
+```
+
+#### No Share Blocks
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+- [nik](https://github.com/nkrapivin)
+
+Removes arbitrary limitations when using Share Button in Games.
 
 # Building
 
@@ -79,11 +108,5 @@ export GOLDHEN_SDK=[directory of installation]
 ### Windows
 
 1. Set environment variable to OpenOrbis and GoldHEN SDK
-
 2. Run `build_static.bat` in GoldHEN SDK repository to build the library statically.
-
 3. Run `build.bat` to build all the modules at once.
-
-## Libraries used
-
-- [tiny-json](https://github.com/rafagafe/tiny-json)
