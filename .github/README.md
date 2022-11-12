@@ -3,6 +3,16 @@ GoldHEN Plugins for PlayStation 4.
 
 ## Plugins
 
+#### Plugin Manager
+Manage installed plugins.
+
+```ini
+; Load all plugins in `GoldHEN_plugins` section
+[GoldHEN_plugins]
+/data/GoldHEN/plugins/example.prx
+/data/GoldHEN/plugins/example2.prx
+```
+
 #### No Share Blocks
 Removes arbitrary limitations when using Share Button in Games.
 
