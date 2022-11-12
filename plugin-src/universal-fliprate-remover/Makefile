@@ -1,7 +1,8 @@
 # Library metadata.
-BUILD_FOLDER := ../../bin/plugins
+BUILD_FOLDER := $(shell pwd)/../../bin/plugins
 OUTPUT_PRX   := fliprate-remover
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
+TARGET_ELF   := $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
 TARGETSTUB   := $(OUTPUT_PRX)_stub.so
 O_FLAG       := -O3
 
@@ -48,9 +49,8 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 $(TARGET): $(INTDIR) $(OBJS)
-	$(LD) $(TOOLCHAIN)/lib/crtlib.o $(INTDIR)/*.o -o $(INTDIR)/$(PROJDIR).elf $(LDFLAGS)
-	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(INTDIR)/$(PROJDIR).elf -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
-	cp $(INTDIR)/$(PROJDIR).elf $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
+	$(LD) $(GH_SDK)/build/crtprx.o $(INTDIR)/*.o -o $(TARGET_ELF) $(LDFLAGS)
+	$(TOOLCHAIN)/bin/$(CDIR)/create-fself -in=$(TARGET_ELF) -out=$(INTDIR)/$(PROJDIR).oelf --lib=$(TARGET) --paid 0x3800000000000011
 
 $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
 	$(CC) $(INTDIR)/*.o.stub -o $(TARGETSTUB) -target x86_64-pc-linux-gnu -shared -fuse-ld=lld -ffreestanding -nostdlib -fno-builtin -L$(TOOLCHAIN)/lib $(LIBS)
