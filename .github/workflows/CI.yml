@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
+  build-prx:
     runs-on: ubuntu-latest
     steps:
 
