@@ -47,18 +47,18 @@ jobs:
         ver="1.$(git rev-list HEAD --count)"
         echo "commit_ver=$ver" >> $GITHUB_ENV
 
-    - name: Build SDK Lib
+    - name: Build SDK Static Lib
       working-directory: SDK
       run: |
         clang -v
         make
-        echo "GOLDHEN_SDK=$GITHUB_WORKSPACE/SDK" >> $GITHUB_ENV
+        echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
 
     - name: Build (Release)
-      run: bash build.sh 0 0
+      run: bash build.sh
 
     - name: Build (Debug)
-      run: bash build.sh 1 0
+      run: bash build.sh -debug
 
     - name: Push module artifact (Release prx)
       uses: actions/upload-artifact@v3

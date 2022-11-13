@@ -6,13 +6,13 @@ echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T')\"" >> common/git_ver.h
 TYPE="_final"
 FINAL="FINAL=-D__FINAL__=1 TYPE=$TYPE $O_FLAG"
 
-if [ $2 -gt "0" ]
+if [ $2 == "-no_opt" ]
 then
     echo "[+] Building without compiler optimization"
     O_FLAG="O_FLAG="
 fi
 
-if [ $1 -gt "0" ]
+if [ $1 == "-debug" ]
 then
     echo "[+] Building with Debug flag"
     TYPE="_debug"
