@@ -9,6 +9,8 @@
 #define s32 int32_t
 #define s64 int64_t
 
+#define attr_module_hidden __attribute__((weak)) __attribute__((visibility("hidden")))
+
 #if (__FINAL__) == 1
 #define BUILD_TYPE "(Release)"
 #define debug_printf(a, args...)

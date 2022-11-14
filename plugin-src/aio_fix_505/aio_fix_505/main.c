@@ -304,8 +304,7 @@ int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[], in
     return 0;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_start(size_t argc, const void* args) {
+int attr_module_hidden module_start(size_t argc, const void* args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
 
@@ -354,8 +353,7 @@ module_start(size_t argc, const void* args) {
     return 0;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_stop(size_t argc, const void* args) {
+int attr_module_hidden module_stop(size_t argc, const void* args) {
     final_printf("[GoldHEN] <aio> module_stop\n");
 
     UNHOOK(sceKernelAioInitializeImpl);

@@ -26,7 +26,7 @@ void load_plugins(ini_section_s *section) {
     return;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
+int attr_module_hidden module_start(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     mkdir(SETTINGS_PATH, 0777);
@@ -81,7 +81,7 @@ int __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(siz
     return 0;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
+int attr_module_hidden module_stop(size_t argc, const void *args) {
     final_printf("Plugin Manager ended successfully\n");
     return 0;
 }

@@ -165,8 +165,7 @@ void make_folders() {
     return;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_start(s64 argc, const void *args) {
+int attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     make_folders();
@@ -183,8 +182,7 @@ module_start(s64 argc, const void *args) {
     return 0;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_stop(s64 argc, const void *args) {
+int attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     return 0;
 }

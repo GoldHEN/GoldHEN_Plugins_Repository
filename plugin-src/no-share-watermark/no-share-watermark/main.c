@@ -43,7 +43,7 @@ s32 sceScreenShotDisable_hook(){
     return 0;
 }
 
-s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(size_t argc, const void *args) {
+s32 attr_module_hidden module_start(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     sceSysmoduleLoadModule(0x009c);
@@ -55,7 +55,7 @@ s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_start(siz
     return 0;
 }
 
-s32 __attribute__((weak)) __attribute__((visibility("hidden"))) module_stop(size_t argc, const void *args) {
+s32 attr_module_hidden module_stop(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     UNHOOK(sceScreenShotSetOverlayImage);
     UNHOOK(sceScreenShotSetOverlayImageWithOrigin);

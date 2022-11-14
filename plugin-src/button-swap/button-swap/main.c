@@ -20,8 +20,7 @@ int32_t sceSystemServiceParamGetInt_hook(int32_t paramId, int32_t *value) {
     return ret;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_start(size_t argc, const void *args) {
+int attr_module_hidden module_start(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     int h = 0;
@@ -31,8 +30,7 @@ module_start(size_t argc, const void *args) {
     return 0;
 }
 
-int __attribute__((weak)) __attribute__((visibility("hidden")))
-module_stop(size_t argc, const void *args) {
+int attr_module_hidden module_stop(size_t argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     UNHOOK(sceSystemServiceParamGetInt);
     return 0;
