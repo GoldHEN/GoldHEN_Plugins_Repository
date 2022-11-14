@@ -1,10 +1,13 @@
 // Author: jocover @ https://github.com/jocover
-// Repository: https://github.com/GoldHEN/GoldHEN_Plugins
+// Repository: https://github.com/GoldHEN/GoldHEN_Plugins_Repository
 
 #include "plugin_common.h"
 #include "Common.h"
 
-#define PLUGIN_NAME "button_swap"
+attr_public const char *g_pluginName = "button_swap";
+attr_public const char *g_pluginDesc = "Swap X and O in Asia PS4";
+attr_public const char *g_pluginAuth = "jocover";
+attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
 s32 (*sceSystemServiceParamGetInt)(s32 paramId, s32 *value);
 
@@ -21,7 +24,8 @@ s32 sceSystemServiceParamGetInt_hook(s32 paramId, s32 *value) {
 }
 
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
-    final_printf("[GoldHEN] <%s> %s\n", PLUGIN_NAME, __func__);
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
+    final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
     s32 h = 0;
     sys_dynlib_load_prx("libSceSystemService.sprx", &h);
@@ -31,7 +35,7 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
 }
 
 s32 attr_module_hidden module_stop(s64 argc, const void *args) {
-    final_printf("[GoldHEN] <%s> %s\n", PLUGIN_NAME, __func__);
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     UNHOOK(sceSystemServiceParamGetInt);
     return 0;
 }

@@ -1,3 +1,9 @@
+// plugin-loader: Plugin loader for GoldHEN.
+// Authors:
+// Ctn123 @ https://github.com/Ctn123
+// illusion0001 @ https://github.com/illusion0001
+// Repository: https://github.com/GoldHEN/GoldHEN_Plugins_Repository
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -8,10 +14,14 @@
 #include "plugin_common.h"
 #include "config.h"
 
-#define PLUGIN_NAME "plugin_loader"
 #define PLUGIN_CONFIG_PATH GOLDHEN_PATH "/plugins.ini"
 #define PLUGIN_PATH GOLDHEN_PATH "/plugins"
 #define PLUGIN_DEFAULT_SECTION "default"
+
+attr_public const char *g_pluginName = "plugin_loader";
+attr_public const char *g_pluginDesc = "Plugin loader for GoldHEN";
+attr_public const char *g_pluginAuth = "Ctn123, illusion";
+attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
 // Todo: Move to sdk.
 bool file_exists(const char* filename)
@@ -78,7 +88,8 @@ uint16_t load_plugins(ini_section_s *section)
 
 int32_t attr_module_hidden module_start(size_t argc, const void *args)
 {
-    final_printf("[GoldHEN] <%s> %s\n", PLUGIN_NAME, __func__);
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
+    final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
 
     // Better done in GoldHEN
@@ -160,6 +171,7 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
 
 int32_t attr_module_hidden module_stop(size_t argc, const void *args)
 {
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("Plugin Manager ended successfully\n");
     return 0;
 }

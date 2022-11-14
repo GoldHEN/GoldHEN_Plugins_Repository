@@ -1,12 +1,15 @@
 // Author: jocover @ https://github.com/jocover
 // Author: SiSTR0 @ https://github.com/SiSTR0
-// Repository: https://github.com/GoldHEN/GoldHEN_Plugins
+// Repository: https://github.com/GoldHEN/GoldHEN_Plugins_Repository
 
 #include "Common.h"
 #include "plugin_common.h"
 
 #define MAX_PATH_ 260
-#define PLUGIN_NAME "afr"
+attr_public const char *g_pluginName = "afr";
+attr_public const char *g_pluginDesc = "Application File Redirector";
+attr_public const char *g_pluginAuth = "jocover, SiSTR0";
+attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
 HOOK_INIT(sceKernelOpen);
 #if (__FINAL__) == 0
@@ -73,7 +76,8 @@ s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
 }
 
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
-    final_printf("[GoldHEN] <%s> %s\n", PLUGIN_NAME, __func__);
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
+    final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
     struct proc_info procInfo;
     if (!sys_sdk_proc_info(&procInfo)) {
@@ -89,7 +93,7 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
 }
 
 s32 attr_module_hidden module_stop(s64 argc, const void *args) {
-    final_printf("[GoldHEN] <%s> %s\n", PLUGIN_NAME, __func__);
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     UNHOOK(sceKernelOpen);
 #if (__FINAL__) == 0
     UNHOOK(sceKernelStat);
