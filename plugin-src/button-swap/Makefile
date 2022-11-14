@@ -1,6 +1,6 @@
 # Library metadata.
 BUILD_FOLDER := $(shell pwd)/../../bin/plugins
-OUTPUT_PRX   := button_swap
+OUTPUT_PRX   := button-swap
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
 TARGET_ELF   := $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
 TARGETSTUB   := $(OUTPUT_PRX)_stub.so
@@ -13,7 +13,7 @@ LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lSceSystemServ
 # Root vars
 TOOLCHAIN     := $(OO_PS4_TOOLCHAIN)
 GH_SDK        := $(GOLDHEN_SDK)
-PROJDIR       := source
+PROJDIR       := $(OUTPUT_PRX)
 INTDIR        := build
 INCLUDEDIR    := include
 

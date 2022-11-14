@@ -13,7 +13,7 @@ LIBS := -lSceScreenShot -lSceVideoRecording -lGoldHEN_Hook -lkernel -lSceLibcInt
 # Root vars
 TOOLCHAIN     := $(OO_PS4_TOOLCHAIN)
 GH_SDK        := $(GOLDHEN_SDK)
-PROJDIR       := source
+PROJDIR       := $(OUTPUT_PRX)
 INTDIR        := build
 INCLUDEDIR    := include
 

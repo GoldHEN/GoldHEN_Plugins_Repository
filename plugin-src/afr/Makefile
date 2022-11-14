@@ -1,19 +1,19 @@
 # Library metadata.
 BUILD_FOLDER := $(shell pwd)/../../bin/plugins
-OUTPUT_PRX   := fliprate-remover
+OUTPUT_PRX   := afr
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
 TARGET_ELF   := $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
-TARGETSTUB   := $(OUTPUT_PRX)_stub.so
+TARGETSTUB   := $(OUTPUT_PRX).so
 O_FLAG       := -O3
 
 # Libraries linked into the ELF.
-LIBS := -lSceVideoOut -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
+LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
 
 # You likely won't need to touch anything below this point.
 # Root vars
 TOOLCHAIN     := $(OO_PS4_TOOLCHAIN)
 GH_SDK        := $(GOLDHEN_SDK)
-PROJDIR       := source
+PROJDIR       := $(OUTPUT_PRX)
 INTDIR        := build
 INCLUDEDIR    := include
 
