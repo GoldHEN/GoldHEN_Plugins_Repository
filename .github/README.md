@@ -63,12 +63,22 @@ Patches game before boot.
 
 Author(s):
 - [Ctn123](https://github.com/Ctn123)
+- [illusion](https://github.com/illusion0001)
 
 Manage installed plugins.
 
+Create file `goldhen.ini` in `/data/GoldHEN/plugins/settings`
+
+Example usage:
+
 ```ini
-; Load all plugins in `GoldHEN_plugins` section
-[GoldHEN_plugins]
+; Load plugins under specific Title ID `CUSA12345`
+[CUSA12345]
+/data/GoldHEN/plugins/example34.prx
+/data/GoldHEN/plugins/example138.prx
+
+; Load plugins in `default` section regardless of Title ID
+[default]
 /data/GoldHEN/plugins/example.prx
 /data/GoldHEN/plugins/example2.prx
 ```
