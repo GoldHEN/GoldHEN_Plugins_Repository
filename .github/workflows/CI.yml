@@ -87,3 +87,27 @@ jobs:
         name: goldplugins_${{ env.commit_ver }}_elf_debug
         path: bin/plugins/elf_debug/*
         if-no-files-found: error
+
+    - name: Create release
+      if: |
+        github.event_name == 'workflow_dispatch' &&
+        github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cd bin/plugins
+        mv prx_final plugins
+        zip -r plugins.zip plugins/*
+        echo "<details>" > hash.md
+        echo "<summary>Plugin Hashes (Click to Expand)</summary>" >> hash.md
+        echo "" >> hash.md
+        echo "\`\`\`" >> hash.md
+        cat plugins/md5.txt >> hash.md
+        echo "\`\`\`" >> hash.md
+        echo "" >> hash.md
+        echo "\`\`\`" >> hash.md
+        cat plugins/sha256.txt >> hash.md
+        echo "\`\`\`" >> hash.md
+        echo "" >> hash.md
+        echo "</details>" >> hash.md
+        gh release create ${{ env.commit_ver }} plugins.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
