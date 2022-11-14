@@ -14,6 +14,7 @@
 #define f64 double
 
 #define attr_module_hidden __attribute__((weak)) __attribute__((visibility("hidden")))
+#define attr_public __attribute__((visibility("default")))
 
 #if (__FINAL__) == 1
 #define BUILD_TYPE "(Release)"
