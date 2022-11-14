@@ -67,7 +67,7 @@ Author(s):
 
 Manage installed plugins.
 
-Create file `goldhen.ini` in `/data/GoldHEN/plugins/settings`
+Create a file `/data/GoldHEN/plugins.ini`
 
 Example usage:
 
