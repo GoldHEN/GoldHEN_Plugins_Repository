@@ -4,7 +4,7 @@
 
 #define PLUGIN_PATH "/data/GoldHEN/plugins"
 #define SETTINGS_PATH PLUGIN_PATH "/settings"
-#define "/data/GoldHEN/plugins.ini"
+#define CONFIG_PATH "/data/GoldHEN/plugins.ini"
 #define DEFAULT_INI_SECTION "default"
 #define plugin_name "boot-loader"
 
