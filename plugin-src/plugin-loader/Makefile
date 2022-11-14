@@ -1,6 +1,6 @@
 # Library metadata.
 BUILD_FOLDER := $(shell pwd)/../../bin/plugins
-OUTPUT_PRX   := boot-loader
+OUTPUT_PRX   := plugin-loader
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX).prx
 TARGET_ELF   := $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX).elf
 TARGETSTUB   := $(OUTPUT_PRX)_stub.so
