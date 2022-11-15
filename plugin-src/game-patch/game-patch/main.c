@@ -178,10 +178,6 @@ module_start(s64 argc, const void *args) {
         print_proc_info();
     }
     pid = procInfo.pid;
-    if (procInfo.titleid[0] == 0) {
-        final_printf("procInfo.titleid == 0! Assuming %s is system process\n", procInfo.name);
-        return 0;
-    }
     get_key_init();
     return 0;
 }

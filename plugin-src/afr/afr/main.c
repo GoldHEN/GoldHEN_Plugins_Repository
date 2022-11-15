@@ -77,10 +77,6 @@ module_start(size_t argc, const void *args) {
         memcpy(titleid, procInfo.titleid, sizeof(titleid));
         print_proc_info();
     }
-    if (procInfo.titleid[0] == 0) {
-        final_printf("procInfo.titleid == 0! Assuming %s is system process\n", procInfo.name);
-        return 0;
-    }
     HOOK32(sceKernelOpen);
     HOOK32(fopen);
     return 0;
