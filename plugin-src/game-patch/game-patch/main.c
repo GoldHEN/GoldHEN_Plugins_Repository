@@ -3,7 +3,7 @@
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
 #include "patch.h"
-#include "tiny-json.h"
+#include "tiny-json/tiny-json.h"
 #include "utils.h"
 
 #define plugin_name "GamePatch"
@@ -61,7 +61,7 @@ void get_key_init() {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
         return;
     }
-    json_t mem[max_tokens];
+    json_t mem[MAX_TOKENS];
     json_t const *json = json_create(buffer, mem, sizeof mem / sizeof *mem);
     if (!json) {
         Notify("Too many tokens or bad file");

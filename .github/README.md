@@ -98,6 +98,7 @@ Removes arbitrary limitations when using Share Button in Games.
 - [LLVM 10+](https://llvm.org/)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
 - [GoldHEN Plugin SDK](https://github.com/GoldHEN/GoldHEN_Plugins_SDK)
+- Submodules checkout `git submodule update --init`
 
 ## Build
 

@@ -1,27 +1,8 @@
 #include <Common.h>
 #include "../../../common/plugin_common.h"
-#include "tiny-json.h"
+#include <stdbool.h>
 
-#define max_tokens 4096
-
-typedef struct {
-    json_t mem[max_tokens];
-    unsigned int nextFree;
-    jsonPool_t pool;
-} jsonStaticPool_t;
-
-static json_t *poolInit(jsonPool_t *pool) {
-    jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
-    spool->nextFree = 1;
-    return &spool->mem[0];
-}
-
-static json_t *poolAlloc(jsonPool_t *pool) {
-    jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
-    if (spool->nextFree >= sizeof spool->mem / sizeof spool->mem[0])
-        return 0;
-    return &spool->mem[spool->nextFree++];
-}
+#define MAX_TOKENS 4096
 
 extern int pid;
 extern u8 arr8[1];
