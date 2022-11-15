@@ -3,7 +3,7 @@
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
 #include "Common.h"
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 
 #define plugin_name "AFR"
 

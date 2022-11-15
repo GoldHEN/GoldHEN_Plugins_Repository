@@ -7,7 +7,7 @@
 
 #include <Common.h>
 #include <orbis/VideoOut.h>
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 
 #define plugin_name "fliprate-remover"
 

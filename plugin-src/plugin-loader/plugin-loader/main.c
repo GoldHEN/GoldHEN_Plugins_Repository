@@ -1,6 +1,6 @@
 #include "common.h"
 #include "config.h"
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 
 #define PLUGIN_PATH "/data/GoldHEN/plugins"
 #define SETTINGS_PATH PLUGIN_PATH "/settings"

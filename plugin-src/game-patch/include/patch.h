@@ -1,5 +1,5 @@
 #include <Common.h>
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 #include <stdbool.h>
 
 #define MAX_TOKENS 4096

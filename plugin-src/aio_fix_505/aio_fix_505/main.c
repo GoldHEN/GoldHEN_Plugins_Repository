@@ -1,7 +1,7 @@
 // Author: jocover @ https://github.com/jocover
 // Repository: https://github.com/GoldHEN/GoldHEN_Plugins
 
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 #include "Common.h"
 
 #define plugin_name "async-io-fix"

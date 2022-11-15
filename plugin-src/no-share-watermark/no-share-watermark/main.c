@@ -8,7 +8,7 @@
 #include <orbis/Sysmodule.h>
 #include <orbis/ScreenShot.h>
 #include <orbis/VideoRecording.h>
-#include "../../../common/plugin_common.h"
+#include "plugin_common.h"
 
 #define plugin_name "no-share-block"
 
