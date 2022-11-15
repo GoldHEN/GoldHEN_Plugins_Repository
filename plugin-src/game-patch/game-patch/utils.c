@@ -1,21 +1,5 @@
 #include "utils.h"
 
-void Notify(const char *FMT, ...) {
-    OrbisNotificationRequest Buffer;
-    const char* Notify_TexIcon = "cxml://psnotification/tex_icon_system";
-    va_list args;
-    va_start(args, FMT);
-    vsprintf(Buffer.message, FMT, args);
-    va_end(args);
-    final_printf("Buffer.message: %s\n", Buffer.message);
-    Buffer.type = NotificationRequest;
-    Buffer.unk3 = 0;
-    Buffer.useIconImageUri = 1;
-    Buffer.targetId = -1;
-    strcpy(Buffer.iconUri, Notify_TexIcon);
-    sceKernelSendNotificationRequest(0, &Buffer, sizeof(Buffer), 0);
-}
-
 s32 Read_File(const char *File, char **Data, size_t *Size, int extra) {
     s32 res = 0;
     s32 pos = 0;

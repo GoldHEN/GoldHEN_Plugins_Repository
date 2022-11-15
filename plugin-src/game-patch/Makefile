@@ -18,6 +18,7 @@ EXTERNAL_DIR  := ../../external
 TINY_JSON     := $(EXTERNAL_DIR)/tiny-json
 INTDIR        := build
 INCLUDEDIR    := include
+COMMON_DIR    := ../../common
 
 # Define objects to build
 CFILES      := $(wildcard $(PROJDIR)/*.c)
@@ -60,6 +61,9 @@ $(TARGETSTUB): $(INTDIR) $(STUBOBJS)
 $(INTDIR)/%.o: $(PROJDIR)/%.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+plugin_common:
+	$(CC) $(CFLAGS) -o $(INTDIR)/plugin_common.o $(COMMON_DIR)/plugin_common.c
+
 tiny-json:
 	$(CC) $(CFLAGS) -o $(INTDIR)/tiny-json.o $(TINY_JSON)/tiny-json.c
 
@@ -75,7 +79,7 @@ $(INTDIR)/%.o.stub: $(PROJDIR)/%.cpp
 .PHONY: clean
 .DEFAULT_GOAL := all
 
-all: tiny-json $(TARGET)
+all: plugin_common tiny-json $(TARGET)
 
 clean:
 	rm -rf $(TARGET) $(TARGETSTUB) $(INTDIR) $(OBJS)

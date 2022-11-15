@@ -33,3 +33,5 @@
   final_printf("version: %s\n", procInfo.version);\
   final_printf("base_address: 0x%lx\n", procInfo.base_address);\
 }
+
+void Notify(const char* IconUri, const char *FMT, ...);

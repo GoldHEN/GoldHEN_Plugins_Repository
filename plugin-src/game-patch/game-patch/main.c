@@ -8,6 +8,7 @@
 
 #define plugin_name "GamePatch"
 
+#define TEX_ICON "cxml://psnotification/tex_icon_system"
 const char *key_patch = "patch";
 const char *key_title = "title";
 const char *key_app_ver = "app_ver";
@@ -64,13 +65,13 @@ void get_key_init() {
     json_t mem[MAX_TOKENS];
     json_t const *json = json_create(buffer, mem, sizeof mem / sizeof *mem);
     if (!json) {
-        Notify("Too many tokens or bad file");
+        Notify(TEX_ICON, "Too many tokens or bad file");
         return;
     }
 
     json_t const *patchItems = json_getProperty(json, key_patch);
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
-        Notify("Patch not found");
+        Notify(TEX_ICON, "Patch not found");
         return;
     }
 
@@ -149,7 +150,7 @@ void get_key_init() {
         }
     }
     if (patch_lines > 0) {
-        Notify("%li Patches Applied\n"
+        Notify(TEX_ICON, "%li Patches Applied\n"
                "%li Patch Lines Applied",
                patch_items, patch_lines);
     }
