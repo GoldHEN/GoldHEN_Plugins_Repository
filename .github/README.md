@@ -1,6 +1,8 @@
 # GoldHEN Plugins
 GoldHEN Plugins for PlayStation 4.
 
+[![Build modules](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml/badge.svg?branch=main&event=push)](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml)
+
 ## Plugins
 #### Application File Redirector
 
