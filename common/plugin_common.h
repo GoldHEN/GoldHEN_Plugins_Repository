@@ -8,6 +8,8 @@
 #define s16 int16_t
 #define s32 int32_t
 #define s64 int64_t
+#define f32 float
+#define f64 double
 
 #define attr_module_hidden __attribute__((weak)) __attribute__((visibility("hidden")))
 

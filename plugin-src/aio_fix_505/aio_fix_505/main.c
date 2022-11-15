@@ -27,86 +27,86 @@ HOOK_INIT(sceKernelAioSubmitWriteCommandsMultiple);
 #define SCE_KERNEL_AIO_STATE_ABORTED (4)
 
 typedef struct SceKernelAioResult {
-    int64_t returnValue;
-    uint32_t state;
+    s64 returnValue;
+    u32 state;
 } SceKernelAioResult;
 
-typedef int SceKernelAioSubmitId;
+typedef s32 SceKernelAioSubmitId;
 
 typedef struct SceKernelAioRWRequest {
     off_t offset;
-    size_t nbyte;
+    s64 nbyte;
     void* buf;
     struct SceKernelAioResult* result;
-    int fd;
+    s32 fd;
 } SceKernelAioRWRequest;
 
-static int* id_state;
-static int id_index;
+static s32* id_state;
+static s32 id_index;
 // static pthread_mutex_t lock;
 
-int (*sceKernelAioInitializeImpl)(void* p, int size);
-int (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, int* ret);
-int (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], int num, int ret[]);
+s32 (*sceKernelAioInitializeImpl)(void* p, s32 size);
+s32 (*sceKernelAioDeleteRequest)(SceKernelAioSubmitId id, s32* ret);
+s32 (*sceKernelAioDeleteRequests)(SceKernelAioSubmitId id[], s32 num, s32 ret[]);
 
-int (*sceKernelAioPollRequest)(SceKernelAioSubmitId id, int* state);
-int (*sceKernelAioPollRequests)(SceKernelAioSubmitId id[], int num, int state[]);
+s32 (*sceKernelAioPollRequest)(SceKernelAioSubmitId id, s32* state);
+s32 (*sceKernelAioPollRequests)(SceKernelAioSubmitId id[], s32 num, s32 state[]);
 
-int (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, int* state);
+s32 (*sceKernelAioCancelRequest)(SceKernelAioSubmitId id, s32* state);
 
-int (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], int num, int state[]);
+s32 (*sceKernelAioCancelRequests)(SceKernelAioSubmitId id[], s32 num, s32 state[]);
 
-int (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, int* state, unsigned int* usec);
-int (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], int num, int state[], uint32_t mode,
-                                unsigned int* usec);
+s32 (*sceKernelAioWaitRequest)(SceKernelAioSubmitId id, s32* state, u32* usec);
+s32 (*sceKernelAioWaitRequests)(SceKernelAioSubmitId id[], s32 num, s32 state[], u32 mode,
+                                u32* usec);
 
-int (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], int size, int prio,
+s32 (*sceKernelAioSubmitReadCommands)(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                       SceKernelAioSubmitId* id);
 
-int (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio,
+s32 (*sceKernelAioSubmitReadCommandsMultiple)(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                               SceKernelAioSubmitId id[]);
 
-int (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], int size, int prio,
+s32 (*sceKernelAioSubmitWriteCommands)(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                        SceKernelAioSubmitId* id);
 
-int (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], int size, int prio,
+s32 (*sceKernelAioSubmitWriteCommandsMultiple)(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                                SceKernelAioSubmitId id[]);
 
 /////hook code////
 
-int sceKernelAioInitializeImpl_hook(void* p, int size) {
+s32 sceKernelAioInitializeImpl_hook(void* p, s32 size) {
 
     return 0;
 }
 
-int sceKernelAioDeleteRequest_hook(SceKernelAioSubmitId id, int* ret) {
+s32 sceKernelAioDeleteRequest_hook(SceKernelAioSubmitId id, s32* ret) {
     id_state[id] = SCE_KERNEL_AIO_STATE_ABORTED;
     *ret = 0;
     return 0;
 }
 
-int sceKernelAioDeleteRequests_hook(SceKernelAioSubmitId id[], int num, int ret[]) {
-    for (int i = 0; i < num; i++) {
+s32 sceKernelAioDeleteRequests_hook(SceKernelAioSubmitId id[], s32 num, s32 ret[]) {
+    for (s32 i = 0; i < num; i++) {
         id_state[id[i]] = SCE_KERNEL_AIO_STATE_ABORTED;
         ret[i] = 0;
     }
 
     return 0;
 }
-int sceKernelAioPollRequest_hook(SceKernelAioSubmitId id, int* state) {
+s32 sceKernelAioPollRequest_hook(SceKernelAioSubmitId id, s32* state) {
     *state = id_state[id];
     return 0;
 }
 
-int sceKernelAioPollRequests_hook(SceKernelAioSubmitId id[], int num, int state[]) {
-    for (int i = 0; i < num; i++) {
+s32 sceKernelAioPollRequests_hook(SceKernelAioSubmitId id[], s32 num, s32 state[]) {
+    for (s32 i = 0; i < num; i++) {
         state[i] = id_state[id[i]];
     }
 
     return 0;
 }
 
-int sceKernelAioCancelRequest_hook(SceKernelAioSubmitId id, int* state) {
+s32 sceKernelAioCancelRequest_hook(SceKernelAioSubmitId id, s32* state) {
     if (id) {
         id_state[id] = SCE_KERNEL_AIO_STATE_ABORTED;
         *state = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -116,8 +116,8 @@ int sceKernelAioCancelRequest_hook(SceKernelAioSubmitId id, int* state) {
     return 0;
 }
 
-int sceKernelAioCancelRequests_hook(SceKernelAioSubmitId id[], int num, int state[]) {
-    for (int i = 0; i < num; i++) {
+s32 sceKernelAioCancelRequests_hook(SceKernelAioSubmitId id[], s32 num, s32 state[]) {
+    for (s32 i = 0; i < num; i++) {
         if (id[i]) {
             id_state[id[i]] = SCE_KERNEL_AIO_STATE_ABORTED;
             state[i] = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -129,10 +129,10 @@ int sceKernelAioCancelRequests_hook(SceKernelAioSubmitId id[], int num, int stat
     return 0;
 }
 
-int sceKernelAioWaitRequest_hook(SceKernelAioSubmitId id, int* state, unsigned int* usec) {
-    unsigned int timer = 0;
+s32 sceKernelAioWaitRequest_hook(SceKernelAioSubmitId id, s32* state, u32* usec) {
+    u32 timer = 0;
 
-    int timeout = 0;
+    s32 timeout = 0;
 
     while (id_state[id] == SCE_KERNEL_AIO_STATE_PROCESSING) {
         sceKernelUsleep(10);
@@ -152,13 +152,13 @@ int sceKernelAioWaitRequest_hook(SceKernelAioSubmitId id, int* state, unsigned i
     return 0;
 }
 
-int sceKernelAioWaitRequests_hook(SceKernelAioSubmitId id[], int num, int state[], uint32_t mode,
-                                  unsigned int* usec) {
-    unsigned int timer = 0;
-    int timeout = 0;
-    int completion = 0;
+s32 sceKernelAioWaitRequests_hook(SceKernelAioSubmitId id[], s32 num, s32 state[], u32 mode,
+                                  u32* usec) {
+    u32 timer = 0;
+    s32 timeout = 0;
+    s32 completion = 0;
 
-    for (int i = 0; i < num; i++) {
+    for (s32 i = 0; i < num; i++) {
         if (!completion && !timeout) {
             while (id_state[id[i]] == SCE_KERNEL_AIO_STATE_PROCESSING) {
                 sceKernelUsleep(10);
@@ -185,14 +185,14 @@ int sceKernelAioWaitRequests_hook(SceKernelAioSubmitId id[], int num, int state[
     return 0;
 }
 
-int sceKernelAioSubmitReadCommands_hook(SceKernelAioRWRequest req[], int size, int prio,
+s32 sceKernelAioSubmitReadCommands_hook(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                         SceKernelAioSubmitId* id) {
 
     id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
 
-    for (int i = 0; i < size; i++) {
+    for (s32 i = 0; i < size; i++) {
 
-        ssize_t ret = sceKernelPread(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
+        s64 ret = sceKernelPread(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
 
         if (ret < 0) {
             req[i].result->state = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -216,12 +216,12 @@ int sceKernelAioSubmitReadCommands_hook(SceKernelAioRWRequest req[], int size, i
     return 0;
 }
 
-int sceKernelAioSubmitReadCommandsMultiple_hook(SceKernelAioRWRequest req[], int size, int prio,
+s32 sceKernelAioSubmitReadCommandsMultiple_hook(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                                 SceKernelAioSubmitId id[]) {
-    for (int i = 0; i < size; i++) {
+    for (s32 i = 0; i < size; i++) {
         id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
 
-        ssize_t ret = sceKernelPread(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
+        s64 ret = sceKernelPread(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
 
         if (ret < 0) {
             req[i].result->state = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -246,12 +246,12 @@ int sceKernelAioSubmitReadCommandsMultiple_hook(SceKernelAioRWRequest req[], int
     return 0;
 }
 
-int sceKernelAioSubmitWriteCommands_hook(SceKernelAioRWRequest req[], int size, int prio,
+s32 sceKernelAioSubmitWriteCommands_hook(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                          SceKernelAioSubmitId* id) {
-    for (int i = 0; i < size; i++) {
+    for (s32 i = 0; i < size; i++) {
         id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
 
-        ssize_t ret = sceKernelPwrite(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
+        s64 ret = sceKernelPwrite(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
 
         if (ret < 0) {
             req[i].result->state = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -278,11 +278,11 @@ int sceKernelAioSubmitWriteCommands_hook(SceKernelAioRWRequest req[], int size, 
     return 0;
 }
 
-int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[], int size, int prio,
+s32 sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[], s32 size, s32 prio,
                                                  SceKernelAioSubmitId id[]) {
-    for (int i = 0; i < size; i++) {
+    for (s32 i = 0; i < size; i++) {
         id_state[id_index] = SCE_KERNEL_AIO_STATE_PROCESSING;
-        ssize_t ret = sceKernelPwrite(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
+        s64 ret = sceKernelPwrite(req[i].fd, req[i].buf, req[i].nbyte, req[i].offset);
 
         if (ret < 0) {
             req[i].result->state = SCE_KERNEL_AIO_STATE_ABORTED;
@@ -304,7 +304,7 @@ int sceKernelAioSubmitWriteCommandsMultiple_hook(SceKernelAioRWRequest req[], in
     return 0;
 }
 
-int attr_module_hidden module_start(size_t argc, const void* args) {
+s32 attr_module_hidden module_start(s64 argc, const void* args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
 
@@ -353,9 +353,8 @@ int attr_module_hidden module_start(size_t argc, const void* args) {
     return 0;
 }
 
-int attr_module_hidden module_stop(size_t argc, const void* args) {
+s32 attr_module_hidden module_stop(s64 argc, const void* args) {
     final_printf("[GoldHEN] <aio> module_stop\n");
-
     UNHOOK(sceKernelAioInitializeImpl);
     UNHOOK(sceKernelAioDeleteRequest);
     UNHOOK(sceKernelAioDeleteRequests);
@@ -369,6 +368,5 @@ int attr_module_hidden module_stop(size_t argc, const void* args) {
     UNHOOK(sceKernelAioSubmitReadCommandsMultiple);
     UNHOOK(sceKernelAioSubmitWriteCommands);
     UNHOOK(sceKernelAioSubmitWriteCommandsMultiple);
-
     return 0;
 }

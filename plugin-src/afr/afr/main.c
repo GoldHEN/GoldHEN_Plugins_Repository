@@ -40,12 +40,12 @@ FILE* fopen_hook(const char *path, const char *mode) {
                            path, mode);
 }
 
-int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
+s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
     debug_printf("path: %s len %li\n", path, strlen(path));
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
-        int fd;
+        s32 fd;
         char possible_path[512];
 
         memset(possible_path, 0, sizeof(possible_path));
@@ -55,7 +55,7 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
         strcat(possible_path, path + 6);
 
         fd = HOOK_CONTINUE(sceKernelOpen,
-                           int (*)(const char *, int, OrbisKernelMode),
+                           s32 (*)(const char *, s32, OrbisKernelMode),
                            possible_path, flags, mode);
 
         debug_printf("possible_path: %s fd: 0x%08x len %li\n", possible_path, fd, strlen(possible_path));
@@ -63,15 +63,14 @@ int sceKernelOpen_hook(const char *path, int flags, OrbisKernelMode mode) {
     }
 
     return HOOK_CONTINUE(sceKernelOpen,
-                         int (*)(const char *, int, OrbisKernelMode),
+                         s32 (*)(const char *, s32, OrbisKernelMode),
                          path, flags, mode);
 }
 
-int attr_module_hidden module_start(size_t argc, const void *args) {
+s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     struct proc_info procInfo;
-
     if (!sys_sdk_proc_info(&procInfo)) {
         memcpy(titleid, procInfo.titleid, sizeof(titleid));
         print_proc_info();
@@ -81,7 +80,7 @@ int attr_module_hidden module_start(size_t argc, const void *args) {
     return 0;
 }
 
-int attr_module_hidden module_stop(size_t argc, const void *args) {
+s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     UNHOOK(sceKernelOpen);
     UNHOOK(fopen);

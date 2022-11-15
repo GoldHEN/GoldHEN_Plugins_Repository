@@ -11,10 +11,10 @@
 char titleid[16] = {0};
 
 void load_plugins(ini_section_s *section) {
-    for (int j = 0; j < section->size; j++) {
+    for (s32 j = 0; j < section->size; j++) {
         ini_entry_s *entry = &section->entry[j];
         final_printf("Starting %s\n", entry->key);
-        int result = sceKernelLoadStartModule(entry->key, 0, 0, 0, NULL, NULL);
+        s32 result = sceKernelLoadStartModule(entry->key, 0, 0, 0, NULL, NULL);
         if (result == 0x80020002) {
             final_printf("Plugin %s not found\n", entry->key);
         } else if (result < 0) {
@@ -26,7 +26,7 @@ void load_plugins(ini_section_s *section) {
     return;
 }
 
-int attr_module_hidden module_start(size_t argc, const void *args) {
+s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     mkdir(SETTINGS_PATH, 0777);
@@ -58,7 +58,7 @@ int attr_module_hidden module_start(size_t argc, const void *args) {
     }
     // int load_count = 0;
     // Example looping over sections and keys
-    for (int i = 0; i < config->size; i++) {
+    for (s32 i = 0; i < config->size; i++) {
         ini_section_s *section = &config->section[i];
         if (section == NULL)
             continue;
@@ -81,7 +81,7 @@ int attr_module_hidden module_start(size_t argc, const void *args) {
     return 0;
 }
 
-int attr_module_hidden module_stop(size_t argc, const void *args) {
+s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("Plugin Manager ended successfully\n");
     return 0;
 }

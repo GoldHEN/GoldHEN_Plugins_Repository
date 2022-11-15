@@ -57,7 +57,7 @@ void get_key_init() {
     u64 size;
     char input_file[64];
     snprintf(input_file, sizeof(input_file), "%s/%s.json", base_path_patch_json, titleid);
-    int res = Read_File(input_file, &buffer, &size, 32);
+    s32 res = Read_File(input_file, &buffer, &size, 32);
     if (res) {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
         return;
@@ -104,7 +104,7 @@ void get_key_init() {
                      "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
             char *buffer2;
             u64 size2;
-            int res = Read_File(settings_path, &buffer2, &size2, 32);
+            s32 res = Read_File(settings_path, &buffer2, &size2, 32);
             if (res == 0x80020002) {
                 final_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path,
                              res);
@@ -165,7 +165,7 @@ void make_folders() {
     return;
 }
 
-int attr_module_hidden module_start(s64 argc, const void *args) {
+s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     make_folders();
@@ -182,7 +182,7 @@ int attr_module_hidden module_start(s64 argc, const void *args) {
     return 0;
 }
 
-int attr_module_hidden module_stop(s64 argc, const void *args) {
+s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     return 0;
 }

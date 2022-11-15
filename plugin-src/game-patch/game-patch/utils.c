@@ -1,6 +1,6 @@
 #include "utils.h"
 
-s32 Read_File(const char *File, char **Data, size_t *Size, int extra) {
+s32 Read_File(const char *File, char **Data, u64 *Size, u32 extra) {
     s32 res = 0;
     s32 pos = 0;
     s32 fd = 0;
@@ -60,7 +60,7 @@ term:
     return res;
 }
 
-s32 Write_File(const char *File, unsigned char *Data, size_t Size) {
+s32 Write_File(const char *File, unsigned char *Data, u64 Size) {
     s32 fd = sceKernelOpen(File, 0x200 | 0x002, 0777);
     if (fd < 0) {
         debug_printf("Failed to make file \"%s\"\n", File);

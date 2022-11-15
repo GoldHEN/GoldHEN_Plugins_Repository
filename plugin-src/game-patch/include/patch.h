@@ -4,7 +4,7 @@
 
 #define MAX_TOKENS 4096
 
-extern int pid;
+extern s32 pid;
 extern u8 arr8[1];
 extern u8 arr16[2];
 extern u8 arr32[4];
@@ -15,7 +15,7 @@ extern char game_elf[32];
 extern char game_ver[8];
 
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size);
-void sys_proc_rw(uint64_t address, void *data, uint64_t length);
+void sys_proc_rw(u64 address, void *data, u64 length);
 bool prefix(const char *pre, const char *str);
 u64 hash(const char *str);
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,

@@ -10,7 +10,7 @@ const char *hex_prefix = "0x";
 
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
     // valid hex look up table.
-    const uint8_t hex_lut[] = {
+    const u8 hex_lut[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -34,30 +34,30 @@ unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00};
 
-    uint32_t str_len = strlen(hexstr);
-    size_t data_len = ((str_len + 1) / 2) * sizeof(unsigned char);
+    u32 str_len = strlen(hexstr);
+    s64 data_len = ((str_len + 1) / 2) * sizeof(unsigned char);
 
     *size = (str_len) * sizeof(unsigned char);
 
     unsigned char *data = (unsigned char *)malloc(*size);
-    uint32_t j = 0; // hexstr position
-    uint32_t i = 0; // data position
+    u32 j = 0; // hexstr position
+    u32 i = 0; // data position
 
     if (str_len % 2 == 1) {
-        data[i] = (uint8_t)(hex_lut[0] << 4) | hex_lut[(uint8_t)hexstr[j]];
+        data[i] = (u8)(hex_lut[0] << 4) | hex_lut[(u8)hexstr[j]];
         j = ++i;
     }
 
     for (; j < str_len; j += 2, i++) {
-        data[i] = (uint8_t)(hex_lut[(uint8_t)hexstr[j]] << 4) |
-                  hex_lut[(uint8_t)hexstr[j + 1]];
+        data[i] = (u8)(hex_lut[(u8)hexstr[j]] << 4) |
+                  hex_lut[(u8)hexstr[j + 1]];
     }
 
     *size = data_len;
     return data;
 }
 
-void sys_proc_rw(uint64_t address, void *data, uint64_t length) {
+void sys_proc_rw(u64 address, void *data, u64 length) {
     struct proc_rw process_rw_data;
     process_rw_data.address = address;
     process_rw_data.data = data;
@@ -102,7 +102,7 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
 
 void patch_data1(const char *type, u64 addr, const char *value) {
     if (type) {
-        int str_base = 16;
+        s32 str_base = 16;
         memset(arr8,  0, sizeof(arr8));
         memset(arr16, 0, sizeof(arr16));
         memset(arr32, 0, sizeof(arr32));
@@ -157,19 +157,19 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, bytearray, szb);
             return;
         } else if (strcmp(type, "float32") == 0) {
-            float real_value = 0;
+            f32 real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr32, &real_value, sizeof(arr32));
             sys_proc_rw(addr, arr32, sizeof(arr32));
             return;
         } else if (strcmp(type, "float64") == 0) {
-            double real_value = 0;
+            f64 real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr64, &real_value, sizeof(arr64));
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "utf8") == 0) {
-            for (int i = 0; value[i] != '\0'; i++) {
+            for (s32 i = 0; value[i] != '\0'; i++) {
                 u8 val_ = value[i];
                 u8 value_[1] = {val_};
                 sys_proc_rw(addr, value_, sizeof(value_));
@@ -180,7 +180,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, value_, sizeof(value_));
             return;
         } else if (strcmp(type, "utf16") == 0) {
-            for (int i = 0; value[i] != '\x00'; i++) {
+            for (s32 i = 0; value[i] != '\x00'; i++) {
                 u8 val_ = value[i];
                 u8 value_[2] = {val_, 0x00};
                 sys_proc_rw(addr, value_, sizeof(value_));

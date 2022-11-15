@@ -27,15 +27,15 @@ s32 sceScreenShotSetOverlayImageWithOrigin_hook(){
     return 0;
 }
 
-s32 sceVideoRecordingSetInfo_hook(s32 iInfoType, const void *pInfoData, size_t ulInfoLen) {
-    if (iInfoType == 0x000D && pInfoData && sizeof(s32) == ulInfoLen && 0x1 == *(int*)pInfoData) {
+s32 sceVideoRecordingSetInfo_hook(s32 iInfoType, const void *pInfoData, s64 ulInfoLen) {
+    if (iInfoType == 0x000D && pInfoData && sizeof(s32) == ulInfoLen && 0x1 == *(s32*)pInfoData) {
         final_printf("sceVideoRecordingSetInfo patched\n");
         // trying to block the recorder, nope...
         return 0; // SCE_OK
     }
 
     // carry on...
-    return HOOK_CONTINUE(sceVideoRecordingSetInfo, int(*)(int, const void*, size_t), iInfoType, pInfoData, ulInfoLen);
+    return HOOK_CONTINUE(sceVideoRecordingSetInfo, s32(*)(s32, const void*, s64), iInfoType, pInfoData, ulInfoLen);
 }
 
 s32 sceScreenShotDisable_hook(){
@@ -43,7 +43,7 @@ s32 sceScreenShotDisable_hook(){
     return 0;
 }
 
-s32 attr_module_hidden module_start(size_t argc, const void *args) {
+s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
     sceSysmoduleLoadModule(0x009c);
@@ -55,7 +55,7 @@ s32 attr_module_hidden module_start(size_t argc, const void *args) {
     return 0;
 }
 
-s32 attr_module_hidden module_stop(size_t argc, const void *args) {
+s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     UNHOOK(sceScreenShotSetOverlayImage);
     UNHOOK(sceScreenShotSetOverlayImageWithOrigin);
