@@ -2,13 +2,12 @@
 #include "config.h"
 #include "plugin_common.h"
 
-#define PLUGIN_PATH "/data/GoldHEN/plugins"
-#define SETTINGS_PATH PLUGIN_PATH "/settings"
 #define CONFIG_PATH "/data/GoldHEN/plugins.ini"
 #define DEFAULT_INI_SECTION "default"
-#define plugin_name "boot-loader"
+#define plugin_name "plugin-loader"
 
 char titleid[16] = {0};
+u32 load_count = 0;
 
 void load_plugins(ini_section_s *section) {
     for (s32 j = 0; j < section->size; j++) {
@@ -21,6 +20,7 @@ void load_plugins(ini_section_s *section) {
             final_printf("Error loading Plugin %s! with error code %i\n", entry->key, result);
         } else {
             final_printf("Loaded Plugin %s.\n", entry->key);
+            load_count++;
         }
     }
     return;
@@ -29,7 +29,6 @@ void load_plugins(ini_section_s *section) {
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s> %s\n", plugin_name, __func__);
     boot_ver();
-    mkdir(SETTINGS_PATH, 0777);
     struct proc_info procInfo;
     if (sys_sdk_proc_info(&procInfo) == 0) {
         memcpy(titleid, procInfo.titleid, sizeof(titleid));
@@ -56,8 +55,6 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
         final_printf("%s section not found\n", DEFAULT_INI_SECTION);
         return -1;
     }
-    // int load_count = 0;
-    // Example looping over sections and keys
     for (s32 i = 0; i < config->size; i++) {
         ini_section_s *section = &config->section[i];
         if (section == NULL)
@@ -71,10 +68,7 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
             load_plugins(section);
         }
     }
-
-    // final_printf("Loaded %i plugin(s)\n", load_count);
-    // always reported zero for some reason, even when passing in as refernce
-    // removed for now
+    final_printf("Loaded %u plugin(s)\n", load_count);
     if (config != NULL) {
         ini_table_destroy(config);
     }
