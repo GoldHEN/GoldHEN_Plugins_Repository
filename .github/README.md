@@ -5,9 +5,9 @@ GoldHEN Plugins for PlayStation 4.
 
 # Getting Started
 
-Create a file config file: `/data/GoldHEN/plugins.ini`
+Create a config file: `/data/GoldHEN/plugins.ini`
 
-Upload plugin files to `/data/GoldHEN/plugins/`
+Copy plugin files to: `/data/GoldHEN/plugins/`
 
 Example ini usage:
 
@@ -75,11 +75,8 @@ Patches game before boot.
 <details>
 <summary>How To Use (Click to Expand)</summary>
 
-- Download zip from [GoldHEN_Patch_Repository](https://github.com/GoldHEN/GoldHEN_Patch_Repository/raw/gh-pages/patch1.zip)
-- Extract it to `/data/GoldHEN/`
-- Patches can be configured via:
-  - GoldHEN Patch Settings
-  - GoldHEN Cheat Manager
+- Patches can be installed, configured and updated via:
+  - [GoldHEN Cheat Manager](https://github.com/GoldHEN/GoldHEN_Cheat_Manager/releases/latest)
   - Itemzflow Game Manager
 - Run your game.
 
