@@ -3,8 +3,30 @@ GoldHEN Plugins for PlayStation 4.
 
 [![Build modules](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml/badge.svg?branch=main&event=push)](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml)
 
+# Getting Started
+
+Create a file config file: `/data/GoldHEN/plugins.ini`
+
+Upload plugin files to `/data/GoldHEN/plugins/`
+
+Example ini usage:
+
+```ini
+; Load plugins under specific Title ID `CUSA12345`
+[CUSA12345]
+/data/GoldHEN/plugins/example34.prx
+/data/GoldHEN/plugins/example138.prx
+
+; Load plugins in `default` section regardless of Title ID
+[default]
+/data/GoldHEN/plugins/example.prx
+/data/GoldHEN/plugins/example2.prx
+```
+
 ## Plugins
-#### Application File Redirector
+### AFR (Application File Redirector)
+
+Plugin filename: `afr.prx`
 
 Author(s):
 - [SiSTR0](https://github.com/SiSTR0)
@@ -23,30 +45,32 @@ Redirect file calls to `/data/`
 
 </details>
 
-#### Button Swap
+### Button Swap
+
+Plugin filename: `button-swap.prx`
 
 Author(s):
 - [jocover](https://github.com/jocover)
 
 Swap X and O around on Asia Region console.
 
-#### Fliprate Remover
+### Fliprate Remover
+
+Plugin filename: `fliprate-remover.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
 
-Removes framerate limit for games using system library `sceVideoOutSetFlipRate`.
+Removes framerate limit for games using system function `sceVideoOutSetFlipRate`.
 
-#### Game Patch
+### Game Patch
+
+Plugin filename: `game-patch.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
 
 Patches game before boot.
-
-##### Libraries used
-
-- [tiny-json](https://github.com/rafagafe/tiny-json)
 
 <details>
 <summary>How To Use (Click to Expand)</summary>
@@ -61,7 +85,17 @@ Patches game before boot.
 
 </details>
 
-#### Plugin Manager
+##### Libraries used
+
+- [tiny-json](https://github.com/rafagafe/tiny-json)
+
+<!--
+
+Users don't need this unless for development.
+
+### Plugin Loader
+
+Plugin filename: `plugin-loader.prx`
 
 Author(s):
 - [Ctn123](https://github.com/Ctn123)
@@ -85,13 +119,17 @@ Example usage:
 /data/GoldHEN/plugins/example2.prx
 ```
 
-#### No Share Blocks
+-->
+
+### No Share Blocks
+
+Plugin filename: `no-share-watermark.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
 - [nik](https://github.com/nkrapivin)
 
-Removes arbitrary limitations when using Share Button in Games.
+Removes image watermark, video and screenshot blocks from games.
 
 # Building
 
@@ -100,7 +138,7 @@ Removes arbitrary limitations when using Share Button in Games.
 - [LLVM 10+](https://llvm.org/)
 - [OpenOrbis SDK](https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain)
 - [GoldHEN Plugin SDK](https://github.com/GoldHEN/GoldHEN_Plugins_SDK)
-- Submodules checkout `git submodule update --init`
+- Submodules checkout with `git submodule update --init`
 
 ## Build
 
@@ -116,7 +154,7 @@ export OO_PS4_TOOLCHAIN=[directory of installation]
 ```
 export GOLDHEN_SDK=[directory of installation]
 ```
-3. Run `./build.sh` You can find built binaries in `bin/plugins`.
+3. Run `./build.sh` or `make` individually; built binaries can be found in `bin/plugins`.
 
 ### Windows
 
