@@ -75,7 +75,12 @@ Patches game before boot.
 <details>
 <summary>How To Use (Click to Expand)</summary>
 
-- Patches can be installed, configured and updated via:
+#### Manual Installation
+- Download [patch zip](https://github.com/GoldHEN/GoldHEN_Patch_Repository/raw/gh-pages/patch1.zip)
+- Extract it to `/data/GoldHEN/`
+
+#### Easy Installation
+- Patches can be configured, install/update via:
   - [GoldHEN Cheat Manager](https://github.com/GoldHEN/GoldHEN_Cheat_Manager/releases/latest)
   - Itemzflow Game Manager
 - Run your game.
