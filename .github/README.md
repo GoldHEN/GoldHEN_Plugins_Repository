@@ -96,7 +96,6 @@ Patches game before boot.
 ### No Share Blocks
 
 Plugin filename: `no-share-watermark.prx`
->>>>>>> 8fd5620aec9736c90626e7532da3cf22a4b45724
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
