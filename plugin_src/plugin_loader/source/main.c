@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-
 #include "GoldHEN.h"
 
 #include <orbis/libkernel.h>
@@ -10,8 +9,8 @@
 #include "config.h"
 
 #define PLUGIN_NAME "plugin_loader"
-#define PLUGIN_CONFIG_PATH GOLDHEN_PATH"/plugins2.ini"
-#define PLUGIN_PATH GOLDHEN_PATH"/plugins"
+#define PLUGIN_CONFIG_PATH GOLDHEN_PATH "/plugins.ini"
+#define PLUGIN_PATH GOLDHEN_PATH "/plugins"
 #define PLUGIN_DEFAULT_SECTION "default"
 
 // Todo: Move to sdk.
@@ -24,17 +23,17 @@ bool file_exists(const char* filename)
 void create_template_config()
 {
     final_printf("Creating new %s file\n", PLUGIN_CONFIG_PATH);
-    const char *file_str = "; Load plugins under specific Title ID CUSA12345\n\
-[CUSA12345]\n\
-;/data/GoldHEN/plugins/example34.prx\n\
-;/data/GoldHEN/plugins/example138.prx\n\
-\n\
-; Load plugins in default section regardless of Title ID\n\
-[default]\n\
-;/data/GoldHEN/plugins/example.prx\n\
-;/data/GoldHEN/plugins/example2.prx\n\
-\n\
-; Note: text following the ; are comments\n";
+    const char *file_str = "; Load plugins under specific Title ID CUSA12345\n"
+                           "[CUSA12345]\n"
+                           ";/data/GoldHEN/plugins/example34.prx\n"
+                           ";/data/GoldHEN/plugins/example138.prx\n"
+                           "\n"
+                           "; Load plugins in default section regardless of Title ID\n"
+                           "[default]\n"
+                           ";/data/GoldHEN/plugins/example.prx\n"
+                           ";/data/GoldHEN/plugins/example2.prx\n"
+                           "\n"
+                           "; Note: text following the ; are comments\n";
 
     // Does not work, may not have write access.
     //FILE* f = fopen(PLUGIN_CONFIG_PATH, "w");
