@@ -172,9 +172,9 @@ bool ini_table_read_from_file(ini_table_s* table, const char* file)
                     }
                     _ini_entry_create(current_section, buf, "");
                 } else if (state == Section) {
-                    debug_printf(line, "Section `%s' missing `]' operator.", buf);
+                    debug_printf("Section `%s' missing `]' operator.", buf);
                 } else if(state == Key && position) {
-                    debug_printf(line, "Key `%s' missing `=' operator.", buf);
+                    debug_printf("Key `%s' missing `=' operator.", buf);
                 }
                 memset(buf, '\0', buffer_size);
                 state = Key;
