@@ -1,8 +1,3 @@
-echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
-echo "#define GIT_VER \"$(git branch --show-current)\"" >> common/git_ver.h
-echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
-echo "#define BUILD_DATE \"$(date '+%b %d %Y @ %T')\"" >> common/git_ver.h
-
 TYPE="_final"
 FINAL="FINAL=-D__FINAL__=1 TYPE=$TYPE $O_FLAG"
 
