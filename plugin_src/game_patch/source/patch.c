@@ -69,8 +69,11 @@ void sys_proc_rw(u64 address, void *data, u64 length) {
     debug_printf("hex_dump: ");
     hex_dump(process_rw_data.data, process_rw_data.length);
     debug_printf("length: 0x%lx\n", process_rw_data.length);
-    #endif
+    s32 ret = sys_sdk_proc_rw(&process_rw_data);
+    debug_printf("sys_sdk_proc_rw: returned 0x%08x\n", ret);
+    #else
     sys_sdk_proc_rw(&process_rw_data);
+    #endif
     return;
 }
 
@@ -169,12 +172,9 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "utf8") == 0) {
-            for (s32 i = 0; value[i] != '\0'; i++) {
-                u8 val_ = value[i];
-                u8 value_[1] = {val_};
-                sys_proc_rw(addr, value_, sizeof(value_));
-                addr++;
-            }
+            u64 char_len = strlen(value);
+            sys_proc_rw(addr, (void*)value, char_len);
+            addr = addr + char_len;
             // null terminate string hack
             u8 value_[1] = { 0x00 };
             sys_proc_rw(addr, value_, sizeof(value_));
@@ -187,7 +187,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
                 addr = addr + 2;
             }
             // null terminate string hack
-            u8 value_[2] = {0x00, 0x00};
+            u8 value_[2] = { 0x00, 0x00 };
             sys_proc_rw(addr, value_, sizeof(value_));
             return;
         } else {
