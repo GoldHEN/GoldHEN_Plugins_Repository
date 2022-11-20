@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "plugin_common.h"
 
+#define MAX_PATH_ 260
 #define plugin_name "AFR"
 
 HOOK_INIT(sceKernelOpen);
@@ -22,7 +23,7 @@ FILE* fopen_hook(const char *path, const char *mode) {
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
         FILE* fp=NULL;
-        char possible_path[512];
+        char possible_path[MAX_PATH_];
 
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
@@ -53,7 +54,7 @@ s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && strlen(path) > 6) {
         s32 fd;
-        char possible_path[512];
+        char possible_path[MAX_PATH_];
 
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
