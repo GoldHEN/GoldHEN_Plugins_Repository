@@ -1,6 +1,3 @@
-export OO_PS4_TOOLCHAIN=/mnt/s/ps4/git/goldhen/dev/oosdk
-export GOLDHEN_SDK=/mnt/s/ps4/git/goldhen/dev/GoldHEN_Plugins_SDK
-
 echo "#define GIT_COMMIT \"$(git rev-parse HEAD)\"" > common/git_ver.h
 echo "#define GIT_VER \"$(git branch --show-current)\"" >> common/git_ver.h
 echo "#define GIT_NUM $(git rev-list HEAD --count)" >> common/git_ver.h
