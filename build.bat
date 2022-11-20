@@ -38,7 +38,7 @@ echo #define GIT_NUM    %VER%         >> common\git_ver.h
 echo #define BUILD_DATE "%datetimef%" >> common\git_ver.h
 
 echo [+] Building the plugins
-for /D %%G in ("plugin-src\*") do (
+for /D %%G in ("plugin_src\*") do (
     rd /s /q "%%G\build"
     mkdir "%%G\build"
     mkdir "%%G\build\ghsdk"

@@ -83,7 +83,11 @@ Example usage:
 [default]
 /data/GoldHEN/plugins/example.prx
 /data/GoldHEN/plugins/example2.prx
+
+; Note: text following the ; are comments
 ```
+
+Please see `plugin_template` for a sample `hello world` plugin.
 
 #### No Share Blocks
 
