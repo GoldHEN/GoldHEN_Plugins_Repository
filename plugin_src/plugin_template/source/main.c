@@ -13,6 +13,7 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args) {
     final_printf("[GoldHEN] %s Plugin Started.\n", g_pluginName);
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
+    Notify(TEX_ICON, "Hello from %s", g_pluginName);
     return 0;
 }
 
