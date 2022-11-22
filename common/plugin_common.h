@@ -12,6 +12,7 @@
 #define s64 int64_t
 #define f32 float
 #define f64 double
+#define TEX_ICON "cxml://psnotification/tex_icon_system"
 
 #define attr_module_hidden __attribute__((weak)) __attribute__((visibility("hidden")))
 #define attr_public __attribute__((visibility("default")))
