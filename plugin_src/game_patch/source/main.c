@@ -11,7 +11,6 @@ attr_public const char *g_pluginDesc = "Patches game before boot";
 attr_public const char *g_pluginAuth = "illusion";
 attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
-#define TEX_ICON "cxml://psnotification/tex_icon_system"
 const char *key_patch = "patch";
 const char *key_title = "title";
 const char *key_app_ver = "app_ver";
