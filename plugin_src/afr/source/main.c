@@ -24,7 +24,7 @@ FILE* fopen_hook(const char *path, const char *mode) {
     debug_printf("path: %s mode: %s strlen: %li\n", path, mode, path_len);
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && strlen(path) > 6) {
+        path[4] == '0' && path_len > 6) {
         FILE* fp=NULL;
         char possible_path[MAX_PATH_];
 
@@ -45,8 +45,18 @@ FILE* fopen_hook(const char *path, const char *mode) {
 }
 
 s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
+    s64 path_len = strlen(path);
     s32 ret = stat(path, stat_buf);
     debug_printf("path: %s stat: 0x%08x\n", path, ret);
+    if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
+        path[4] == '0' && path_len > 6 && ret == -1) {
+        char possible_path[MAX_PATH_];
+        memset(possible_path, 0, sizeof(possible_path));
+        snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
+        s32 ret_pos = stat(possible_path, stat_buf);
+        debug_printf("possible_path: %s stat: 0x%08x\n", possible_path, ret_pos);
+        return ret_pos;
+      }
     return ret;
 }
 
@@ -55,7 +65,7 @@ s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
     debug_printf("path: %s strlen: %li\n", path, path_len);
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && strlen(path) > 6) {
+        path[4] == '0' && path_len > 6) {
         s32 fd;
         char possible_path[MAX_PATH_];
 
