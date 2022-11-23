@@ -12,9 +12,7 @@ attr_public const char *g_pluginAuth = "jocover, SiSTR0";
 attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
 HOOK_INIT(sceKernelOpen);
-//#if (__FINAL__) == 0
 HOOK_INIT(sceKernelStat);
-//#endif
 HOOK_INIT(fopen);
 
 char titleid[16];
@@ -48,8 +46,9 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
     s64 path_len = strlen(path);
     s32 ret = stat(path, stat_buf);
     debug_printf("path: %s stat: 0x%08x\n", path, ret);
+    // Try redirect path if file not found
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && path_len > 6 && ret == -1) {
+        path[4] == '0' && path_len > 6 && ret == 0xffffffff ) {
         char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
@@ -95,9 +94,7 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
         print_proc_info();
     }
     HOOK32(sceKernelOpen);
-//#if (__FINAL__) == 0
     HOOK32(sceKernelStat);
-//#endif
     HOOK32(fopen);
     return 0;
 }
@@ -105,9 +102,7 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
 s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     UNHOOK(sceKernelOpen);
-//#if (__FINAL__) == 0
     UNHOOK(sceKernelStat);
-//#endif
     UNHOOK(fopen);
     return 0;
 }
