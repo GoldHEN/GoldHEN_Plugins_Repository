@@ -48,7 +48,7 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
     debug_printf("path: %s stat: 0x%08x\n", path, ret);
     // Try redirect path if file not found
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && path_len > 6 && ret == 0xffffffff ) {
+        path[4] == '0' && path_len > 6 && ret != 0 ) {
         char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
