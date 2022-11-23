@@ -76,10 +76,10 @@ uint16_t load_plugins(ini_section_s *section)
             final_printf("Plugin %s not found\n", entry->key);
         } else if (result < 0)
         {
-            final_printf("Error loading Plugin %s! with error code %i\n", entry->key, result);
+            final_printf("Error loading Plugin %s! Error code 0x%08x (%i)\n", entry->key, result, result);
         } else
         {
-            final_printf("Loaded Plugin %s.\n", entry->key);
+            final_printf("Loaded Plugin %s\n", entry->key);
             load_count++;
         }
     }
@@ -112,7 +112,7 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
     // Better done in GoldHEN
     if (!file_exists(PLUGIN_CONFIG_PATH))
     {
-       final_printf("Plugin config %s not found.\n", PLUGIN_CONFIG_PATH);
+       final_printf("Plugin config %s not found\n", PLUGIN_CONFIG_PATH);
        create_template_config();
        return -1;
     }
