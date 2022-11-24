@@ -5,7 +5,6 @@
 #include "Common.h"
 #include "plugin_common.h"
 
-#define MAX_PATH_ 260
 attr_public const char *g_pluginName = "afr";
 attr_public const char *g_pluginDesc = "Application File Redirector";
 attr_public const char *g_pluginAuth = "jocover, SiSTR0";
