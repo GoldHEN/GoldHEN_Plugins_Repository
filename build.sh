@@ -1,4 +1,5 @@
 TYPE="_final"
+O_FLAG="O_FLAG=-O3"
 FINAL="FINAL=-D__FINAL__=1 TYPE=$TYPE $O_FLAG"
 
 if [[ $2 == "-no_opt" ]]
