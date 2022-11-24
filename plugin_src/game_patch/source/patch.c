@@ -6,8 +6,6 @@ u8 arr16[2];
 u8 arr32[4];
 u8 arr64[8];
 
-const char *hex_prefix = "0x";
-
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
     // valid hex look up table.
     const u8 hex_lut[] = {
@@ -63,7 +61,7 @@ void sys_proc_rw(u64 address, void *data, u64 length) {
     process_rw_data.data = data;
     process_rw_data.length = length;
     process_rw_data.write_flags = 1;
-    #if(__FINAL__) == 0
+#if (__FINAL__) == 0
     debug_printf("process_rw_data: %p\n", &process_rw_data);
     debug_printf("address: 0x%lx\n", process_rw_data.address);
     debug_printf("hex_dump: ");
@@ -71,21 +69,24 @@ void sys_proc_rw(u64 address, void *data, u64 length) {
     debug_printf("length: 0x%lx\n", process_rw_data.length);
     s32 ret = sys_sdk_proc_rw(&process_rw_data);
     debug_printf("sys_sdk_proc_rw: returned 0x%08x\n", ret);
-    #else
+#else
     sys_sdk_proc_rw(&process_rw_data);
-    #endif
+#endif
     return;
 }
 
-// https://stackoverflow.com/a/4770992
-bool prefix(const char *pre, const char *str) {
-    return strncmp(pre, str, strlen(pre)) == 0;
+bool hex_prefix(const char *str)
+{
+    if (str[0] == '0' && str[1] == 'x')
+        return true;
+    else
+        return false;
 }
 
 // http://www.cse.yorku.ca/~oz/hash.html
-u64 hash(const char *str) {
+u64 djb2(const char *str) {
     u64 hash = 5381;
-    u32 c;
+    u32 c = 0;
     while ((c = *str++))
         hash = hash * 33 ^ c;
     return hash;
@@ -97,7 +98,7 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
     char hash_str[256];
     snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
              title_id, elf);
-    output_hash = hash(hash_str);
+    output_hash = djb2(hash_str);
     debug_printf("input: \"%s\"\n", hash_str);
     debug_printf("output: 0x%016lx\n", output_hash);
     return output_hash;
@@ -112,7 +113,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
         memset(arr64, 0, sizeof(arr64));
         if (strcmp(type, "byte") == 0) {
             u8 real_value = 0;
-            if (prefix(hex_prefix, value)) {
+            if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
             } else {
                 str_base = 10;
@@ -123,7 +124,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             return;
         } else if (strcmp(type, "bytes16") == 0) {
             u16 real_value = 0;
-            if (prefix(hex_prefix, value)) {
+            if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
             } else {
                 str_base = 10;
@@ -134,7 +135,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             return;
         } else if (strcmp(type, "bytes32") == 0) {
             u32 real_value = 0;
-            if (prefix(hex_prefix, value)) {
+            if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
             } else {
                 str_base = 10;
@@ -145,7 +146,7 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             return;
         } else if (strcmp(type, "bytes64") == 0) {
             s64 real_value = 0;
-            if (prefix(hex_prefix, value)) {
+            if (hex_prefix(value)) {
                 real_value = strtoll(value, NULL, str_base);
             } else {
                 str_base = 10;
