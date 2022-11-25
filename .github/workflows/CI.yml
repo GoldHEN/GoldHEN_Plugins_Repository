@@ -2,27 +2,17 @@ name: Build modules
 
 on:
   push:
-    paths:
-      - '**/*.c'
-      - '**/*.cpp'
-      - '**/*.h'
-      - '**/*.yml'
-      - '**/Makefile'
-      - '**/.sh'
-      - '**/.bat'
+    paths-ignore:
+      - "**/*.md"
+      - '**/*.txt'
   pull_request:
-    paths:
-      - '**/*.c'
-      - '**/*.cpp'
-      - '**/*.h'
-      - '**/*.yml'
-      - '**/Makefile'
-      - '**/.sh'
-      - '**/.bat'
+    paths-ignore:
+      - "**/*.md"
+      - '**/*.txt'
   workflow_dispatch:
 
 jobs:
-  build-prx:
+  build_prx:
     runs-on: ubuntu-latest
     steps:
 
@@ -39,14 +29,17 @@ jobs:
         repository: GoldHEN/GoldHEN_Plugins_SDK
         path: SDK
 
+    - name: Setup variables
+      run: |
+        ver="1.$(git rev-list HEAD --count)"
+        echo "commit_ver=$ver" >> $GITHUB_ENV
+
     - name: Download OpenOrbis Toolchain
       run: |
         curl -fLOs https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
         sudo apt install llvm lld
         tar xf toolchain.tar.gz
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
-        ver="1.$(git rev-list HEAD --count)"
-        echo "commit_ver=$ver" >> $GITHUB_ENV
 
     - name: Build SDK Static Lib
       working-directory: SDK
