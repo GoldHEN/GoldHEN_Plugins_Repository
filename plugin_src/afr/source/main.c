@@ -46,7 +46,6 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
     s64 path_len = strlen(path);
     s32 ret = stat(path, stat_buf);
     debug_printf("path: %s stat: 0x%08x\n", path, ret);
-    // Try redirect path if file not found
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && path_len > 6 ) {
         char possible_path[MAX_PATH_];
@@ -60,14 +59,14 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
 }
 
 s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
+    s32 fd = 0;
     s64 path_len = strlen(path);
     debug_printf("path: %s strlen: %li\n", path, path_len);
 
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
         path[4] == '0' && path_len > 6) {
-        s32 fd;
-        char possible_path[MAX_PATH_];
 
+        char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
         s64 possible_path_len = strlen(possible_path);
@@ -79,9 +78,11 @@ s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
         if (fd >= 0) return fd;
     }
 
-    return HOOK_CONTINUE(sceKernelOpen,
-                         s32 (*)(const char *, s32, OrbisKernelMode),
-                         path, flags, mode);
+    fd = HOOK_CONTINUE(sceKernelOpen,
+                       s32 (*)(const char *, s32, OrbisKernelMode),
+                       path, flags, mode);
+    debug_printf("fd: 0x%08x\n", fd);
+    return fd;
 }
 
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
