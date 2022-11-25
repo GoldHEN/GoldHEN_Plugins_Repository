@@ -45,7 +45,7 @@ jobs:
       working-directory: SDK
       run: |
         clang -v
-        make
+        make DEBUGFLAGS=1
         echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
 
     - name: Build (Release)
