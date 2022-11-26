@@ -58,7 +58,9 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_final
-        path: bin/plugins/prx_final/*.prx
+        path: |
+          bin/plugins/prx_final/*.prx
+          bin/plugins/prx_final/*.txt
         if-no-files-found: error
 
     - name: Push module artifact (Release elf)
@@ -72,7 +74,9 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_debug
-        path: bin/plugins/prx_debug/*.prx
+        path: |
+          bin/plugins/prx_debug/*.prx
+          bin/plugins/prx_debug/*.txt
         if-no-files-found: error
 
     - name: Push module artifact (Debug elf)
