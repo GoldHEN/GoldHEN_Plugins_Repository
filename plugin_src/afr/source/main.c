@@ -53,6 +53,7 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
         s32 ret_pos = stat(possible_path, stat_buf);
         debug_printf("possible_path: %s stat: 0x%08x\n", possible_path, ret_pos);
+        if (ret_pos < 0) return ret;
         return ret_pos;
       }
     return ret;
