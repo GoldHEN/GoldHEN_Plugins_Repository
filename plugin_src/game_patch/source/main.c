@@ -51,13 +51,13 @@ s32 get_key_init() {
     json_t mem[MAX_TOKENS];
     json_t const *json = json_create(buffer, mem, MAX_TOKENS);
     if (!json) {
-        Notify(TEX_ICON, "Too many tokens or bad file");
+        Notify(TEX_ICON_SYSTEM, "Too many tokens or bad file");
         return -1;
     }
 
     json_t const *patchItems = json_getProperty(json, KEY_PATCH);
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
-        Notify(TEX_ICON, "Patch not found");
+        Notify(TEX_ICON_SYSTEM, "Patch not found");
         return -1;
     }
 
@@ -136,7 +136,7 @@ s32 get_key_init() {
         }
     }
     if (patch_lines > 0) {
-        Notify(TEX_ICON, "%li Patches Applied\n"
+        Notify(TEX_ICON_SYSTEM, "%li Patches Applied\n"
                "%li Patch Lines Applied",
                patch_items, patch_lines);
     }
