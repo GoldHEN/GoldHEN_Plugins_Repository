@@ -17,7 +17,6 @@ attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 HOOK_INIT(sceVideoOutSetFlipRate);
 
 s32 sceVideoOutSetFlipRate_hook(s32 handle, s32 fliprate){
-    debug_printf("handle 0x%08x fliprate 0x%08x\n", handle, fliprate);
     return 0;
 }
 
