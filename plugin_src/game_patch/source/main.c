@@ -143,11 +143,18 @@ s32 get_key_init() {
     return 0;
 }
 
+void mkdir_chmod(char* path, OrbisKernelMode mode)
+{
+    sceKernelMkdir(path, mode);
+    sceKernelChmod(path, mode);
+    return;
+}
+
 void make_folders() {
-    mkdir(GOLDHEN_PATH, 0777);
-    mkdir(BASE_PATH_PATCH, 0777);
-    mkdir(BASE_PATH_PATCH_JSON, 0777);
-    mkdir(BASE_PATH_PATCH_SETTINGS, 0777);
+    mkdir_chmod(GOLDHEN_PATH, 0777);
+    mkdir_chmod(BASE_PATH_PATCH, 0777);
+    mkdir_chmod(BASE_PATH_PATCH_JSON, 0777);
+    mkdir_chmod(BASE_PATH_PATCH_SETTINGS, 0777);
     return;
 }
 
