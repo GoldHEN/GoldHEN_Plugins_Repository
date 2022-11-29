@@ -58,9 +58,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_final
-        path: |
-          bin/plugins/prx_final/*.prx
-          bin/plugins/prx_final/*.txt
+        path: bin/plugins/prx_final/*
         if-no-files-found: error
 
     - name: Push module artifact (Release elf)
@@ -74,9 +72,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: goldplugins_${{ env.commit_ver }}_prx_debug
-        path: |
-          bin/plugins/prx_debug/*.prx
-          bin/plugins/prx_debug/*.txt
+        path: bin/plugins/prx_debug/*
         if-no-files-found: error
 
     - name: Push module artifact (Debug elf)
@@ -95,15 +91,16 @@ jobs:
       run: |
         cd bin/plugins
         mv prx_final plugins
+        chmod -R 0777 plugins
         zip -r plugins.zip plugins/*
         echo "<details>" > hash.md
         echo "<summary>Plugin Hashes (Click to Expand)</summary>" >> hash.md
         echo "" >> hash.md
-        echo "\`\`\`" >> hash.md
+        echo "\`\`\`md5" >> hash.md
         cat plugins/md5.txt >> hash.md
         echo "\`\`\`" >> hash.md
         echo "" >> hash.md
-        echo "\`\`\`" >> hash.md
+        echo "\`\`\`sha256" >> hash.md
         cat plugins/sha256.txt >> hash.md
         echo "\`\`\`" >> hash.md
         echo "" >> hash.md
