@@ -31,15 +31,26 @@ jobs:
 
     - name: Setup variables
       run: |
+        echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
         ver="1.$(git rev-list HEAD --count)"
         echo "commit_ver=$ver" >> $GITHUB_ENV
 
+    - name: Cache OpenOrbis Toolchain
+      id: cache-oosdk
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.OO_PS4_TOOLCHAIN }}
+        key: ${{ runner.os }}-oosdk
+
+    # temporary release until 0.53 is released
     - name: Download OpenOrbis Toolchain
+      if: steps.cache-oosdk.outputs.cache-hit != 'true'
       run: |
         curl -fLOs https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz
-        sudo apt install llvm lld
         tar xf toolchain.tar.gz
-        echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
+
+    - name: Setup dependencies
+      run: sudo apt install llvm lld
 
     - name: Build SDK Static Lib
       working-directory: SDK
