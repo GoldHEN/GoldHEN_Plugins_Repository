@@ -45,7 +45,7 @@ s32 get_key_init() {
 
     if (res) {
         final_printf("file %s not found\n error: 0x%08x", input_file, res);
-        return -1;
+        return 0;
     }
 
     json_t mem[MAX_TOKENS];
