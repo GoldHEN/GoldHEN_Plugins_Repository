@@ -24,6 +24,7 @@ attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 #define KEY_APP_ADDR "addr"
 #define KEY_APP_VALUE "value"
 #define KEY_PATCH_LIST "patch_list"
+#define KEY_COMMENT "comment"
 
 #define BASE_PATH_PATCH GOLDHEN_PATH "/patches"
 #define BASE_PATH_PATCH_SETTINGS BASE_PATH_PATCH "/settings"
@@ -38,7 +39,8 @@ s32 get_key_init() {
     u64 patch_lines = 0;
     u64 patch_items = 0;
     char *buffer;
-    u64 size;
+    char *buffer2;
+    u64 size = 0;
     char input_file[64];
     snprintf(input_file, sizeof(input_file), "%s/%s.json", BASE_PATH_PATCH_JSON, titleid);
     s32 res = Read_File(input_file, &buffer, &size, 0);
@@ -52,12 +54,14 @@ s32 get_key_init() {
     json_t const *json = json_create(buffer, mem, MAX_TOKENS);
     if (!json) {
         Notify(TEX_ICON_SYSTEM, "Too many tokens or bad file");
+        free(buffer);
         return -1;
     }
 
     json_t const *patchItems = json_getProperty(json, KEY_PATCH);
     if (!patchItems || JSON_ARRAY != json_getType(patchItems)) {
         Notify(TEX_ICON_SYSTEM, "Patch not found");
+        free(buffer);
         return -1;
     }
 
@@ -67,37 +71,49 @@ s32 get_key_init() {
             char const *gameTitle = json_getPropertyValue(patches, KEY_TITLE);
             if (!gameTitle)
                 final_printf("%s: not found\n", KEY_TITLE);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_TITLE, gameTitle, gameTitle);
             char const *gameAppver = json_getPropertyValue(patches, KEY_APP_VER);
             if (!gameAppver)
                 final_printf("%s: not found\n", KEY_APP_VER);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_APP_VER, gameAppver, gameAppver);
             char const *gameAppElf = json_getPropertyValue(patches, KEY_APP_ELF);
             if (!gameAppElf)
                 final_printf("%s: not found\n", KEY_APP_ELF);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_APP_ELF, gameAppElf, gameAppElf);
             char const *gameName = json_getPropertyValue(patches, KEY_NAME);
             if (!gameName)
                 final_printf("%s: not found\n", KEY_NAME);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_NAME, gameName, gameName);
             char const *gameAuthor = json_getPropertyValue(patches, KEY_AUTHOR);
             if (!gameAuthor)
                 final_printf("%s: not found\n", KEY_AUTHOR);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_AUTHOR, gameAuthor, gameAuthor);
             char const *gameNote = json_getPropertyValue(patches, KEY_NOTE);
             if (!gameNote)
                 final_printf("%s: not found\n", KEY_NOTE);
+            else
+                debug_printf("%s: %s: 0x%p\n", KEY_NOTE, gameNote, gameNote);
             json_t const *patch_List_Items = json_getProperty(patches, KEY_PATCH_LIST);
             json_t const *patch_lists;
             u64 hashout = patch_hash_calc(gameTitle, gameName, gameAppver, input_file, gameAppElf);
             char settings_path[64];
             snprintf(settings_path, sizeof(settings_path),
                      "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
-            char *buffer2;
-            u64 size2;
+            u64 size2 = 0;
             s32 res = Read_File(settings_path, &buffer2, &size2, 0);
             if (res == 0x80020002) {
-                final_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path,
+                debug_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path,
                              res);
                 unsigned char false_data[2] = {0x30, 0xa};
                 Write_File(settings_path, false_data, sizeof(false_data));
             } else if (res == 0) {
-                if (buffer2[0] == 0x31 && strcmp(game_elf, gameAppElf) == 0 &&
+                if (buffer2[0] == 0x31 &&
+                    strcmp(game_elf, gameAppElf) == 0 &&
                     strcmp(game_ver, gameAppver) == 0) {
                     debug_printf("settings path: %s ret: 0x%08x\n", settings_path, res);
                     patch_items++;
@@ -106,38 +122,49 @@ s32 get_key_init() {
                         if (JSON_OBJ == json_getType(patch_lists)) {
                             u64 addr_real = 0;
                             char const *gameType = json_getPropertyValue(patch_lists, KEY_APP_TYPE);
-                            if (!gameType) {
+                            if (!gameType)
+                            {
                                 final_printf("  %s: not found\n", KEY_APP_TYPE);
-                                return -1;
+                                continue;
                             }
                             char const *gameAddr = json_getPropertyValue(patch_lists, KEY_APP_ADDR);
-                            if (!gameAddr) {
+                            if (!gameAddr)
+                            {
                                 final_printf("  %s: not found\n", KEY_APP_ADDR);
-                                return -1;
+                                continue;
                             } else {
                                 addr_real = strtoull(gameAddr, NULL, 16);
                             }
-                            char const *gameValue =
-                                json_getPropertyValue(patch_lists, KEY_APP_VALUE);
-                            if (!gameValue) {
+                            char const *gameValue = json_getPropertyValue(patch_lists, KEY_APP_VALUE);
+                            char const *gameOptionalComment = json_getPropertyValue(patch_lists, KEY_COMMENT);
+                            if (!gameValue)
+                            {
                                 final_printf("  %s: not found\n", KEY_APP_VALUE);
-                                return -1;
+                                continue;
                             }
                             debug_printf(
                                 "game_ver: %s game_elf: %s gameAppElf: %s gameAppver: %s\n",
                                 game_ver, game_elf, gameAppElf, gameAppver);
                             debug_printf("setting %s true\n", settings_path);
-                            patch_data1(gameType, addr_real, gameValue);
-                            patch_lines++;
+                            debug_printf("  %s: %s\n", KEY_COMMENT, gameOptionalComment);
+                            if (gameType && addr_real) // type and address must be present
+                            {
+                                patch_data1(gameType, addr_real, gameValue);
+                                patch_lines++;
+                            }
                         }
                     }
                 }
             }
         }
     }
-    if (patch_lines > 0) {
-        Notify(TEX_ICON_SYSTEM, "%li Patches Applied\n"
-               "%li Patch Lines Applied",
+    free(buffer2);
+    free(buffer);
+    if (patch_lines > 0)
+    {
+        Notify(TEX_ICON_SYSTEM,
+               "%lu Patches Applied\n"
+               "%lu Patch Lines Applied",
                patch_items, patch_lines);
     }
     return 0;

@@ -2,7 +2,7 @@
 #include "plugin_common.h"
 #include <stdbool.h>
 
-#define MAX_TOKENS 4096
+#define MAX_TOKENS 10240
 
 extern s32 pid;
 extern u8 arr8[1];
