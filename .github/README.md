@@ -1,31 +1,42 @@
 # GoldHEN Plugins
-GoldHEN Plugins for PlayStation 4.
+Plugins allows you to customize your games like never before!
 
 [![Build modules](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml/badge.svg?branch=main&event=push)](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/actions/workflows/CI.yml)
 
+## Features:
+
+- Hook into Games before boot.
+- Write your own code into games in C/C++.
+- Hook and modify system functions.
+
+## :warning: Disclaimer
+
+While we make every effort to deliver high quality products, we do not guarantee that our products are free from defects. Our software is provided **as is** and you use the software at your own risk.
+
 # Getting Started
 
-Create a config file: `/data/GoldHEN/plugins.ini`
-
-Copy plugin files to: `/data/GoldHEN/plugins/`
-
-Example ini usage:
+- Load [GoldHEN 2.3](https://github.com/GoldHEN/GoldHEN/releases/latest) or newer on your PS4.
+- Enable option to load plugins in Plugins Menu.
+- Download plugins from [Release Page](https://github.com/GoldHEN/GoldHEN_Plugins_Repository/releases/latest).
+- Extract downloaded plugins into `/data/GoldHEN/plugins/`.
+- Add plugins you want to load into `/data/GoldHEN/plugins.ini`.
+  - Per game plugins sections are recommended over putting everything in `default`.
 
 ```ini
-; Load plugins under specific Title ID `CUSA12345`
-[CUSA12345]
-/data/GoldHEN/plugins/example34.prx
-/data/GoldHEN/plugins/example138.prx
+; Load plugins for any title
 
-; Load plugins in `default` section regardless of Title ID
 [default]
-/data/GoldHEN/plugins/example.prx
-/data/GoldHEN/plugins/example2.prx
+/data/GoldHEN/plugins/game_patch.prx
 
-; Note: text following the ; are comments
+; Load plugins only for Playroom
+
+[CUSA00001]
+/data/GoldHEN/plugins/afr.prx
+/data/GoldHEN/plugins/no_share_watermark.prx
 ```
 
 ## Plugins
+
 ### AFR (Application File Redirector)
 
 Plugin filename: `afr.prx`
@@ -49,7 +60,7 @@ Redirect file calls to `/data/`
 
 ### Button Swap
 
-Plugin filename: `button-swap.prx`
+Plugin filename: `button_swap.prx`
 
 Author(s):
 - [jocover](https://github.com/jocover)
@@ -58,7 +69,7 @@ Swap X and O around on Asia Region console.
 
 ### Fliprate Remover
 
-Plugin filename: `fliprate-remover.prx`
+Plugin filename: `fliprate_remover.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
@@ -67,7 +78,7 @@ Removes framerate limit for games using system function `sceVideoOutSetFlipRate`
 
 ### Game Patch
 
-Plugin filename: `game-patch.prx`
+Plugin filename: `game_patch.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
@@ -95,7 +106,7 @@ Patches game before boot.
 
 ### No Share Blocks
 
-Plugin filename: `no-share-watermark.prx`
+Plugin filename: `no_share_watermark.prx`
 
 Author(s):
 - [illusion](https://github.com/illusion0001)
@@ -133,3 +144,13 @@ export GOLDHEN_SDK=[directory of installation]
 1. Set environment variable to OpenOrbis and GoldHEN SDK
 2. Run `build_static.bat` in GoldHEN SDK repository to build the library statically.
 3. Run `build.bat` to build all the modules at once.
+
+# Coded by:
+
+- [bucanero](https://github.com/bucanero)
+- [ctn123](https://github.com/ctn123)
+- [illusion](https://github.com/illusion0001)
+- [jocover](https://github.com/jocover)
+- [nkrapivin](https://github.com/nkrapivin)
+- [OSM](https://github.com/OSM-Made)
+- [SiSTRo](https://github.com/SiSTR0)
