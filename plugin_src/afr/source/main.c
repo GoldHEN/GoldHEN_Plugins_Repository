@@ -17,28 +17,26 @@ HOOK_INIT(fopen);
 char titleid[16];
 
 FILE* fopen_hook(const char *path, const char *mode) {
-    s64 path_len = strlen(path);
-    debug_printf("path: %s mode: %s strlen: %li\n", path, mode, path_len);
-
+    FILE* fp = NULL;
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && path_len > 6) {
-        FILE* fp=NULL;
-        char possible_path[MAX_PATH_];
+        path[4] == '0' && strlen(path) > 6) {
 
+        char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
 
         fp = HOOK_CONTINUE(fopen,
                            FILE *(*)(const char *, const char *),
                            possible_path, mode);
-        s64 possible_path_len = strlen(possible_path);
-        debug_printf("possible_path: %s strlen: %li FILE*: 0x%p\n", possible_path, possible_path_len, &fp);
+        debug_printf("possible_path: %s FILE*: 0x%p\n", possible_path, &fp);
         if (fp) return fp;
     }
 
-        return HOOK_CONTINUE(fopen,
-                           FILE *(*)(const char *, const char *),
-                           path, mode);
+    fp = HOOK_CONTINUE(fopen,
+                       FILE *(*)(const char *, const char *),
+                       path, mode);
+    debug_printf("path: %s mode: %s FILE*: 0x%p\n", path, mode, &fp);
+    return fp;
 }
 
 s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
@@ -60,28 +58,24 @@ s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
 
 s32 sceKernelOpen_hook(const char *path, s32 flags, OrbisKernelMode mode) {
     s32 fd = 0;
-    s64 path_len = strlen(path);
-    debug_printf("path: %s strlen: %li\n", path, path_len);
-
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && path_len > 6) {
+        path[4] == '0' && strlen(path) > 6) {
 
         char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
-        s64 possible_path_len = strlen(possible_path);
         fd = HOOK_CONTINUE(sceKernelOpen,
                            s32 (*)(const char *, s32, OrbisKernelMode),
                            possible_path, flags, mode);
 
-        debug_printf("possible_path: %s fd: 0x%08x strlen: %li\n", possible_path, fd, possible_path_len);
+        debug_printf("possible_path: %s fd: 0x%08x\n", possible_path, fd);
         if (fd >= 0) return fd;
     }
 
     fd = HOOK_CONTINUE(sceKernelOpen,
                        s32 (*)(const char *, s32, OrbisKernelMode),
                        path, flags, mode);
-    debug_printf("fd: 0x%08x\n", fd);
+    debug_printf("path: %s fd: 0x%08x\n", path, fd);
     return fd;
 }
 
