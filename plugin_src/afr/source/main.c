@@ -39,19 +39,24 @@ FILE* fopen_hook(const char *path, const char *mode) {
     return fp;
 }
 
-s32 sceKernelStat_hook(char *path, struct stat* stat_buf) {
-    s64 path_len = strlen(path);
-    s32 ret = stat(path, stat_buf);
+s32 sceKernelStat_hook(char *path, struct stat* stat_buf)
+{
+    // FIXME: use errno for correct `stat()` return values
+    s32 ret = 0;
+    s32 ret_pos = 0;
+    ret = stat(path, stat_buf);
     debug_printf("path: %s stat: 0x%08x\n", path, ret);
     if (path[0] == '/' && path[1] == 'a' && path[2] == 'p' && path[3] == 'p' &&
-        path[4] == '0' && path_len > 6 ) {
+        path[4] == '0' && strlen(path) > 6 ) {
         char possible_path[MAX_PATH_];
         memset(possible_path, 0, sizeof(possible_path));
         snprintf(possible_path, sizeof(possible_path), "/data/GoldHEN/AFR/%s/%s", titleid, path + 6);
-        s32 ret_pos = stat(possible_path, stat_buf);
-        debug_printf("possible_path: %s stat: 0x%08x\n", possible_path, ret_pos);
-        if (ret_pos < 0) return ret;
-        return ret_pos;
+        ret_pos = stat(possible_path, stat_buf);
+        debug_printf("possible_path: %s original_path stat: 0x%08x possible_path stat: 0x%08x\n", possible_path, ret, ret_pos);
+        if (ret_pos < 0)
+            return ret; // use original if not found
+        else
+            return ret_pos; // use possible path if found
       }
     return ret;
 }
