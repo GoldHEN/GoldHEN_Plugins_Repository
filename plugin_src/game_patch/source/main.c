@@ -35,12 +35,14 @@ char game_elf[32] = {0};
 char game_prx[MAX_PATH_] = {0};
 char game_ver[8] = {0};
 
-s32 get_key_init() {
+s32 get_key_init(void)
+{
     u64 patch_lines = 0;
     u64 patch_items = 0;
     char *buffer;
     char *buffer2;
     u64 size = 0;
+    u64 size2 = 0;
     char input_file[64];
     snprintf(input_file, sizeof(input_file), "%s/%s.json", BASE_PATH_PATCH_JSON, titleid);
     s32 res = Read_File(input_file, &buffer, &size, 0);
@@ -104,7 +106,6 @@ s32 get_key_init() {
             char settings_path[64];
             snprintf(settings_path, sizeof(settings_path),
                      "/data/GoldHEN/patches/settings/0x%016lx.txt", hashout);
-            u64 size2 = 0;
             s32 res = Read_File(settings_path, &buffer2, &size2, 0);
             if (res == 0x80020002) {
                 debug_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path,
@@ -159,14 +160,30 @@ s32 get_key_init() {
         }
     }
     free(buffer2);
+    final_printf("free %lu bytes from memory\n", size2);
     free(buffer);
-    if (patch_lines > 0)
+    final_printf("free %lu bytes from memory\n", size);
+
+    char line_msg[64];
+    char item_msg[64];
+
+    if (patch_lines == 1)
+        snprintf(line_msg, sizeof(line_msg), "%lu Patch Line Applied", patch_lines);
+    if (patch_lines > 1)
+        snprintf(line_msg, sizeof(line_msg), "%lu Patch Lines Applied", patch_lines);
+    if (patch_items == 1)
+        snprintf(item_msg, sizeof(item_msg), "%lu Patch Applied", patch_items);
+    if (patch_items > 1)
+        snprintf(item_msg, sizeof(item_msg), "%lu Patches Applied", patch_items);
+
+    if (patch_items > 0 && patch_lines > 0)
     {
         Notify(TEX_ICON_SYSTEM,
-               "%lu Patches Applied\n"
-               "%lu Patch Lines Applied",
-               patch_items, patch_lines);
+               "%s\n"
+               "%s",
+               item_msg, line_msg);
     }
+
     return 0;
 }
 
@@ -177,7 +194,10 @@ void mkdir_chmod(char* path, OrbisKernelMode mode)
     return;
 }
 
-void make_folders() {
+void make_folders(void)
+{
+    // do this every boot in cases where user
+    // may create a folder with 511 perms
     mkdir_chmod(GOLDHEN_PATH, 0777);
     mkdir_chmod(BASE_PATH_PATCH, 0777);
     mkdir_chmod(BASE_PATH_PATCH_JSON, 0777);
