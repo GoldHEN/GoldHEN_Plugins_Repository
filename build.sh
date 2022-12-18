@@ -22,14 +22,18 @@ rm -rf $BUILD_PRX $BUILD_ELF
 mkdir -p $BUILD_PRX $BUILD_ELF
 
 cd plugin_src
+MAKEFILE="Makefile"
+
 for dir in ./*
-  do
-    echo "[+] build dir: $dir"
-    cd "$dir"
-    make clean $FINAL || exit 1
-    make $FINAL || exit 1
-    cd ..
-  done
+do
+    if [[ -f "$dir/$MAKEFILE" ]]; then
+        echo "[+] build dir: $dir"
+        cd $dir
+        make clean $FINAL || exit 1
+        make $FINAL || exit 1
+        cd ..
+    fi
+done
 
 cd ..
 
