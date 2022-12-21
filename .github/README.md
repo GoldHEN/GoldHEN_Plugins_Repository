@@ -139,6 +139,10 @@ export GOLDHEN_SDK=[directory of installation]
 ```
 3. Run `./build.sh` or `make` individually; built binaries can be found in `bin/plugins`.
 
+# Troubleshooting log crashes
+
+If you ran into crashes related to print logging (usually during VA args assignment clearing stack) you can try building with printf `./build.sh -printf`.
+
 ### Windows
 
 1. Set environment variable to OpenOrbis and GoldHEN SDK

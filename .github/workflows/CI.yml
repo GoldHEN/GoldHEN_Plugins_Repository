@@ -56,6 +56,12 @@ jobs:
         make DEBUGFLAGS=1
         echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
 
+    - name: Build (Release) (printf)
+      run: bash build.sh -printf
+
+    - name: Build (Debug) (printf)
+      run: bash build.sh -debug 0 -printf
+
     - name: Build (Release)
       run: bash build.sh
 

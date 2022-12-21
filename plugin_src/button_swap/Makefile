@@ -1,6 +1,20 @@
 # Library metadata.
-TYPE         := _final
-FINAL        := -D__FINAL__=1
+
+DEBUG_FLAGS = -D__FINAL__=1
+LOG_TYPE = -D__USE_KLOG__
+BUILD_TYPE = _final
+
+ifeq ($(PRINTF),1)
+    LOG_TYPE = -D__USE_PRINTF__
+endif
+
+ifeq ($(DEBUG),1)
+    DEBUG_FLAGS = -D__FINAL__=0
+    BUILD_TYPE = _debug
+endif
+
+TYPE         := $(BUILD_TYPE)
+FINAL        := $(DEBUG_FLAGS)
 BUILD_FOLDER := $(shell pwd)/../../bin/plugins
 OUTPUT_PRX   := $(shell basename $(CURDIR))
 TARGET       := $(BUILD_FOLDER)/prx$(TYPE)/$(OUTPUT_PRX)
@@ -10,6 +24,8 @@ O_FLAG       := -O3
 
 # Libraries linked into the ELF.
 LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lSceSystemService
+
+EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE)
 
 # You likely won't need to touch anything below this point.
 # Root vars
