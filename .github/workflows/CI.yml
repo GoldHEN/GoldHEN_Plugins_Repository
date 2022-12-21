@@ -90,17 +90,41 @@ jobs:
         path: bin/plugins/elf_debug/*.elf
         if-no-files-found: error
 
-    - name: Create release
+    - name: Prepare Release
       if: |
         github.event_name == 'workflow_dispatch' &&
         github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        # Removing non user related plugins from release
+        BUILD=plugins
         cd bin/plugins
-        mv prx_final plugins
-        chmod -R 0777 plugins
-        zip -r plugins.zip plugins/*
+        mv prx_final $BUILD
+        chmod -R 0777 $BUILD
+        BUILD_MD5="md5.txt"
+        BUILD_SHA256="sha256.txt"
+        echo "MD5:" > $BUILD/$BUILD_MD5
+        echo "SHA256:" > $BUILD/$BUILD_SHA256
+        FILES="$BUILD/*.prx"
+        for f in $FILES
+        do
+        if  [[ "$f" == "$BUILD/aio_fix_505.prx" ]] ||
+            [[ "$f" == "$BUILD/game_call_example.prx" ]] ||
+            [[ "$f" == "$BUILD/plugin_loader.prx" ]] ||
+            [[ "$f" == "$BUILD/plugin_template.prx" ]]; then
+            echo "[+] Skipping $f"
+            rm $f
+            continue
+        fi
+            echo "$(sha256sum $f)" >> $BUILD/$BUILD_MD5
+            echo "$(md5sum $f)" >> $BUILD/$BUILD_SHA256
+        done
+        cat $BUILD/$BUILD_MD5
+        cat $BUILD/$BUILD_SHA256
+        # Create zip
+        commit_hash=$(echo ${GITHUB_SHA} | cut -c1-8)
+        ZIP_NAME=GoldPlugins-${{ env.commit_ver }}-$commit_hash
+        echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+        zip -r $ZIP_NAME.zip plugins/*
         echo "<details>" > hash.md
         echo "<summary>Plugin Hashes (Click to Expand)</summary>" >> hash.md
         echo "" >> hash.md
@@ -113,4 +137,13 @@ jobs:
         echo "\`\`\`" >> hash.md
         echo "" >> hash.md
         echo "</details>" >> hash.md
-        gh release create ${{ env.commit_ver }} plugins.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
+
+    - name: Create Release
+      working-directory: bin/plugins
+      if: |
+        github.event_name == 'workflow_dispatch' &&
+        github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ env.commit_ver }} ${{ env.ZIP_NAME }}.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
