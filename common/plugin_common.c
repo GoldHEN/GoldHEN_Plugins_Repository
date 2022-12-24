@@ -10,6 +10,7 @@ void Notify(const char* IconUri, const char *FMT, ...) {
     va_start(args, FMT);
     vsprintf(Buffer.message, FMT, args);
     va_end(args);
+    final_printf("Notify message:\n%s\n", Buffer.message);
     Buffer.type = NotificationRequest;
     Buffer.unk3 = 0;
     Buffer.useIconImageUri = 1;
