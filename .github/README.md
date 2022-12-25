@@ -83,7 +83,7 @@ Plugin filename: `game_patch.prx`
 Author(s):
 - [illusion](https://github.com/illusion0001)
 
-Patches game before boot.
+Patches game before boot. Using patches from the [Patch Repository](https://github.com/GoldHEN/GoldHEN_Patch_Repository)
 
 <details>
 <summary>How To Use (Click to Expand)</summary>
