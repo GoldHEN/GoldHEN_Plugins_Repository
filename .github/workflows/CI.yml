@@ -120,8 +120,8 @@ jobs:
             rm $f
             continue
         fi
-            echo "$(sha256sum $f)" >> $BUILD/$BUILD_MD5
-            echo "$(md5sum $f)" >> $BUILD/$BUILD_SHA256
+            echo "$(sha256sum $f)" >> $BUILD/$BUILD_SHA256
+            echo "$(md5sum $f)" >> $BUILD/$BUILD_MD5
         done
         cat $BUILD/$BUILD_MD5
         cat $BUILD/$BUILD_SHA256
