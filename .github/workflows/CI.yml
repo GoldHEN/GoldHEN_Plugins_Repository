@@ -149,6 +149,6 @@ jobs:
         github.event_name == 'workflow_dispatch' &&
         github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
       env:
-        token: ${{ secrets.my_token }}
+        GITHUB_TOKEN: ${{ secrets.my_token }}
       run: |
         gh release create ${{ env.commit_ver }} ${{ env.ZIP_NAME }}.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
