@@ -100,7 +100,7 @@ jobs:
         github.event_name == 'workflow_dispatch' &&
         github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
       run: |
-        # Removing non user related plugins from release
+        # Excluding non user related plugins from release
         BUILD=plugins
         cd bin/plugins
         mv prx_final $BUILD
@@ -128,8 +128,20 @@ jobs:
         # Create zip
         commit_hash=$(echo ${GITHUB_SHA} | cut -c1-8)
         ZIP_NAME=GoldPlugins-${{ env.commit_ver }}-$commit_hash
+        CFG=plugins.ini
         echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
-        zip -r $ZIP_NAME.zip plugins/*
+        echo "; Note: lines starting with semicolon are for comments." > $CFG
+        echo "; Load plugins for any title." >> $CFG
+        echo "" >> $CFG
+        echo "[default]" >> $CFG
+        echo "/data/GoldHEN/plugins/game_patch.prx" >> $CFG
+        echo "" >> $CFG
+        echo "; Load plugins only for Playroom." >> $CFG
+        echo "" >> $CFG
+        echo "[CUSA00001]" >> $CFG
+        echo "/data/GoldHEN/plugins/afr.prx" >> $CFG
+        echo "/data/GoldHEN/plugins/no_share_watermark.prx" >> $CFG
+        zip -r $ZIP_NAME.zip plugins/* $CFG
         echo "<details>" > hash.md
         echo "<summary>Plugin Hashes (Click to Expand)</summary>" >> hash.md
         echo "" >> hash.md
