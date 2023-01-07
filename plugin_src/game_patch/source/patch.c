@@ -6,9 +6,54 @@ u8 arr16[2];
 u8 arr32[4];
 u8 arr64[8];
 
-unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
-    // valid hex look up table.
-    const u8 hex_lut[] = {
+char* unescape(const char *s) {
+    s64 len = strlen(s);
+    char *unescaped_str = (char *)malloc(len + 1);
+    u32 i, j;
+    for (i = 0, j = 0; s[i] != '\0'; i++, j++) {
+        if (s[i] == '\\') {
+            i++;
+            switch (s[i]) {
+                case 'n':
+                    unescaped_str[j] = '\n';
+                    break;
+                case 't':
+                    unescaped_str[j] = '\t';
+                    break;
+                case 'r':
+                    unescaped_str[j] = '\r';
+                    break;
+                case '\\':
+                    unescaped_str[j] = '\\';
+                    break;
+                case 'x':
+                    {
+                        char hex_string[3];
+                        u32 val = 0;
+                        hex_string[0] = s[++i];
+                        hex_string[1] = s[++i];
+                        hex_string[2] = '\0';
+                        if (sscanf(hex_string, "%x", &val) != 1) {
+                            printf("Invalid hex escape sequence: %s\n", hex_string);
+                            val = '?';
+                        }
+                        unescaped_str[j] = (char)val;
+                    }
+                    break;
+                default:
+                    unescaped_str[j] = s[i];
+                    break;
+            }
+        } else {
+            unescaped_str[j] = s[i];
+        }
+    }
+    unescaped_str[j] = '\0';
+    return unescaped_str;
+}
+
+// valid hex look up table.
+const u8 hex_lut[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -30,14 +75,14 @@ unsigned char *hexstrtochar2(const char *hexstr, s64 *size) {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00};
+        0x00, 0x00, 0x00, 0x00 };
+
+u8 *hexstrtochar2(const char *hexstr, s64 *size) {
 
     u32 str_len = strlen(hexstr);
-    s64 data_len = ((str_len + 1) / 2) * sizeof(unsigned char);
-
-    *size = (str_len) * sizeof(unsigned char);
-
-    unsigned char *data = (unsigned char *)malloc(*size);
+    s64 data_len = ((str_len + 1) / 2) * sizeof(u8);
+    *size = (str_len) * sizeof(u8);
+    u8 *data = (u8 *)malloc(*size);
     u32 j = 0; // hexstr position
     u32 i = 0; // data position
 
@@ -77,7 +122,7 @@ void sys_proc_rw(u64 address, void *data, u64 length) {
 
 bool hex_prefix(const char *str)
 {
-    if (str[0] == '0' && str[1] == 'x')
+    if ((str[0] == '0' && str[1] == 'x') || (str[0] == '0' && str[1] == 'X'))
         return true;
     else
         return false;
@@ -156,9 +201,10 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "bytes") == 0) {
-            s64 szb = 0;
-            u8 *bytearray = hexstrtochar2(value, &szb);
-            sys_proc_rw(addr, bytearray, szb);
+            s64 bytearray_size = 0;
+            u8 *bytearray = hexstrtochar2(value, &bytearray_size);
+            sys_proc_rw(addr, bytearray, bytearray_size);
+            free(bytearray);
             return;
         } else if (strcmp(type, "float32") == 0) {
             f32 real_value = 0;
@@ -173,23 +219,23 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
         } else if (strcmp(type, "utf8") == 0) {
-            u64 char_len = strlen(value);
-            sys_proc_rw(addr, (void*)value, char_len);
-            addr = addr + char_len;
-            // null terminate string hack
-            u8 value_[1] = { 0x00 };
-            sys_proc_rw(addr, value_, sizeof(value_));
+            char* new_str = unescape(value);
+            u64 char_len = strlen(new_str);
+            sys_proc_rw(addr, (void*)new_str, char_len + 1); // get null
+            free(new_str);
             return;
         } else if (strcmp(type, "utf16") == 0) {
-            for (s32 i = 0; value[i] != '\x00'; i++) {
-                u8 val_ = value[i];
+            char* new_str = unescape(value);
+            for (u32 i = 0; new_str[i] != '\x00'; i++)
+            {
+                u8 val_ = new_str[i];
                 u8 value_[2] = {val_, 0x00};
                 sys_proc_rw(addr, value_, sizeof(value_));
                 addr = addr + 2;
             }
-            // null terminate string hack
-            u8 value_[2] = { 0x00, 0x00 };
+            u8 value_[2] = {0x00, 0x00};
             sys_proc_rw(addr, value_, sizeof(value_));
+            free(new_str);
             return;
         } else {
             final_printf("type not found or unsupported\n");

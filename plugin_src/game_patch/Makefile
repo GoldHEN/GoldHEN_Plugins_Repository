@@ -23,9 +23,9 @@ TARGETSTUB   := $(OUTPUT_PRX).so
 O_FLAG       := -O3
 
 # Libraries linked into the ELF.
-LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
+LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lmxml
 
-EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE)
+EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE) -D__PRX_BUILD__
 
 # You likely won't need to touch anything below this point.
 # Root vars
