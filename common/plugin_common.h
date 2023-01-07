@@ -46,4 +46,5 @@
     final_printf("base_address: 0x%lx\n", procInfo.base_address);\
 }
 
+void NotifyStatic(const char* IconUri, const char *text);
 void Notify(const char* IconUri, const char *FMT, ...);
