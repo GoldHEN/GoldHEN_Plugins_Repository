@@ -1,3 +1,0 @@
-[submodule "external/tiny-json"]
-	path = external/tiny-json
-	url = https://github.com/rafagafe/tiny-json.git

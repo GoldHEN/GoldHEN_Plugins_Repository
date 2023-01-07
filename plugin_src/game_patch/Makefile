@@ -32,7 +32,6 @@ EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE)
 TOOLCHAIN     := $(OO_PS4_TOOLCHAIN)
 GH_SDK        := $(GOLDHEN_SDK)
 EXTERNAL_DIR  := ../../external
-TINY_JSON     := $(EXTERNAL_DIR)/tiny-json
 PROJDIR       := ../$(shell basename $(CURDIR))/source
 INTDIR        := ../$(shell basename $(CURDIR))/build
 INCLUDEDIR    := ../$(shell basename $(CURDIR))/include
@@ -91,9 +90,6 @@ $(INTDIR)/%.o.stub: $(PROJDIR)/%.cpp
 plugin_common:
 	$(CC) $(CFLAGS) -o $(INTDIR)/plugin_common.o $(COMMON_DIR)/plugin_common.c
 
-tiny-json:
-	$(CC) $(CFLAGS) -o $(INTDIR)/tiny-json.o $(TINY_JSON)/tiny-json.c
-
 build-info:
 	$(shell echo "#define GIT_COMMIT \"$(shell git rev-parse HEAD)\"" > $(COMMON_DIR)/git_ver.h)
 	$(shell echo "#define GIT_VER \"$(shell git branch --show-current)\"" >> $(COMMON_DIR)/git_ver.h)
@@ -103,7 +99,7 @@ build-info:
 .PHONY: clean
 .DEFAULT_GOAL := all
 
-all: build-info plugin_common tiny-json $(TARGET)
+all: build-info plugin_common $(TARGET)
 
 clean:
 	rm -rf $(TARGET) $(TARGETSTUB) $(INTDIR) $(OBJS)
