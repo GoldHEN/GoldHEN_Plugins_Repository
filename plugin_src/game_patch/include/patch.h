@@ -2,13 +2,7 @@
 #include "plugin_common.h"
 #include <stdbool.h>
 
-#define MAX_TOKENS 10240
-
 extern s32 pid;
-extern u8 arr8[1];
-extern u8 arr16[2];
-extern u8 arr32[4];
-extern u8 arr64[8];
 
 extern char titleid[16];
 extern char game_elf[32];
