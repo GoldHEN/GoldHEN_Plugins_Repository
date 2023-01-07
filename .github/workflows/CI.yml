@@ -28,8 +28,17 @@ jobs:
         repository: GoldHEN/GoldHEN_Plugins_SDK
         path: SDK
 
+    - name: Checkout mxml
+      uses: actions/checkout@v3
+      with:
+        repository: illusion0001/mxml
+        ref: patch-1
+        path: mxml
+
     - name: Setup variables
       run: |
+        echo "llvm_ver=12.0" >> $GITHUB_ENV
+        echo "llvm_path=$RUNNER_TOOL_CACHE/llvm" >> $GITHUB_ENV
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
         echo "commit_ver=1.$(git rev-list HEAD --count)" >> $GITHUB_ENV
 
@@ -45,8 +54,19 @@ jobs:
       if: steps.cache-oosdk.outputs.cache-hit != 'true'
       run: curl -sL https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz | tar xz -C ./
 
-    - name: Setup dependencies
-      run: sudo apt install llvm lld
+    - name: Cache LLVM and Clang (${{ env.llvm_ver }})
+      id: cache-llvm
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.llvm_path }}
+        key: llvm-${{ env.llvm_ver }}
+
+    - name: Install LLVM and Clang (${{ env.llvm_ver }})
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: ${{ env.llvm_ver }}
+        directory: ${{ env.llvm_path }}
+        cached: ${{ steps.cache-llvm.outputs.cache-hit }}
 
     - name: Build SDK Static Lib
       working-directory: SDK
@@ -55,17 +75,17 @@ jobs:
         make DEBUGFLAGS=1
         echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
 
+    - name: Install mini xml
+      working-directory: mxml/ps4
+      run: |
+        wget https://raw.githubusercontent.com/bucanero/oosdk_libraries/master/build_rules.mk -O $OO_PS4_TOOLCHAIN/build_rules.mk
+        make install PRX_BUILD=1
+
     - name: Build (Release) (printf)
       run: bash build.sh -printf
 
     - name: Build (Debug) (printf)
       run: bash build.sh -debug 0 -printf
-
-    - name: Build (Release)
-      run: bash build.sh
-
-    - name: Build (Debug)
-      run: bash build.sh -debug
 
     - name: Push module artifact (Release prx)
       uses: actions/upload-artifact@v3
