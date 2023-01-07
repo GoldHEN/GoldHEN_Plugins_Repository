@@ -47,8 +47,8 @@ do
     if [[ -f "$dir/$MAKEFILE" ]]; then
         echo "[+] build dir: $dir"
         cd $dir
-        make clean $DEBUG_FLAG $LOG_TYPE || exit 1
-        make $DEBUG_FLAG $LOG_TYPE || exit 1
+        make clean || exit 1
+        make $DEBUG_FLAG $LOG_TYPE $O_FLAG || exit 1
         cd ..
     fi
 done
