@@ -5,7 +5,6 @@
 - Custom TouchPad Button
 - Custom Button Mapping
 - Custom Viration Intensity settings
-- Disable LightBar
 
 # Getting Started
 Config File in `/data/GoldHEN/gamepad.ini`.
