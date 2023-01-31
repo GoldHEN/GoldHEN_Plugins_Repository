@@ -211,7 +211,10 @@ s32 attr_module_hidden module_start(s64 argc, const void* args) {
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
 
+    char module[256];
+    snprintf(module, 256, "/%s/common/lib/%s", sceKernelGetFsSandboxRandomWord(), "libScePad.sprx");
     int h = 0;
+    sys_dynlib_load_prx(module, &h);
 
     scePadReadExtPatcher = (Patcher*)malloc(sizeof(Patcher));
     scePadReadStateExtPatcher = (Patcher*)malloc(sizeof(Patcher));
