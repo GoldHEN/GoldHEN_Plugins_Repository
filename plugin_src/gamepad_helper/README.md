@@ -15,17 +15,17 @@ Config File in `/data/GoldHEN/gamepad.ini`.
 [default]
 enableDeadZone=1
 DeadZoneLeft=13
-DeadZoneRight=10
+DeadZoneRight=13
 
-enableCustomButton=1
-BUTTON_TRIANGLE=BUTTON_CROSS
+enableCustomTouchPad=1
+TOUCH_L2=BUTTON_L3
+TOUCH_R2=BUTTON_TOUCH_PAD
 
 ; Load gamepad config for Playroom
 
 [CUSA00001]
-enableCustomTouchPad=1
-TOUCH_L1=BUTTON_L3
-TOUCH_R2=BUTTON_TOUCH_PAD
+enableCustomButton=1
+BUTTON_L3=BUTTON_CROSS
 
 VirationIntensity=medium
 ```
