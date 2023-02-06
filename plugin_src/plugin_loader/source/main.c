@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include "GoldHEN.h"
 
@@ -66,9 +67,25 @@ void create_template_config()
 uint16_t load_plugins(ini_section_s *section)
 {
     uint16_t load_count = 0;
+    bool notifi_shown = false;
     for (uint16_t j = 0; j < section->size; j++)
     {
         ini_entry_s *entry = &section->entry[j];
+        if (entry->key[0] != '/')
+        {
+            if (!notifi_shown)
+            {
+                char notify_msg[128];
+                snprintf(notify_msg, sizeof(notify_msg), "Path \"%s\" is wrong!\nPlugin will not load", entry->key);
+                NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
+                notifi_shown = true;
+            }
+            else
+            {
+                final_printf("Path \"%s\" is wrong!\nPlugin will not load\n", entry->key);
+            }
+            continue;
+        }
         sceKernelChmod(entry->key, 0777);
         final_printf("Starting %s\n", entry->key);
         int32_t result = sceKernelLoadStartModule(entry->key, 0, 0, 0, NULL, NULL);
@@ -162,7 +179,13 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
             load_count += load_plugins(section);
         }
     }
-    final_printf("Loaded %u plugin(s)\n", load_count);
+
+    if (load_count > 1)
+    {
+        char notify_msg[32];
+        snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)", load_count);
+        NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
+    }
 
     if (config != NULL)
         ini_table_destroy(config);
