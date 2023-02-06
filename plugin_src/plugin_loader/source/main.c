@@ -69,7 +69,7 @@ uint16_t load_plugins(ini_section_s *section)
     for (uint16_t j = 0; j < section->size; j++)
     {
         ini_entry_s *entry = &section->entry[j];
-        SceKernelChmod(entry->key, 0777);
+        sceKernelChmod(entry->key, 0777);
         final_printf("Starting %s\n", entry->key);
         int32_t result = sceKernelLoadStartModule(entry->key, 0, 0, 0, NULL, NULL);
         if (result == 0x80020002)
