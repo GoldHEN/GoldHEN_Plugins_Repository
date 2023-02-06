@@ -68,24 +68,21 @@ jobs:
         directory: ${{ env.llvm_path }}
         cached: ${{ steps.cache-llvm.outputs.cache-hit }}
 
-    - name: Build SDK Static Lib
-      working-directory: SDK
-      run: |
-        clang -v
-        make DEBUGFLAGS=1
-        echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
-
     - name: Install mini xml
       working-directory: mxml/ps4
       run: |
         wget https://raw.githubusercontent.com/bucanero/oosdk_libraries/master/build_rules.mk -O $OO_PS4_TOOLCHAIN/build_rules.mk
         make install PRX_BUILD=1
 
+    - name: Export path to SDK
+      working-directory: SDK
+      run: echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
+
     - name: Build (Release) (printf)
-      run: bash build.sh -printf
+      run: make LOG=PRINTF
 
     - name: Build (Debug) (printf)
-      run: bash build.sh -debug 0 -printf
+      run: make LOG=PRINTF DEBUG=1
 
     - name: Push module artifact (Release prx)
       uses: actions/upload-artifact@v3
@@ -132,8 +129,7 @@ jobs:
         FILES="$BUILD/*.prx"
         for f in $FILES
         do
-        if  [[ "$f" == "$BUILD/aio_fix_505.prx" ]] ||
-            [[ "$f" == "$BUILD/game_call_example.prx" ]] ||
+        if  [[ "$f" == "$BUILD/game_call_example.prx" ]] ||
             [[ "$f" == "$BUILD/plugin_loader.prx" ]] ||
             [[ "$f" == "$BUILD/plugin_template.prx" ]]; then
             echo "[+] Skipping $f"
