@@ -34,6 +34,9 @@ int g_virationIntensity;
 
 uint32_t* buttonMapping;
 
+inline int deadzone_apply(ScePadData* pData);
+inline uint8_t check_deadzone(uint8_t input, uint8_t deadZone);
+
 bool file_exists(const char* filename) {
     struct stat buff;
     return stat(filename, &buff) == 0 ? true : false;
@@ -61,7 +64,7 @@ int scePadSetVibration_hook(int32_t handle, const ScePadVibrationParam* pParam) 
     return ret;
 }
 
-inline uint8_t check_deadzone(uint8_t input, uint8_t deadZone) {
+uint8_t check_deadzone(uint8_t input, uint8_t deadZone) {
     if (abs(input - JOY_CENTER_POS) <= deadZone) {
         return JOY_CENTER_POS;
     }
@@ -69,7 +72,7 @@ inline uint8_t check_deadzone(uint8_t input, uint8_t deadZone) {
     return input;
 };
 
-inline int deadzone_apply(ScePadData* pData) {
+int deadzone_apply(ScePadData* pData) {
     if (g_enableDeadZone) {
         pData->leftStick.x = check_deadzone(pData->leftStick.x, g_deadZoneLeft);
         pData->leftStick.y = check_deadzone(pData->leftStick.y, g_deadZoneLeft);
