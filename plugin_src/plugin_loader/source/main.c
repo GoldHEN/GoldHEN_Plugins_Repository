@@ -60,7 +60,7 @@ void create_template_config()
         return;
     }
 
-    ssize_t written = sceKernelWrite(f, file_str, strlen(file_str));
+    sceKernelWrite(f, file_str, strlen(file_str));
     sceKernelClose(f);
 }
 

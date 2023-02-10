@@ -24,7 +24,7 @@ TARGETSTUB   := $(OUTPUT_PRX).so
 # Libraries linked into the ELF.
 LIBS := -lSceVideoOut -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule
 
-EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE)
+EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE) -fcolor-diagnostics -Wall
 
 # You likely won't need to touch anything below this point.
 # Root vars
