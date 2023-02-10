@@ -128,35 +128,27 @@ bool hex_prefix(const char *str)
         return false;
 }
 
-// http://www.cse.yorku.ca/~oz/hash.html
-u64 djb2(const char *str) {
-    u64 hash = 5381;
-    u32 c = 0;
-    while ((c = *str++))
-        hash = hash * 33 ^ c;
-    return hash;
-}
-
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
                     const char *title_id, const char *elf) {
     u64 output_hash = 0;
     char hash_str[256];
     snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
              title_id, elf);
-    output_hash = djb2(hash_str);
+    output_hash = djb2_hash(hash_str);
     debug_printf("input: \"%s\"\n", hash_str);
     debug_printf("output: 0x%016lx\n", output_hash);
     return output_hash;
 }
 
-void patch_data1(const char *type, u64 addr, const char *value) {
-    if (type) {
-        s32 str_base = 16;
-        memset(arr8,  0, sizeof(arr8));
-        memset(arr16, 0, sizeof(arr16));
-        memset(arr32, 0, sizeof(arr32));
-        memset(arr64, 0, sizeof(arr64));
-        if (strcmp(type, "byte") == 0) {
+void patch_data1(u64 patch_type, u64 addr, const char *value) {
+    s32 str_base = 16;
+    memset(arr8,  0, sizeof(arr8));
+    memset(arr16, 0, sizeof(arr16));
+    memset(arr32, 0, sizeof(arr32));
+    memset(arr64, 0, sizeof(arr64));
+    switch(patch_type) {
+        case djb2_hash("byte"):
+        {
             u8 real_value = 0;
             if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
@@ -167,7 +159,9 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             memcpy(arr8, &real_value, sizeof(arr8));
             sys_proc_rw(addr, arr8, sizeof(arr8));
             return;
-        } else if (strcmp(type, "bytes16") == 0) {
+        }
+        case djb2_hash("bytes16"):
+        {
             u16 real_value = 0;
             if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
@@ -178,7 +172,9 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             memcpy(arr16, &real_value, sizeof(arr16));
             sys_proc_rw(addr, arr16, sizeof(arr16));
             return;
-        } else if (strcmp(type, "bytes32") == 0) {
+        }
+        case djb2_hash("bytes32"):
+        {
             u32 real_value = 0;
             if (hex_prefix(value)) {
                 real_value = strtol(value, NULL, str_base);
@@ -189,7 +185,9 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             memcpy(arr32, &real_value, sizeof(arr32));
             sys_proc_rw(addr, arr32, sizeof(arr32));
             return;
-        } else if (strcmp(type, "bytes64") == 0) {
+        }
+        case djb2_hash("bytes64"):
+        {
             s64 real_value = 0;
             if (hex_prefix(value)) {
                 real_value = strtoll(value, NULL, str_base);
@@ -200,31 +198,41 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             memcpy(arr64, &real_value, sizeof(arr64));
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
-        } else if (strcmp(type, "bytes") == 0) {
+        }
+        case djb2_hash("bytes"):
+        {
             s64 bytearray_size = 0;
             u8 *bytearray = hexstrtochar2(value, &bytearray_size);
             sys_proc_rw(addr, bytearray, bytearray_size);
             free(bytearray);
             return;
-        } else if (strcmp(type, "float32") == 0) {
+        }
+        case djb2_hash("float32"):
+        {
             f32 real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr32, &real_value, sizeof(arr32));
             sys_proc_rw(addr, arr32, sizeof(arr32));
             return;
-        } else if (strcmp(type, "float64") == 0) {
+        }
+        case djb2_hash("float64"):
+        {
             f64 real_value = 0;
             real_value = strtod(value, NULL);
             memcpy(arr64, &real_value, sizeof(arr64));
             sys_proc_rw(addr, arr64, sizeof(arr64));
             return;
-        } else if (strcmp(type, "utf8") == 0) {
+        }
+        case djb2_hash("utf8"):
+        {
             char* new_str = unescape(value);
             u64 char_len = strlen(new_str);
             sys_proc_rw(addr, (void*)new_str, char_len + 1); // get null
             free(new_str);
             return;
-        } else if (strcmp(type, "utf16") == 0) {
+        }
+        case djb2_hash("utf16"):
+        {
             char* new_str = unescape(value);
             for (u32 i = 0; new_str[i] != '\x00'; i++)
             {
@@ -237,7 +245,9 @@ void patch_data1(const char *type, u64 addr, const char *value) {
             sys_proc_rw(addr, value_, sizeof(value_));
             free(new_str);
             return;
-        } else {
+        }
+        default:
+        {
             final_printf("type not found or unsupported\n");
         }
     }

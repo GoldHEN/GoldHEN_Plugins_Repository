@@ -11,20 +11,15 @@ attr_public const char *g_pluginDesc = "Patches game before boot";
 attr_public const char *g_pluginAuth = "illusion";
 attr_public u32 g_pluginVersion = 0x00000100; // 1.00
 
-#define BASE_PATH_PATCH GOLDHEN_PATH "/patches"
-#define BASE_PATH_PATCH_SETTINGS BASE_PATH_PATCH "/settings"
-#define BASE_PATH_PATCH_XML BASE_PATH_PATCH "/xml"
+#define GOLDHEN_PATH_ (char*) GOLDHEN_PATH
+#define BASE_PATH_PATCH (char*) GOLDHEN_PATH_ "/patches"
+#define BASE_PATH_PATCH_SETTINGS (char*) BASE_PATH_PATCH "/settings"
+#define BASE_PATH_PATCH_XML (char*) BASE_PATH_PATCH "/xml"
 
 char titleid[16] = {0};
 char game_elf[32] = {0};
 char game_prx[MAX_PATH_] = {0};
 char game_ver[8] = {0};
-
-static const char *xml_whitespace_cb(mxml_node_t *node, int where) {
-    if (where == MXML_WS_AFTER_OPEN || where == MXML_WS_AFTER_CLOSE)
-        return ("\n");
-    return (NULL);
-}
 
 const char* GetXMLAttr(mxml_node_t *node, const char *name)
 {
@@ -64,17 +59,13 @@ void get_key_init(void)
              node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND)) {
             const char *TitleData = GetXMLAttr(node, "Title");
             const char *NameData = GetXMLAttr(node, "Name");
-            const char *AuthorData = GetXMLAttr(node, "Author");
-            const char *NoteData = GetXMLAttr(node, "Note");
             const char *AppVerData = GetXMLAttr(node, "AppVer");
             const char *AppElfData = GetXMLAttr(node, "AppElf");
 
             debug_printf("Title: \"%s\"\n", TitleData);
             debug_printf("Name: \"%s\"\n", NameData);
-            debug_printf("Author: \"%s\"\n", AuthorData);
             debug_printf("AppVer: \"%s\"\n", AppVerData);
             debug_printf("AppElf: \"%s\"\n", AppElfData);
-            debug_printf("Note: \"%s\"\n", NoteData);
 
             u64 hashout = patch_hash_calc(TitleData, NameData, AppVerData, input_file, AppElfData);
             char settings_path[64];
@@ -105,7 +96,7 @@ void get_key_init(void)
                     debug_printf("patch line: %lu\n", patch_lines);
                     if (gameType && addr_real) // type and address must be present
                     {
-                        patch_data1(gameType, addr_real, gameValue);
+                        patch_data1(djb2_hash(gameType), addr_real, gameValue);
                         patch_lines++;
                     }
                 }
@@ -118,19 +109,20 @@ void get_key_init(void)
         mxmlDelete(tree);
         free(buffer);
 
-        char line_msg[64];
-        char item_msg[64];
+        if (patch_items > 0 && patch_lines > 0)
+        {
+            char line_msg[64];
+            char item_msg[64];
 
-        if (patch_lines == 1)
-            snprintf(line_msg, sizeof(line_msg), "%lu Patch Line Applied", patch_lines);
-        if (patch_lines > 1)
-            snprintf(line_msg, sizeof(line_msg), "%lu Patch Lines Applied", patch_lines);
-        if (patch_items == 1)
-            snprintf(item_msg, sizeof(item_msg), "%lu Patch Applied", patch_items);
-        if (patch_items > 1)
-            snprintf(item_msg, sizeof(item_msg), "%lu Patches Applied", patch_items);
+            if (patch_lines == 1)
+                snprintf(line_msg, sizeof(line_msg), "%lu Patch Line Applied", patch_lines);
+            else if (patch_lines > 1)
+                snprintf(line_msg, sizeof(line_msg), "%lu Patch Lines Applied", patch_lines);
+            if (patch_items == 1)
+                snprintf(item_msg, sizeof(item_msg), "%lu Patch Applied", patch_items);
+            else if (patch_items > 1)
+                snprintf(item_msg, sizeof(item_msg), "%lu Patches Applied", patch_items);
 
-        if (patch_items > 0 && patch_lines > 0) {
             char msg[128];
             snprintf(msg, sizeof(msg),
                      "%s\n"
@@ -138,39 +130,42 @@ void get_key_init(void)
                      item_msg, line_msg);
             NotifyStatic(TEX_ICON_SYSTEM, msg);
         }
-        return;
     }
-    char msg[128];
-    snprintf(msg, sizeof(msg), "File %s\nis empty", input_file);
-    NotifyStatic(TEX_ICON_SYSTEM, msg);
+    else // if (buffer)
+    {
+        char msg[128];
+        snprintf(msg, sizeof(msg), "File %s\nis empty", input_file);
+        NotifyStatic(TEX_ICON_SYSTEM, msg);
+    }
     return;
 }
 
-void mkdir_chmod(char *path, OrbisKernelMode mode) {
+void mkdir_chmod(const char *path, OrbisKernelMode mode) {
     sceKernelMkdir(path, mode);
     sceKernelChmod(path, mode);
     return;
 }
 
 void make_folders(void) {
-    mkdir_chmod(GOLDHEN_PATH, 0777);
+    mkdir_chmod(GOLDHEN_PATH_, 0777);
     mkdir_chmod(BASE_PATH_PATCH, 0777);
     mkdir_chmod(BASE_PATH_PATCH_XML, 0777);
     mkdir_chmod(BASE_PATH_PATCH_SETTINGS, 0777);
     return;
 }
 
+extern "C" {
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
-    make_folders();
     pid = 0;
     struct proc_info procInfo;
     if (sys_sdk_proc_info(&procInfo) == 0) {
         memcpy(titleid, procInfo.titleid, sizeof(titleid));
         memcpy(game_elf, procInfo.name, sizeof(game_elf));
         memcpy(game_ver, procInfo.version, sizeof(game_ver));
+        make_folders();
         print_proc_info();
         get_key_init();
         return 0;
@@ -178,8 +173,11 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
     NotifyStatic(TEX_ICON_SYSTEM, "Unable to get process info from " STRINGIFY(sys_sdk_proc_info));
     return -1;
 }
+}
 
+extern "C" {
 s32 attr_module_hidden module_stop(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     return 0;
+}
 }

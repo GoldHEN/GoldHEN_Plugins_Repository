@@ -2,7 +2,6 @@
 
 s32 Read_File(const char *input_file, char **file_data, u64 *filesize, u32 extra) {
     s32 res = 0;
-    s32 pos = 0;
     s32 fd = 0;
 
     debug_printf("Reading input_file \"%s\"\n", input_file);
