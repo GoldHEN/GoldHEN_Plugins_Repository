@@ -24,7 +24,7 @@ TARGETSTUB   := $(OUTPUT_PRX).so
 # Libraries linked into the ELF.
 LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lmxml
 
-EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE) -D__PRX_BUILD__
+EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE) -fcolor-diagnostics -Wall -D__PRX_BUILD__
 
 # You likely won't need to touch anything below this point.
 # Root vars
@@ -87,7 +87,9 @@ $(INTDIR)/%.o.stub: $(PROJDIR)/%.cpp
 	$(CCX) -target x86_64-pc-linux-gnu -ffreestanding -nostdlib -fno-builtin -fPIC $(O_FLAG) -s -c -o $@ $<
 
 plugin_common:
-	$(CC) $(CFLAGS) -o $(INTDIR)/plugin_common.o $(COMMON_DIR)/plugin_common.c
+	mv $(COMMON_DIR)/plugin_common.c $(COMMON_DIR)/plugin_common.cpp
+	$(CCX) $(CXXFLAGS) -o $(INTDIR)/plugin_common.o $(COMMON_DIR)/plugin_common.cpp
+	mv $(COMMON_DIR)/plugin_common.cpp $(COMMON_DIR)/plugin_common.c
 
 build-info:
 	$(shell echo "#define GIT_COMMIT \"$(shell git rev-parse HEAD)\"" > $(COMMON_DIR)/git_ver.h)
