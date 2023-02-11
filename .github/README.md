@@ -67,6 +67,15 @@ Author(s):
 
 Swap X and O around on Asia Region console.
 
+### Force 1080p Display
+
+Plugin filename: `force_1080p_display.prx`
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+
+Reports to the app that it is connected to a 1080p display.
+
 ### Fliprate Remover
 
 Plugin filename: `fliprate_remover.prx`
