@@ -46,7 +46,7 @@ void get_key_init(void)
     }
 
     if (buffer) {
-        mxml_node_t *node, *tree, *Patchlist_node, *Line_node = NULL;
+        mxml_node_t *node, *tree = NULL;
         tree = mxmlLoadString(NULL, buffer, MXML_NO_CALLBACK);
 
         if (!tree) {
@@ -78,9 +78,9 @@ void get_key_init(void)
                 Write_File(settings_path, false_data, sizeof(false_data));
             } else if (buffer2[0] == '1' && !strcmp(game_ver, AppVerData) && !strcmp(game_elf, AppElfData)) {
                 patch_items++;
-                Patchlist_node = mxmlFindElement(node, node, "PatchList", NULL, NULL, MXML_DESCEND);
-                for (Line_node = mxmlFindElement(node, node, "Line", NULL, NULL, MXML_DESCEND); Line_node != NULL;
-                     Line_node = mxmlFindElement(Line_node, Patchlist_node, "Line", NULL, NULL, MXML_DESCEND))
+                mxml_node_t *Patchlist_node = mxmlFindElement(node, node, "PatchList", NULL, NULL, MXML_DESCEND);
+                for (mxml_node_t *Line_node = mxmlFindElement(node, node, "Line", NULL, NULL, MXML_DESCEND); Line_node != NULL;
+                                  Line_node = mxmlFindElement(Line_node, Patchlist_node, "Line", NULL, NULL, MXML_DESCEND))
                 {
                     u64 addr_real = 0;
                     const char *gameType = GetXMLAttr(Line_node, "Type");
@@ -103,8 +103,6 @@ void get_key_init(void)
             }
         }
 
-        mxmlDelete(Line_node);
-        mxmlDelete(Patchlist_node);
         mxmlDelete(node);
         mxmlDelete(tree);
         free(buffer);
