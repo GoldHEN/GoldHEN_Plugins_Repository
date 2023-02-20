@@ -87,6 +87,9 @@ Removes framerate limit for games using system function `sceVideoOutSetFlipRate`
 
 ### GamePad helper Plugin
 
+Author(s):
+- [jocover](https://github.com/jocover)
+
 #### Features:
 - Custom DeadZone settings
 - Custom TouchPad Button
