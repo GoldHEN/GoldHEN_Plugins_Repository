@@ -87,6 +87,8 @@ Removes framerate limit for games using system function `sceVideoOutSetFlipRate`
 
 ### GamePad helper Plugin
 
+Plugin filename: `gamepad_helper.prx`
+
 Author(s):
 - [jocover](https://github.com/jocover)
 
