@@ -30,14 +30,18 @@ s32 sceVideoOutGetResolutionStatus_hook(int handle, OrbisVideoOutResolutionStatu
     s32 ret = HOOK_CONTINUE(sceVideoOutGetResolutionStatus,
                            s32 (*)(s32, OrbisVideoOutResolutionStatus*),
                            handle, status);
+#if (__FINAL__) == 0
     final_printf("old OrbisVideoOutResolutionStatus *status\n");
     print_resStat(status);
+#endif
     status->width = 1920;
     status->height = 1080;
     status->paneWidth = 1920;
     status->paneHeight = 1080;
+#if (__FINAL__) == 0
     final_printf("new OrbisVideoOutResolutionStatus *status\n");
     print_resStat(status);
+#endif
     return ret;
 }
 
