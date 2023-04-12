@@ -76,6 +76,15 @@ Author(s):
 
 Reports to the app that it is connected to a 1080p display.
 
+### Force 30 FPS
+
+Plugin filename: `force_30_fps.prx`
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+
+Force any game to run at 30 FPS.
+
 ### Fliprate Remover
 
 Plugin filename: `fliprate_remover.prx`
