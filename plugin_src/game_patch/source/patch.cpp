@@ -140,13 +140,14 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
     return output_hash;
 }
 
-void patch_data1(u64 patch_type, u64 addr, const char *value) {
+void patch_data1(u64 patch_type, u64 addr, const char *value, const char *mask_offset, uint32_t source_size, uint64_t jump_target) {
     s32 str_base = 16;
     memset(arr8,  0, sizeof(arr8));
     memset(arr16, 0, sizeof(arr16));
     memset(arr32, 0, sizeof(arr32));
     memset(arr64, 0, sizeof(arr64));
-    switch(patch_type) {
+    switch(patch_type)
+    {
         case djb2_hash("byte"):
         {
             u8 real_value = 0;
@@ -244,6 +245,37 @@ void patch_data1(u64 patch_type, u64 addr, const char *value) {
             u8 value_[2] = {0x00, 0x00};
             sys_proc_rw(addr, value_, sizeof(value_));
             free(new_str);
+            return;
+        }
+        case djb2_hash("mask"):
+        {
+            s64 bytearray_size = 0;
+            u8 *bytearray = hexstrtochar2(value, &bytearray_size);
+            sys_proc_rw(addr, bytearray, bytearray_size);
+            free(bytearray);
+            return;
+        }
+        case djb2_hash("mask_jump32"):
+        {
+            s64 bytearray_size = 0;
+            u8 *bytearray = hexstrtochar2(value, &bytearray_size);
+            u64 code_cave_end = jump_target + bytearray_size;
+            for (uint32_t i = 0; i < source_size; i++)
+            {
+                u8 nop_byte[] = { 0x90 };
+                sys_proc_rw(addr + i, nop_byte, sizeof(nop_byte));
+            }
+            u8 jump_32[] = { 0xe9, 0x00, 0x00, 0x00, 0x00 };
+            s32 target_jmp = (s32) (jump_target - addr - 5);
+            s32 target_return = (s32) (addr) - (code_cave_end);
+            sys_proc_rw(jump_target, bytearray, bytearray_size);
+            sys_proc_rw(addr, jump_32, sizeof(jump_32));
+            memcpy(arr32, &target_jmp, sizeof(target_jmp));
+            sys_proc_rw(addr + 1, arr32, sizeof(arr32));
+            sys_proc_rw(jump_target + bytearray_size, jump_32, sizeof(jump_32));
+            memcpy(arr32, &target_return, sizeof(target_return));
+            sys_proc_rw(code_cave_end + 1, arr32, sizeof(arr32));
+            free(bytearray);
             return;
         }
         default:
