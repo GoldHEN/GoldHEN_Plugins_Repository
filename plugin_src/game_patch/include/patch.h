@@ -23,4 +23,4 @@ constexpr inline u64 djb2_hash(const char *str) {
 
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
                     const char *title_id, const char *elf);
-void patch_data1(u64 patch_type, u64 addr, const char *value);
+void patch_data1(u64 patch_type, u64 addr, const char *value, const char *mask_offset, uint32_t source_size, uint64_t jump_target);
