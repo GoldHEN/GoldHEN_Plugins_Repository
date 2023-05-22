@@ -147,13 +147,18 @@ void get_key_init(void)
                 u8 false_data[2] = {'0', '\n'};
                 Write_File(settings_path, false_data, sizeof(false_data));
             } else if (buffer2[0] == '1' && !strcmp(game_elf, AppElfData)) {
-                if (!strcmp(game_ver, AppVerData))
+                s32 ret_cmp = strcmp(game_ver, AppVerData);
+                if (!ret_cmp)
                 {
                     use_mask = false;
                 }
                 else if (!strcmp("mask", AppVerData))
                 {
                     use_mask = true;
+                }
+                else if (ret_cmp)
+                {
+                    continue;
                 }
                 patch_items++;
                 mxml_node_t *Patchlist_node = mxmlFindElement(node, node, "PatchList", NULL, NULL, MXML_DESCEND);
