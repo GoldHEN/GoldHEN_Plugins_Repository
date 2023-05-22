@@ -184,7 +184,7 @@ void get_key_init(void)
                         }
                         gameOffset = GetXMLAttr(Line_node, "Offset");
                         addr_real = (uint64_t)PatternScan(module_base, module_size, gameAddr);
-                        debug_printf("Masked Address: 0x%lx\n", addr_real);
+                        final_printf("Masked Address: 0x%lx\n", addr_real);
                         debug_printf("Offset: %s\n", gameOffset);
                         if (gameOffset[0] != '0')
                         {
