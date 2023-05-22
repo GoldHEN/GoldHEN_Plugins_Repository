@@ -9,12 +9,13 @@
 attr_public const char *g_pluginName = "game_patch";
 attr_public const char *g_pluginDesc = "Patches game before boot";
 attr_public const char *g_pluginAuth = "illusion";
-attr_public u32 g_pluginVersion = 0x00000100; // 1.00
+attr_public u32 g_pluginVersion = 0x00000110; // 1.10
 
-#define GOLDHEN_PATH_ (char*) GOLDHEN_PATH
-#define BASE_PATH_PATCH (char*) GOLDHEN_PATH_ "/patches"
-#define BASE_PATH_PATCH_SETTINGS (char*) BASE_PATH_PATCH "/settings"
-#define BASE_PATH_PATCH_XML (char*) BASE_PATH_PATCH "/xml"
+#define GOLDHEN_PATH_ (const char*) GOLDHEN_PATH
+#define BASE_PATH_PATCH (const char*) GOLDHEN_PATH_ "/patches"
+#define BASE_PATH_PATCH_SETTINGS (const char*) BASE_PATH_PATCH "/settings"
+#define BASE_PATH_PATCH_XML (const char*) BASE_PATH_PATCH "/xml"
+#define NO_ASLR_ADDR 0x00400000
 
 char titleid[16] = {0};
 char game_elf[32] = {0};
@@ -126,7 +127,8 @@ void get_key_init(void)
 
         for (node = mxmlFindElement(tree, tree, "Metadata", NULL, NULL, MXML_DESCEND); node != NULL;
              node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND)) {
-            u8 use_mask = false;
+            bool use_mask = false;
+            bool PRX_patch = false;
             const char *TitleData = GetXMLAttr(node, "Title");
             const char *NameData = GetXMLAttr(node, "Name");
             const char *AppVerData = GetXMLAttr(node, "AppVer");
@@ -221,7 +223,16 @@ void get_key_init(void)
                     debug_printf("patch line: %lu\n", patch_lines);
                     if (gameType && addr_real) // type and address must be present
                     {
-                        patch_data1(djb2_hash(gameType), addr_real, gameValue, gameOffset, jump_size, jump_addr);
+                        if (!PRX_patch && !use_mask)
+                        {
+                            // previous self, eboot patches were made with no aslr addresses
+                            addr_real = module_base + (addr_real - NO_ASLR_ADDR);
+                        }
+                        else if (PRX_patch && !use_mask)
+                        {
+                            addr_real = module_base + addr_real;
+                        }
+                        patch_data1(gameType, addr_real, gameValue, jump_size, jump_addr);
                         patch_lines++;
                     }
                 }
@@ -322,7 +333,6 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
-    pid = 0;
     struct proc_info procInfo;
     OrbisKernelModuleInfo CurrentModuleInfo;
     CurrentModuleInfo.size = sizeof(OrbisKernelModuleInfo);

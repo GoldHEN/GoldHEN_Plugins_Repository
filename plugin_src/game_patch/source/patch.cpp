@@ -1,6 +1,5 @@
 #include "patch.h"
 
-s32 pid = 0;
 u8 arr8[1];
 u8 arr16[2];
 u8 arr32[4];
@@ -34,7 +33,7 @@ char* unescape(const char *s) {
                         hex_string[1] = s[++i];
                         hex_string[2] = '\0';
                         if (sscanf(hex_string, "%x", &val) != 1) {
-                            printf("Invalid hex escape sequence: %s\n", hex_string);
+                            final_printf("Invalid hex escape sequence: %s\n", hex_string);
                             val = '?';
                         }
                         unescaped_str[j] = (char)val;
@@ -128,6 +127,15 @@ bool hex_prefix(const char *str)
         return false;
 }
 
+// http://www.cse.yorku.ca/~oz/hash.html
+constexpr u64 djb2_hash(const char *str) {
+    u64 hash = 5381;
+    u32 c = 0;
+    while ((c = *str++))
+        hash = hash * 33 ^ c;
+    return hash;
+}
+
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
                     const char *title_id, const char *elf) {
     u64 output_hash = 0;
@@ -140,12 +148,13 @@ u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
     return output_hash;
 }
 
-void patch_data1(u64 patch_type, u64 addr, const char *value, const char *mask_offset, uint32_t source_size, uint64_t jump_target) {
+void patch_data1(const char* patch_type_str, u64 addr, const char *value, uint32_t source_size, uint64_t jump_target) {
     s32 str_base = 16;
     memset(arr8,  0, sizeof(arr8));
     memset(arr16, 0, sizeof(arr16));
     memset(arr32, 0, sizeof(arr32));
     memset(arr64, 0, sizeof(arr64));
+    u64 patch_type = djb2_hash(patch_type_str);
     switch(patch_type)
     {
         case djb2_hash("byte"):
@@ -285,7 +294,7 @@ void patch_data1(u64 patch_type, u64 addr, const char *value, const char *mask_o
         }
         default:
         {
-            final_printf("type not found or unsupported\n");
+            final_printf("Patch type: %s not found or unsupported\n", patch_type_str);
         }
     }
     return;
