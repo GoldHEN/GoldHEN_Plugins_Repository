@@ -257,6 +257,11 @@ void patch_data1(u64 patch_type, u64 addr, const char *value, const char *mask_o
         }
         case djb2_hash("mask_jump32"):
         {
+            if (source_size < 5)
+            {
+                final_printf("Can't create code cave with size less than 32 bit jump!\n");
+                return;
+            }
             s64 bytearray_size = 0;
             u8 *bytearray = hexstrtochar2(value, &bytearray_size);
             u64 code_cave_end = jump_target + bytearray_size;
