@@ -186,15 +186,24 @@ void get_key_init(void)
                         addr_real = (uint64_t)PatternScan(module_base, module_size, gameAddr);
                         final_printf("Masked Address: 0x%lx\n", addr_real);
                         debug_printf("Offset: %s\n", gameOffset);
+                        u32 real_offset = 0;
                         if (gameOffset[0] != '0')
                         {
                             if (gameOffset[0] == '-')
                             {
                                 debug_printf("Offset mode: subtract\n");
+                                real_offset = strtoul(gameOffset + 1, NULL, 10);
+                                debug_printf("before offset: 0x%lx\n", addr_real);
+                                addr_real = addr_real - real_offset;
+                                debug_printf("after offset: 0x%lx\n", addr_real);
                             }
                             else if (gameOffset[0] == '+')
                             {
                                 debug_printf("Offset mode: addition\n");
+                                real_offset = strtoul(gameOffset + 1, NULL, 10);
+                                debug_printf("before offset: 0x%lx\n", addr_real);
+                                addr_real = addr_real + real_offset;
+                                debug_printf("after offset: 0x%lx\n", addr_real);
                             }
                         }
                         else
