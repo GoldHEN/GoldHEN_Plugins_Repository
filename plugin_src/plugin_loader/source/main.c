@@ -31,7 +31,7 @@ bool file_exists(const char* filename)
     return stat(filename, &buff) == 0 ? true : false;
 }
 
-void create_template_config()
+void create_template_config(void)
 {
     final_printf("Creating new %s file\n", PLUGIN_CONFIG_PATH);
     const char *file_str = "; Load plugins under specific Title ID CUSA12345\n"
@@ -64,6 +64,25 @@ void create_template_config()
     sceKernelClose(f);
 }
 
+bool simple_get_bool(const char* val)
+{
+    if (val == NULL || val[0] == 0)
+    {
+        return true;
+    }
+    if (!strncmp(val, "on", 2)||
+        !strncmp(val, "true", 4)||
+        !strncmp(val, "1", 1))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
 uint16_t load_plugins(ini_section_s *section)
 {
     uint16_t load_count = 0;
@@ -71,6 +90,12 @@ uint16_t load_plugins(ini_section_s *section)
     for (uint16_t j = 0; j < section->size; j++)
     {
         ini_entry_s *entry = &section->entry[j];
+        final_printf("%s=%s\n", entry->key, entry->value);
+        if (!simple_get_bool(entry->value))
+        {
+            final_printf("Skipping entry (%s)\n", entry->value);
+            continue;
+        }
         if (entry->key[0] != '/')
         {
             if (!notifi_shown)
