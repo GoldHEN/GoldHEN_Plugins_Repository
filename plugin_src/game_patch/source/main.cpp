@@ -6,27 +6,32 @@
 #include "patch.h"
 #include "utils.h"
 
-attr_public const char *g_pluginName = "game_patch";
-attr_public const char *g_pluginDesc = "Patches game before boot";
-attr_public const char *g_pluginAuth = "illusion";
-attr_public u32 g_pluginVersion = 0x00000110; // 1.10
-
 #define GOLDHEN_PATH_ (const char*) GOLDHEN_PATH
 #define BASE_PATH_PATCH (const char*) GOLDHEN_PATH_ "/patches"
 #define BASE_PATH_PATCH_SETTINGS (const char*) BASE_PATH_PATCH "/settings"
 #define BASE_PATH_PATCH_XML (const char*) BASE_PATH_PATCH "/xml"
+#define PLUGIN_NAME (const char*) "game_patch"
+#define PLUGIN_DESC (const char*) "Patches game at boot"
+#define PLUGIN_AUTH (const char*) "illusion"
+#define PLUGIN_VER 0x110 // 1.10
+
 #define NO_ASLR_ADDR 0x00400000
+
+attr_public const char *g_pluginName = PLUGIN_NAME;
+attr_public const char *g_pluginDesc = PLUGIN_DESC;
+attr_public const char *g_pluginAuth = PLUGIN_AUTH;
+attr_public u32 g_pluginVersion = PLUGIN_VER;
 
 char titleid[16] = {0};
 char game_elf[32] = {0};
 char game_prx[MAX_PATH_] = {0};
 char game_ver[8] = {0};
 
-uint64_t module_base = 0;
-uint32_t module_size = 0;
+u64 module_base = 0;
+u32 module_size = 0;
 // unused for now
-uint64_t PRX_module_base = 0;
-uint32_t PRX_module_size = 0;
+u64 PRX_module_base = 0;
+u32 PRX_module_size = 0;
 
 const char* GetXMLAttr(mxml_node_t *node, const char *name)
 {
@@ -35,16 +40,19 @@ const char* GetXMLAttr(mxml_node_t *node, const char *name)
     return AttrData;
 }
 
-constexpr uint32_t MAX_PATTERN_LENGTH = 256;
+constexpr u32 MAX_PATTERN_LENGTH = 256;
 
-static int pattern_to_byte(const char* pattern, uint8_t* bytes)
+s32 pattern_to_byte(const char* pattern, uint8_t* bytes)
 {
-    int count = 0;
+    s32 count = 0;
     const char* start = pattern;
     const char* end = pattern + strlen(pattern);
 
     for (const char* current = start; current < end; ++current)
     {
+        if (*current == ' ')
+            continue;
+
         if (*current == '?')
         {
             ++current;
@@ -65,24 +73,32 @@ static int pattern_to_byte(const char* pattern, uint8_t* bytes)
 /*
  * @brief Scan for a given byte pattern on a module
  *
- * @param module    Base of the module to search
- * @param signature IDA-style byte array pattern
- *
- * @returns Address of the first occurrence
+ * @param module_base Base of the module to search
+ * @param module_size Size of the module to search
+ * @param signature   IDA-style byte array pattern
+ * @credit            https://github.com/OneshotGH/CSGOSimple-master/blob/59c1f2ec655b2fcd20a45881f66bbbc9cd0e562e/CSGOSimple/helpers/utils.cpp#L182
+ * @returns           Address of the first occurrence
  */
- // https://github.com/OneshotGH/CSGOSimple-master/blob/59c1f2ec655b2fcd20a45881f66bbbc9cd0e562e/CSGOSimple/helpers/utils.cpp#L182
-uint8_t* PatternScan(uint64_t module_base, uint32_t module_size, const char* signature)
+u8* PatternScan(uint64_t module_base, uint32_t module_size, const char* signature)
 {
     if (!module_base || !module_size)
+    {
         return nullptr;
-    uint8_t patternBytes[MAX_PATTERN_LENGTH];
-    int patternLength = pattern_to_byte(signature, patternBytes);
-    uint8_t* scanBytes = (uint8_t*)module_base;
+    }
+    u8 patternBytes[MAX_PATTERN_LENGTH];
+    s32 patternLength = pattern_to_byte(signature, patternBytes);
+    if (!patternLength || patternLength >= MAX_PATTERN_LENGTH)
+    {
+        final_printf("Pattern length too large or invalid! %i (0x%08x)\n", patternLength, patternLength);
+        final_printf("Input Pattern %s\n", signature);
+        return nullptr;
+    }
+    u8* scanBytes = (uint8_t*)module_base;
 
-    for (size_t i = 0; i < module_size; ++i)
+    for (u64 i = 0; i < module_size; ++i)
     {
         bool found = true;
-        for (int j = 0; j < patternLength; ++j)
+        for (s32 j = 0; j < patternLength; ++j)
         {
             if (scanBytes[i + j] != patternBytes[j] && patternBytes[j] != 0xff)
             {
@@ -95,7 +111,7 @@ uint8_t* PatternScan(uint64_t module_base, uint32_t module_size, const char* sig
             return &scanBytes[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void get_key_init(void)
@@ -186,6 +202,11 @@ void get_key_init(void)
                         }
                         gameOffset = GetXMLAttr(Line_node, "Offset");
                         addr_real = (uint64_t)PatternScan(module_base, module_size, gameAddr);
+                        if (!addr_real)
+                        {
+                            final_printf("Masked Address: %s not found\n", gameAddr);
+                            continue;
+                        }
                         final_printf("Masked Address: 0x%lx\n", addr_real);
                         debug_printf("Offset: %s\n", gameOffset);
                         u32 real_offset = 0;
