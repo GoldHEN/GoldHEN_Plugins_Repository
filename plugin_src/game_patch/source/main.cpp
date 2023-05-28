@@ -170,7 +170,7 @@ void get_key_init(void)
                 {
                     use_mask = false;
                 }
-                else if (!strcmp("mask", AppVerData))
+                else if (!strncmp("mask", AppVerData, 4) || !strncmp("all", AppVerData, 3))
                 {
                     use_mask = true;
                 }
