@@ -18,11 +18,12 @@
 #define PLUGIN_CONFIG_PATH GOLDHEN_PATH "/plugins.ini"
 #define PLUGIN_PATH GOLDHEN_PATH "/plugins"
 #define PLUGIN_DEFAULT_SECTION "default"
+#define PLUGIN_SETTINGS_SECTION "settings"
 
 attr_public const char *g_pluginName = "plugin_loader";
 attr_public const char *g_pluginDesc = "Plugin loader for GoldHEN";
 attr_public const char *g_pluginAuth = "Ctn123, illusion";
-attr_public u32 g_pluginVersion = 0x00000100; // 1.00
+attr_public u32 g_pluginVersion = 0x00000110; // 1.10
 
 // Todo: Move to sdk.
 bool file_exists(const char* filename)
@@ -34,10 +35,14 @@ bool file_exists(const char* filename)
 void create_template_config(void)
 {
     final_printf("Creating new %s file\n", PLUGIN_CONFIG_PATH);
-    const char *file_str = "; Load plugins under specific Title ID CUSA12345\n"
-                           "[CUSA12345]\n"
-                           ";/data/GoldHEN/plugins/example34.prx\n"
-                           ";/data/GoldHEN/plugins/example138.prx\n"
+    const char *file_str = ""
+                           "[" PLUGIN_SETTINGS_SECTION "]\n"
+                           "; Global settings for plugin loader.\n"
+                           "; Affects every app/process boot.\n"
+                           "show_load_notification=true\n"
+                           "; Details for show_load_notification\n"
+                           "; Shows how many plugins were successfully loaded.\n"
+                           "; Valid options: false or true.\n"
                            "\n"
                            "; Load plugins in default section regardless of Title ID\n"
                            "[default]\n"
@@ -70,8 +75,8 @@ bool simple_get_bool(const char* val)
     {
         return true;
     }
-    if (!strncmp(val, "on", 2)||
-        !strncmp(val, "true", 4)||
+    if (!strncmp(val, "on", 2) ||
+        !strncmp(val, "true", 4) ||
         !strncmp(val, "1", 1))
     {
         return true;
@@ -98,16 +103,16 @@ uint16_t load_plugins(ini_section_s *section)
         }
         if (entry->key[0] != '/')
         {
+            char notify_msg[160];
+            snprintf(notify_msg, sizeof(notify_msg), "Path:\n\"%s\"\nis wrong!\nPlugin will not load.", entry->key);
             if (!notifi_shown)
             {
-                char notify_msg[128];
-                snprintf(notify_msg, sizeof(notify_msg), "Path \"%s\" is wrong!\nPlugin will not load", entry->key);
                 NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
                 notifi_shown = true;
             }
             else
             {
-                final_printf("Path \"%s\" is wrong!\nPlugin will not load\n", entry->key);
+                final_printf("%s\n", notify_msg);
             }
             continue;
         }
@@ -183,8 +188,8 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
     }
     */
 
-    final_printf("Section is TitleID [%s]\n", procInfo.titleid);
-
+    // final_printf("Section is TitleID [%s]\n", procInfo.titleid);
+    bool show_load_notification = false;
     uint16_t load_count = 0;
 
     for (uint16_t i = 0; i < config->size; i++)
@@ -194,22 +199,41 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
         if (section == NULL)
             continue;
 
+        if (strcmp(section->name, PLUGIN_SETTINGS_SECTION) == 0)
+        {
+            final_printf("Section [%s] is settings\n", section->name);
+            for (uint16_t j = 0; j < section->size; j++)
+            {
+                ini_entry_s *entry = &section->entry[j];
+                final_printf("%s=%s\n", entry->key, entry->value);
+                if (strcmp("show_load_notification", entry->key) == 0)
+                {
+                    show_load_notification = simple_get_bool(entry->value);
+                    final_printf("%s=%u\n", entry->key, show_load_notification);
+                }
+            }
+        }
+
         if (strcmp(section->name, PLUGIN_DEFAULT_SECTION) == 0)
         {
             final_printf("Section [%s] is default\n", section->name);
             load_count += load_plugins(section);
-        } else if (strcmp(section->name, procInfo.titleid) == 0)
+        }
+        else if (strcmp(section->name, procInfo.titleid) == 0)
         {
             final_printf("Section is TitleID [%s]\n", procInfo.titleid);
             load_count += load_plugins(section);
         }
     }
 
-    if (load_count > 1)
+    if (show_load_notification)
     {
-        char notify_msg[32];
-        snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)", load_count);
-        NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
+        if (load_count > 0)
+        {
+            char notify_msg[32];
+            snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)", load_count);
+            NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
+        }
     }
 
     if (config != NULL)
