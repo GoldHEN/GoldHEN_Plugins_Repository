@@ -4,10 +4,6 @@
 
 #pragma once
 
-extern char titleid[16];
-extern char game_elf[32];
-extern char game_ver[8];
-
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size);
 void sys_proc_rw(u64 address, void *data, u64 length);
 bool hex_prefix(const char *str);
