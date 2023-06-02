@@ -23,7 +23,7 @@ attr_public const char *g_pluginAuth = PLUGIN_AUTH;
 attr_public u32 g_pluginVersion = PLUGIN_VER;
 
 char titleid[16] = {0};
-char game_elf[32] = {0};
+char game_elf[MAX_PATH_] = {0};
 char game_prx[MAX_PATH_] = {0};
 char game_ver[8] = {0};
 
@@ -116,13 +116,13 @@ u8* PatternScan(uint64_t module_base, uint32_t module_size, const char* signatur
 
 void get_key_init(void)
 {
-    u64 patch_lines = 0;
-    u64 patch_items = 0;
-    char *buffer;
-    char *buffer2;
+    u32 patch_lines = 0;
+    u32 patch_items = 0;
+    char *buffer = nullptr;
+    char *buffer2 = nullptr;
     u64 size = 0;
     u64 size2 = 0;
-    char input_file[64];
+    char input_file[MAX_PATH_];
     snprintf(input_file, sizeof(input_file), BASE_PATH_PATCH_XML "/%s.xml", titleid);
     s32 res = Read_File(input_file, &buffer, &size, 0);
 
@@ -143,7 +143,6 @@ void get_key_init(void)
 
         for (node = mxmlFindElement(tree, tree, "Metadata", NULL, NULL, MXML_DESCEND); node != NULL;
              node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND)) {
-            bool use_mask = false;
             bool PRX_patch = false;
             const char *TitleData = GetXMLAttr(node, "Title");
             const char *NameData = GetXMLAttr(node, "Name");
@@ -156,26 +155,28 @@ void get_key_init(void)
             debug_printf("AppElf: \"%s\"\n", AppElfData);
 
             u64 hashout = patch_hash_calc(TitleData, NameData, AppVerData, input_file, AppElfData);
-            char settings_path[64];
+            char settings_path[MAX_PATH_];
             snprintf(settings_path, sizeof(settings_path), BASE_PATH_PATCH_SETTINGS "/0x%016lx.txt", hashout);
             final_printf("Settings path: %s\n", settings_path);
             s32 res = Read_File(settings_path, &buffer2, &size2, 0);
             if (res == ORBIS_KERNEL_ERROR_ENOENT) {
                 debug_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
-                u8 false_data[2] = {'0', '\n'};
+                u8 false_data[] = {'0', '\n'};
                 Write_File(settings_path, false_data, sizeof(false_data));
             } else if (buffer2[0] == '1' && !strcmp(game_elf, AppElfData)) {
-                s32 ret_cmp = strcmp(game_ver, AppVerData);
+                s32 ret_cmp = strncmp(game_ver, AppVerData, 5);
                 if (!ret_cmp)
                 {
-                    use_mask = false;
+                    debug_printf("App ver %s == %s\n", game_ver, AppVerData);
                 }
                 else if (!strncmp("mask", AppVerData, 4) || !strncmp("all", AppVerData, 3))
                 {
-                    use_mask = true;
+                    debug_printf("App ver masked: %s\n", AppVerData);
                 }
                 else if (ret_cmp)
                 {
+                    debug_printf("App ver %s != %s\n", game_ver, AppVerData);
+                    debug_printf("Skipping patch entry\n");
                     continue;
                 }
                 patch_items++;
@@ -186,10 +187,17 @@ void get_key_init(void)
                     u64 addr_real = 0;
                     u64 jump_addr = 0;
                     u32 jump_size = 0;
+                    bool use_mask = false;
                     const char *gameType = GetXMLAttr(Line_node, "Type");
                     const char *gameAddr = GetXMLAttr(Line_node, "Address");
                     const char *gameValue = GetXMLAttr(Line_node, "Value");
                     const char *gameOffset = nullptr;
+                    // starts with `mask`
+                    // mask or mask_jump32
+                    if (!strncmp("mask", gameType, 4))
+                    {
+                        use_mask = true;
+                    }
                     if (use_mask)
                     {
                         if (!strcmp("mask_jump32", gameType))
@@ -241,7 +249,7 @@ void get_key_init(void)
                         debug_printf("Address: 0x%lx\n", addr_real);
                     }
                     debug_printf("Value: \"%s\"\n", gameValue);
-                    debug_printf("patch line: %lu\n", patch_lines);
+                    debug_printf("patch line: %u\n", patch_lines);
                     if (gameType && addr_real) // type and address must be present
                     {
                         if (!PRX_patch && !use_mask)
@@ -266,47 +274,38 @@ void get_key_init(void)
 
         if (patch_items > 0 && patch_lines > 0)
         {
-            char line_msg[64];
-            char item_msg[64];
-
-            if (patch_lines == 1)
-                snprintf(line_msg, sizeof(line_msg), "%lu Patch Line Applied", patch_lines);
-            else if (patch_lines > 1)
-                snprintf(line_msg, sizeof(line_msg), "%lu Patch Lines Applied", patch_lines);
-            if (patch_items == 1)
-                snprintf(item_msg, sizeof(item_msg), "%lu Patch Applied", patch_items);
-            else if (patch_items > 1)
-                snprintf(item_msg, sizeof(item_msg), "%lu Patches Applied", patch_items);
-
             char msg[128];
-            snprintf(msg, sizeof(msg),
-                     "%s\n"
-                     "%s",
-                     item_msg, line_msg);
+            snprintf(msg, sizeof(msg), "%u %s Applied\n"
+                                       "%u %s Applied",
+                                       patch_items, (patch_items == 1) ? "Patch" : "Patches",
+                                       patch_lines, (patch_lines == 1) ? "Patch Line" : "Patch Lines");
             NotifyStatic(TEX_ICON_SYSTEM, msg);
         }
     }
-    else // if (buffer)
+    else // if (!buffer)
     {
         char msg[128];
         snprintf(msg, sizeof(msg), "File %s\nis empty", input_file);
         NotifyStatic(TEX_ICON_SYSTEM, msg);
     }
-    return;
+    if (buffer2)
+    {
+        free(buffer2);
+    }
 }
 
-void mkdir_chmod(const char *path, OrbisKernelMode mode) {
+void mkdir_chmod(const char *path, OrbisKernelMode mode)
+{
     sceKernelMkdir(path, mode);
     sceKernelChmod(path, mode);
-    return;
 }
 
-void make_folders(void) {
+void make_folders(void)
+{
     mkdir_chmod(GOLDHEN_PATH_, 0777);
     mkdir_chmod(BASE_PATH_PATCH, 0777);
     mkdir_chmod(BASE_PATH_PATCH_XML, 0777);
     mkdir_chmod(BASE_PATH_PATCH_SETTINGS, 0777);
-    return;
 }
 
 // https://github.com/bucanero/apollo-ps4/blob/a530cae3c81639eedebac606c67322acd6fa8965/source/orbis_jbc.c#L62
