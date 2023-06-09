@@ -2,8 +2,6 @@
 #include "plugin_common.h"
 #include <stdbool.h>
 
-#pragma once
-
 unsigned char *hexstrtochar2(const char *hexstr, s64 *size);
 void sys_proc_rw(u64 address, void *data, u64 length);
 bool hex_prefix(const char *str);
