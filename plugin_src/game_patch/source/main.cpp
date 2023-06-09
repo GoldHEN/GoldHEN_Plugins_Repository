@@ -22,96 +22,23 @@ attr_public const char *g_pluginDesc = PLUGIN_DESC;
 attr_public const char *g_pluginAuth = PLUGIN_AUTH;
 attr_public u32 g_pluginVersion = PLUGIN_VER;
 
-char titleid[16] = {0};
-char game_elf[MAX_PATH_] = {0};
-char game_prx[MAX_PATH_] = {0};
-char game_ver[8] = {0};
+char g_titleid[16] = {0};
+char g_game_elf[MAX_PATH_] = {0};
+char g_game_prx[MAX_PATH_] = {0};
+char g_game_ver[8] = {0};
 
-u64 module_base = 0;
-u32 module_size = 0;
+u64 g_module_base = 0;
+u32 g_module_size = 0;
 // unused for now
-u64 PRX_module_base = 0;
-u32 PRX_module_size = 0;
+bool g_PRX = false;
+u64 g_PRX_module_base = 0;
+u32 g_PRX_module_size = 0;
 
 const char* GetXMLAttr(mxml_node_t *node, const char *name)
 {
     const char* AttrData = mxmlElementGetAttr(node, name);
-    if (AttrData == NULL) AttrData = "";
+    if (AttrData == NULL) AttrData = "\0";
     return AttrData;
-}
-
-constexpr u32 MAX_PATTERN_LENGTH = 256;
-
-s32 pattern_to_byte(const char* pattern, uint8_t* bytes)
-{
-    s32 count = 0;
-    const char* start = pattern;
-    const char* end = pattern + strlen(pattern);
-
-    for (const char* current = start; current < end; ++current)
-    {
-        if (*current == ' ')
-            continue;
-
-        if (*current == '?')
-        {
-            ++current;
-            if (*current == '?')
-            {
-                ++current;
-            }
-            bytes[count++] = -1;
-        }
-        else
-        {
-            bytes[count++] = strtoul(current, (char**)&current, 16);
-        }
-    }
-    return count;
-}
-
-/*
- * @brief Scan for a given byte pattern on a module
- *
- * @param module_base Base of the module to search
- * @param module_size Size of the module to search
- * @param signature   IDA-style byte array pattern
- * @credit            https://github.com/OneshotGH/CSGOSimple-master/blob/59c1f2ec655b2fcd20a45881f66bbbc9cd0e562e/CSGOSimple/helpers/utils.cpp#L182
- * @returns           Address of the first occurrence
- */
-u8* PatternScan(uint64_t module_base, uint32_t module_size, const char* signature)
-{
-    if (!module_base || !module_size)
-    {
-        return nullptr;
-    }
-    u8 patternBytes[MAX_PATTERN_LENGTH];
-    s32 patternLength = pattern_to_byte(signature, patternBytes);
-    if (!patternLength || patternLength >= MAX_PATTERN_LENGTH)
-    {
-        final_printf("Pattern length too large or invalid! %i (0x%08x)\n", patternLength, patternLength);
-        final_printf("Input Pattern %s\n", signature);
-        return nullptr;
-    }
-    u8* scanBytes = (uint8_t*)module_base;
-
-    for (u64 i = 0; i < module_size; ++i)
-    {
-        bool found = true;
-        for (s32 j = 0; j < patternLength; ++j)
-        {
-            if (scanBytes[i + j] != patternBytes[j] && patternBytes[j] != 0xff)
-            {
-                found = false;
-                break;
-            }
-        }
-        if (found)
-        {
-            return &scanBytes[i];
-        }
-    }
-    return nullptr;
 }
 
 void get_key_init(void)
@@ -122,27 +49,31 @@ void get_key_init(void)
     char *buffer2 = nullptr;
     u64 size = 0;
     u64 size2 = 0;
-    char input_file[MAX_PATH_];
-    snprintf(input_file, sizeof(input_file), BASE_PATH_PATCH_XML "/%s.xml", titleid);
+    char input_file[MAX_PATH_] = {0};
+    snprintf(input_file, sizeof(input_file), BASE_PATH_PATCH_XML "/%s.xml", g_titleid);
     s32 res = Read_File(input_file, &buffer, &size, 0);
 
-    if (res) {
+    if (res)
+    {
         final_printf("file %s not found\nerror: 0x%08x", input_file, res);
         return;
     }
 
-    if (buffer) {
+    if (buffer)
+    {
         mxml_node_t *node, *tree = NULL;
         tree = mxmlLoadString(NULL, buffer, MXML_NO_CALLBACK);
 
-        if (!tree) {
+        if (!tree)
+        {
             final_printf("XML: could not parse XML:\n%s\n", buffer);
             free(buffer);
             return;
         }
 
         for (node = mxmlFindElement(tree, tree, "Metadata", NULL, NULL, MXML_DESCEND); node != NULL;
-             node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND)) {
+             node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND))
+        {
             bool PRX_patch = false;
             const char *TitleData = GetXMLAttr(node, "Title");
             const char *NameData = GetXMLAttr(node, "Name");
@@ -163,19 +94,19 @@ void get_key_init(void)
                 debug_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
                 u8 false_data[] = {'0', '\n'};
                 Write_File(settings_path, false_data, sizeof(false_data));
-            } else if (buffer2[0] == '1' && !strcmp(game_elf, AppElfData)) {
-                s32 ret_cmp = strncmp(game_ver, AppVerData, 5);
+            } else if (buffer2[0] == '1' && !strcmp(g_game_elf, AppElfData)) {
+                s32 ret_cmp = strcmp(g_game_ver, AppVerData);
                 if (!ret_cmp)
                 {
-                    debug_printf("App ver %s == %s\n", game_ver, AppVerData);
+                    debug_printf("App ver %s == %s\n", g_game_ver, AppVerData);
                 }
-                else if (!strncmp("mask", AppVerData, 4) || !strncmp("all", AppVerData, 3))
+                else if (!startsWith(AppVerData, "mask") || !startsWith(AppVerData, "all"))
                 {
                     debug_printf("App ver masked: %s\n", AppVerData);
                 }
                 else if (ret_cmp)
                 {
-                    debug_printf("App ver %s != %s\n", game_ver, AppVerData);
+                    debug_printf("App ver %s != %s\n", g_game_ver, AppVerData);
                     debug_printf("Skipping patch entry\n");
                     continue;
                 }
@@ -193,23 +124,22 @@ void get_key_init(void)
                     const char *gameValue = GetXMLAttr(Line_node, "Value");
                     const char *gameOffset = nullptr;
                     // starts with `mask`
-                    // mask or mask_jump32
-                    if (!strncmp("mask", gameType, 4))
+                    if (!startsWith(gameType, "mask"))
                     {
                         use_mask = true;
                     }
                     if (use_mask)
                     {
-                        if (!strcmp("mask_jump32", gameType))
+                        if (!startsWith(gameType, "mask_jump32"))
                         {
                             const char* gameJumpTarget = GetXMLAttr(Line_node, "Target");
                             const char* gameJumpSize = GetXMLAttr(Line_node, "Size");
-                            jump_addr = addr_real = (uint64_t)PatternScan(module_base, module_size, gameJumpTarget);
+                            jump_addr = addr_real = (uint64_t)PatternScan(g_module_base, g_module_size, gameJumpTarget);
                             jump_size = strtoul(gameJumpSize, NULL, 10);
                             debug_printf("Target: 0x%lx jump size %u\n", jump_addr, jump_size);
                         }
                         gameOffset = GetXMLAttr(Line_node, "Offset");
-                        addr_real = (uint64_t)PatternScan(module_base, module_size, gameAddr);
+                        addr_real = (uint64_t)PatternScan(g_module_base, g_module_size, gameAddr);
                         if (!addr_real)
                         {
                             final_printf("Masked Address: %s not found\n", gameAddr);
@@ -250,16 +180,16 @@ void get_key_init(void)
                     }
                     debug_printf("Value: \"%s\"\n", gameValue);
                     debug_printf("patch line: %u\n", patch_lines);
-                    if (gameType && addr_real) // type and address must be present
+                    if (gameType && addr_real && *gameValue != '\0') // type, address and value must be present
                     {
                         if (!PRX_patch && !use_mask)
                         {
                             // previous self, eboot patches were made with no aslr addresses
-                            addr_real = module_base + (addr_real - NO_ASLR_ADDR);
+                            addr_real = g_module_base + (addr_real - NO_ASLR_ADDR);
                         }
                         else if (PRX_patch && !use_mask)
                         {
-                            addr_real = module_base + addr_real;
+                            addr_real = g_module_base + addr_real;
                         }
                         patch_data1(gameType, addr_real, gameValue, jump_size, jump_addr);
                         patch_lines++;
@@ -274,7 +204,7 @@ void get_key_init(void)
 
         if (patch_items > 0 && patch_lines > 0)
         {
-            char msg[128];
+            char msg[128] = {0};
             snprintf(msg, sizeof(msg), "%u %s Applied\n"
                                        "%u %s Applied",
                                        patch_items, (patch_items == 1) ? "Patch" : "Patches",
@@ -284,7 +214,7 @@ void get_key_init(void)
     }
     else // if (!buffer)
     {
-        char msg[128];
+        char msg[128] = {0};
         snprintf(msg, sizeof(msg), "File %s\nis empty", input_file);
         NotifyStatic(TEX_ICON_SYSTEM, msg);
     }
@@ -308,70 +238,31 @@ void make_folders(void)
     mkdir_chmod(BASE_PATH_PATCH_SETTINGS, 0777);
 }
 
-// https://github.com/bucanero/apollo-ps4/blob/a530cae3c81639eedebac606c67322acd6fa8965/source/orbis_jbc.c#L62
-int get_module_info(OrbisKernelModuleInfo moduleInfo, const char* name, uint64_t *base, uint32_t *size)
-{
-    OrbisKernelModule handles[256];
-    size_t numModules;
-    int ret = 0;
-    ret = sceKernelGetModuleList(handles, sizeof(handles), &numModules);
-    if (ret)
-    {
-        final_printf("sceKernelGetModuleList (0x%08x)\n", ret);
-        return ret;
-    }
-    final_printf("numModules: %li\n", numModules);
-    for (size_t i = 0; i < numModules; ++i)
-    {
-        ret = sceKernelGetModuleInfo(handles[i], &moduleInfo);
-        final_printf("ret 0x%x\n", ret);
-        final_printf("module %li\n", i);
-        final_printf("name: %s\n", moduleInfo.name);
-        final_printf("start: 0x%lx\n", (uint64_t)moduleInfo.segmentInfo[0].address);
-        final_printf("size: %u (0x%x)\n", moduleInfo.segmentInfo[0].size, moduleInfo.segmentInfo[0].size);
-        if (ret)
-        {
-            final_printf("sceKernelGetModuleInfo (%X)\n", ret);
-            return ret;
-        }
-
-        if (strcmp(moduleInfo.name, name) == 0 || name[0] == '0')
-        {
-            if (base)
-                *base = (uint64_t)moduleInfo.segmentInfo[0].address;
-
-            if (size)
-                *size = moduleInfo.segmentInfo[0].size;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 extern "C" {
 s32 attr_module_hidden module_start(s64 argc, const void *args) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
-    struct proc_info procInfo;
-    OrbisKernelModuleInfo CurrentModuleInfo;
+    proc_info procInfo{};
+    OrbisKernelModuleInfo CurrentModuleInfo{};
     CurrentModuleInfo.size = sizeof(OrbisKernelModuleInfo);
-    if(!get_module_info(CurrentModuleInfo, "0", &module_base, &module_size) && module_base && module_size)
+    if(!get_module_info(CurrentModuleInfo, "0", &g_module_base, &g_module_size) && (!g_module_base || !g_module_size))
     {
         final_printf("Could not find module info for current process\n");
         return -1;
     }
-    final_printf("Module start: 0x%lx 0x%x\n", module_base, module_size);
-    if (sys_sdk_proc_info(&procInfo) == 0) {
-        memcpy(titleid, procInfo.titleid, sizeof(titleid));
-        memcpy(game_elf, procInfo.name, sizeof(game_elf));
-        memcpy(game_ver, procInfo.version, sizeof(game_ver));
+    final_printf("Module start: 0x%lx 0x%x\n", g_module_base, g_module_size);
+    if (sys_sdk_proc_info(&procInfo) == 0)
+    {
+        strncpy(g_titleid, procInfo.titleid, sizeof(g_titleid));
+        strncpy(g_game_elf, procInfo.name, sizeof(g_game_elf));
+        strncpy(g_game_ver, procInfo.version, sizeof(g_game_ver));
         make_folders();
         print_proc_info();
         get_key_init();
         return 0;
     }
-    NotifyStatic(TEX_ICON_SYSTEM, "Unable to get process info from " STRINGIFY(sys_sdk_proc_info));
+    NotifyStatic(TEX_ICON_SYSTEM, "Unable to get process info from sys_sdk_proc_info");
     return -1;
 }
 }
