@@ -159,7 +159,7 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             final_printf("Error loading Plugin %s! Error code 0x%08x (%i)\n", entry->key, result, result);
         } else
         {
-            char plugin_entry[128] = {0};
+            char plugin_entry[128];
             const char** ModuleName = NULL;
             int ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
             final_printf("Loaded Plugin %s\n", entry->key);
