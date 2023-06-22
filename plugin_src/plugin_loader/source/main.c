@@ -90,6 +90,36 @@ bool simple_get_bool(const char* val)
     return true;
 }
 
+size_t strncat_s(char* dest, size_t destSize, const char* source, size_t source_count)
+{
+    if (dest == NULL || destSize == 0 || source == NULL || source_count == 0)
+    {
+        return 0;
+    }
+
+    size_t destLen = strlen(dest);
+    size_t srcLen = strlen(source);
+
+    if ((destLen + srcLen) >= destSize)
+    {
+        return 0;
+    }
+
+    size_t copyLen = destSize - destLen - 1;
+    if (copyLen > source_count)
+    {
+        copyLen = source_count;
+    }
+
+    for (size_t i = 0; i < copyLen; i++)
+    {
+        dest[destLen + i] = source[i];
+    }
+
+    dest[destLen + copyLen] = '\0';
+    return destLen + copyLen;
+}
+
 void load_plugins(ini_section_s *section, uint32_t *load_count)
 {
     bool notifi_shown = false;
@@ -133,12 +163,12 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             int ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
             final_printf("Loaded Plugin %s\n", entry->key);
             final_printf("Plugin Handle 0x%08x Dlsym 0x%08x\n", result, ret);
-            if (ModuleName)
+            *load_count += 1;
+            if (ModuleName && strlen(g_PluginDetails) < sizeof(g_PluginDetails))
             {
-                *load_count += 1;
                 char plugin_entry[128]; // cant really zero initialize this but didnt want my console to crash
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
-                strncat(g_PluginDetails, plugin_entry, sizeof(plugin_entry));
+                strncat_s(g_PluginDetails, sizeof(g_PluginDetails), plugin_entry, strlen(plugin_entry));
             }
         }
     }
