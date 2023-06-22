@@ -25,7 +25,7 @@ attr_public const char *g_pluginDesc = "Plugin loader for GoldHEN";
 attr_public const char *g_pluginAuth = "Ctn123, illusion";
 attr_public u32 g_pluginVersion = 0x00000110; // 1.10
 
-char PluginDetails[256] = {0};
+char g_PluginDetails[256] = {0};
 
 // Todo: Move to sdk.
 bool file_exists(const char* filename)
@@ -138,8 +138,7 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
                 *load_count += 1;
                 char plugin_entry[128];
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
-                strcat(PluginDetails, plugin_entry);
-                //snprintf(PluginDetails, sizeof(PluginDetails), "%s");
+                strcat(g_PluginDetails, plugin_entry);
             }
         }
     }
@@ -243,12 +242,12 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
         {
             char notify_msg[128];
             // trim newline
-            size_t PluginLen = strlen(PluginDetails) - 1;
-            if (PluginDetails[PluginLen] == '\n')
+            size_t PluginLen = strlen(g_PluginDetails) - 1;
+            if (g_PluginDetails[PluginLen] == '\n')
             {
-                PluginDetails[PluginLen] = '\0';
+                g_PluginDetails[PluginLen] = '\0';
             }
-            snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)\n%s", load_count, PluginDetails);
+            snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)\n%s", load_count, g_PluginDetails);
             NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
         }
     }
