@@ -136,10 +136,9 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             if (ModuleName)
             {
                 *load_count += 1;
-                char plugin_entry[128];
+                char plugin_entry[128]; // cant really zero initialize this but didnt want my console to crash
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
                 strcat(g_PluginDetails, plugin_entry);
-                final_printf("%s", plugin_entry);
             }
         }
     }
