@@ -25,6 +25,8 @@ attr_public const char *g_pluginDesc = "Plugin loader for GoldHEN";
 attr_public const char *g_pluginAuth = "Ctn123, illusion";
 attr_public u32 g_pluginVersion = 0x00000110; // 1.10
 
+char PluginDetails[256] = {0};
+
 // Todo: Move to sdk.
 bool file_exists(const char* filename)
 {
@@ -88,11 +90,10 @@ bool simple_get_bool(const char* val)
     return true;
 }
 
-uint16_t load_plugins(ini_section_s *section)
+void load_plugins(ini_section_s *section, uint32_t *load_count)
 {
-    uint16_t load_count = 0;
     bool notifi_shown = false;
-    for (uint16_t j = 0; j < section->size; j++)
+    for (uint32_t j = 0; j < section->size; j++)
     {
         ini_entry_s *entry = &section->entry[j];
         final_printf("%s=%s\n", entry->key, entry->value);
@@ -116,6 +117,7 @@ uint16_t load_plugins(ini_section_s *section)
             }
             continue;
         }
+        chmod(entry->key, 0777);
         sceKernelChmod(entry->key, 0777);
         final_printf("Starting %s\n", entry->key);
         int32_t result = sceKernelLoadStartModule(entry->key, 0, 0, 0, NULL, NULL);
@@ -127,11 +129,17 @@ uint16_t load_plugins(ini_section_s *section)
             final_printf("Error loading Plugin %s! Error code 0x%08x (%i)\n", entry->key, result, result);
         } else
         {
+            const char** ModuleName = NULL;
+            int ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
             final_printf("Loaded Plugin %s\n", entry->key);
-            load_count++;
+            final_printf("Plugin Handle 0x%08x Dlsym 0x%08x\n", result, ret);
+            if (ModuleName)
+            {
+                *load_count += 1;
+                snprintf(PluginDetails, sizeof(PluginDetails), "%s%u. %s\n", PluginDetails, *load_count, *ModuleName);
+            }
         }
     }
-    return load_count;
 }
 
 int32_t attr_module_hidden module_start(size_t argc, const void *args)
@@ -190,9 +198,9 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
 
     // final_printf("Section is TitleID [%s]\n", procInfo.titleid);
     bool show_load_notification = false;
-    uint16_t load_count = 0;
+    uint32_t load_count = 0;
 
-    for (uint16_t i = 0; i < config->size; i++)
+    for (uint32_t i = 0; i < config->size; i++)
     {
         ini_section_s *section = &config->section[i];
 
@@ -217,12 +225,12 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
         if (strcmp(section->name, PLUGIN_DEFAULT_SECTION) == 0)
         {
             final_printf("Section [%s] is default\n", section->name);
-            load_count += load_plugins(section);
+            load_plugins(section, &load_count);
         }
         else if (strcmp(section->name, procInfo.titleid) == 0)
         {
             final_printf("Section is TitleID [%s]\n", procInfo.titleid);
-            load_count += load_plugins(section);
+            load_plugins(section, &load_count);
         }
     }
 
@@ -230,8 +238,14 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
     {
         if (load_count > 0)
         {
-            char notify_msg[32];
-            snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)", load_count);
+            char notify_msg[128];
+            // trim newline
+            size_t PluginLen = strlen(PluginDetails) - 1;
+            if (PluginDetails[PluginLen] == '\n')
+            {
+                PluginDetails[PluginLen] = '\0';
+            }
+            snprintf(notify_msg, sizeof(notify_msg), "Loaded %u plugin(s)\n%s", load_count, PluginDetails);
             NotifyStatic(TEX_ICON_SYSTEM, notify_msg);
         }
     }
