@@ -159,6 +159,7 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             final_printf("Error loading Plugin %s! Error code 0x%08x (%i)\n", entry->key, result, result);
         } else
         {
+            char plugin_entry[128] = {0};
             const char** ModuleName = NULL;
             int ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
             final_printf("Loaded Plugin %s\n", entry->key);
@@ -166,21 +167,11 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             *load_count += 1;
             if (ModuleName)
             {
-                char plugin_entry[128]; // cant really zero initialize this but didnt want my console to crash
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
-                if(!strncat_s(g_PluginDetails, sizeof(g_PluginDetails), plugin_entry, strlen(plugin_entry)))
-                {
-                    final_printf("Failed to concatenate string!\n");
-                    final_printf("g_PluginDetails: %s\n", g_PluginDetails);
-                    final_printf("strlen(g_PluginDetails): %li\n", strlen(g_PluginDetails));
-                    final_printf("sizeof(g_PluginDetails): %li\n", sizeof(g_PluginDetails));
-                    final_printf("plugin_entry: %s\n", plugin_entry);
-                    final_printf("strlen(plugin_entry): %li\n", strlen(plugin_entry));
-                }
             }
             else if (!ModuleName)
             {
-                    final_printf("Failed to resolve g_pluginName string!\n");
+                final_printf("Failed to resolve g_pluginName string!\n");
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. unknown\n", *load_count);
             }
             else if (strlen(g_PluginDetails) >= sizeof(g_PluginDetails))
@@ -188,6 +179,15 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
                 final_printf("String size of g_PluginDetails is too large!\n");
                 final_printf("g_PluginDetails: %s\n", g_PluginDetails);
                 final_printf("strlen(g_PluginDetails): %li\n", strlen(g_PluginDetails));
+            }
+            if (!strncat_s(g_PluginDetails, sizeof(g_PluginDetails), plugin_entry, strlen(plugin_entry)))
+            {
+                final_printf("Failed to concatenate string!\n");
+                final_printf("g_PluginDetails: %s\n", g_PluginDetails);
+                final_printf("strlen(g_PluginDetails): %li\n", strlen(g_PluginDetails));
+                final_printf("sizeof(g_PluginDetails): %li\n", sizeof(g_PluginDetails));
+                final_printf("plugin_entry: %s\n", plugin_entry);
+                final_printf("strlen(plugin_entry): %li\n", strlen(plugin_entry));
             }
         }
     }
