@@ -77,9 +77,9 @@ bool simple_get_bool(const char* val)
     {
         return true;
     }
-    if (!strncmp(val, "on", 2) ||
-        !strncmp(val, "true", 4) ||
-        !strncmp(val, "1", 1))
+    if (!startsWith(val, "on") ||
+        !startsWith(val, "true") ||
+        !startsWith(val, "1"))
     {
         return true;
     }
@@ -168,7 +168,14 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             {
                 char plugin_entry[128]; // cant really zero initialize this but didnt want my console to crash
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
-                strncat_s(g_PluginDetails, sizeof(g_PluginDetails), plugin_entry, strlen(plugin_entry));
+                if(!strncat_s(g_PluginDetails, sizeof(g_PluginDetails), plugin_entry, strlen(plugin_entry)))
+                {
+                    final_printf("Failed to concatenate string!\n");
+                    final_printf("g_PluginDetails: %s\n", g_PluginDetails);
+                    final_printf("sizeof(g_PluginDetails): %li\n", sizeof(g_PluginDetails));
+                    final_printf("plugin_entry: %s\n", plugin_entry);
+                    final_printf("strlen(plugin_entry): %li\n", strlen(plugin_entry));
+                }
             }
         }
     }
