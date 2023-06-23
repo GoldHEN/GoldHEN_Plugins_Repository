@@ -291,7 +291,7 @@ void patch_data1(const char* patch_type_str, u64 addr, const char *value, uint32
             final_printf("Patch data:\n");
             final_printf("      Address: 0x%lx\n", addr);
             final_printf("      Value: %s\n", value);
-            final_printf("      Jump Size: %s\n", source_size);
+            final_printf("      Jump Size: %u\n", source_size);
             final_printf("      Jump Target: 0x%lx\n", jump_target);
             break;
         }
