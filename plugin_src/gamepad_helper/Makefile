@@ -4,10 +4,6 @@ DEBUG_FLAGS = -D__FINAL__=1
 LOG_TYPE = -D__USE_PRINTF__
 BUILD_TYPE = _final
 
-ifeq ($(PRINTF),1)
-    LOG_TYPE = -D__USE_PRINTF__
-endif
-
 ifeq ($(DEBUG),1)
     DEBUG_FLAGS = -D__FINAL__=0
     BUILD_TYPE = _debug
@@ -22,7 +18,7 @@ TARGET_ELF   := $(BUILD_FOLDER)/elf$(TYPE)/$(OUTPUT_PRX)
 TARGETSTUB   := $(OUTPUT_PRX).so
 
 # Libraries linked into the ELF.
-LIBS := -lGoldHEN_Hook -lkernel -lSceLibcInternal -lSceSysmodule -lScePad
+LIBS := -lSceLibcInternal -lGoldHEN_Hook -lkernel -lSceSysmodule -lScePad
 
 EXTRAFLAGS := $(DEBUG_FLAGS) $(LOG_TYPE) -fcolor-diagnostics -Wall
 

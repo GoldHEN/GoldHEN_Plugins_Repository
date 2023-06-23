@@ -82,11 +82,11 @@ jobs:
       working-directory: SDK
       run: echo "GOLDHEN_SDK=$(pwd)" >> $GITHUB_ENV
 
-    - name: Build (Release) (printf)
-      run: make LOG=PRINTF
+    - name: Build (Release)
+      run: make
 
-    - name: Build (Debug) (printf)
-      run: make LOG=PRINTF DEBUG=1
+    - name: Build (Debug)
+      run: make DEBUG=1
 
     - name: Push module artifact (Release prx)
       uses: actions/upload-artifact@v3
