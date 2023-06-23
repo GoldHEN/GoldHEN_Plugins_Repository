@@ -37,21 +37,22 @@ bool file_exists(const char* filename)
 void create_template_config(void)
 {
     final_printf("Creating new %s file\n", PLUGIN_CONFIG_PATH);
-    const char *file_str = ""
-                           "[" PLUGIN_SETTINGS_SECTION "]\n"
-                           "; Global settings for plugin loader.\n"
-                           "; Affects every app/process boot.\n"
-                           "show_load_notification=true\n"
-                           "; Details for show_load_notification\n"
-                           "; Shows how many plugins were successfully loaded.\n"
-                           "; Valid options: false or true.\n"
-                           "\n"
-                           "; Load plugins in default section regardless of Title ID\n"
-                           "[default]\n"
-                           ";/data/GoldHEN/plugins/example.prx\n"
-                           ";/data/GoldHEN/plugins/example2.prx\n"
-                           "\n"
-                           "; Note: text following the ; are comments\n";
+    // compile time
+    #define DEFAULT_INI_DATA "" \
+                            "[" PLUGIN_SETTINGS_SECTION "]\n" \
+                            "; Global settings for plugin loader.\n" \
+                            "; Affects every app/process boot.\n" \
+                            "show_load_notification=true\n" \
+                            "; Details for show_load_notification\n" \
+                            "; Shows how many plugins were successfully loaded.\n" \
+                            "; Valid options: false or true.\n" \
+                            "\n" \
+                            "; Load plugins in default section regardless of Title ID\n" \
+                            "[default]\n" \
+                            ";/data/GoldHEN/plugins/example.prx\n" \
+                            ";/data/GoldHEN/plugins/example2.prx\n" \
+                            "\n" \
+                            "; Note: text following the ; are comments\n"
 
     // Does not work, may not have write access.
     //FILE* f = fopen(PLUGIN_CONFIG_PATH, "w");
@@ -63,11 +64,11 @@ void create_template_config(void)
     int32_t f = sceKernelOpen(PLUGIN_CONFIG_PATH, 0x200 | 0x001, 0777);
     if (f < 0)
     {
-        final_printf("Failed to create file \"%s\"\n", PLUGIN_CONFIG_PATH);
+        final_printf("Failed to create file \"%s\" 0x%08x\n", PLUGIN_CONFIG_PATH, f);
         return;
     }
 
-    sceKernelWrite(f, file_str, strlen(file_str));
+    sceKernelWrite(f, DEFAULT_INI_DATA, strlen(DEFAULT_INI_DATA));
     sceKernelClose(f);
 }
 
@@ -134,7 +135,7 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
         }
         if (entry->key[0] != '/')
         {
-            char notify_msg[160];
+            char notify_msg[160] = {0};
             snprintf(notify_msg, sizeof(notify_msg), "Path:\n\"%s\"\nis wrong!\nPlugin will not load.", entry->key);
             if (!notifi_shown)
             {
@@ -159,13 +160,45 @@ void load_plugins(ini_section_s *section, uint32_t *load_count)
             final_printf("Error loading Plugin %s! Error code 0x%08x (%i)\n", entry->key, result, result);
         } else
         {
-            char plugin_entry[128];
+            int32_t ret = 0;
+            bool load_success = false;
             const char** ModuleName = NULL;
-            int ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
+            // TODO: accept user provided arguments
+            int32_t(*plugin_load_ret)(void) = NULL;
+            int32_t(*plugin_unload_ret)(void) = NULL;
+            ret = sceKernelDlsym(result, "g_pluginName", (void**)&ModuleName);
             final_printf("Loaded Plugin %s\n", entry->key);
             final_printf("Plugin Handle 0x%08x Dlsym 0x%08x\n", result, ret);
-            *load_count += 1;
-            if (ModuleName)
+            ret = sceKernelDlsym(result, "plugin_load", (void**)&plugin_load_ret);
+            final_printf("plugin_load Dlsym 0x%08x @ 0x%p\n", ret, plugin_load_ret);
+            ret = sceKernelDlsym(result, "plugin_unload", (void**)&plugin_unload_ret);
+            final_printf("plugin_unload Dlsym 0x%08x @ 0x%p\n", ret, plugin_unload_ret);
+            if (plugin_load_ret && plugin_unload_ret)
+            {
+                final_printf("Starting plugin...\n");
+                int32_t prx_ret = plugin_load_ret();
+                final_printf("plugin_load returned with 0x%08x\n", prx_ret);
+                if (prx_ret || prx_ret < 0)
+                {
+                    final_printf("Program returned non zero, Starting plugin_unload...\n");
+                    int32_t prx_ret = plugin_unload_ret();
+                    final_printf("plugin_unload returned with 0x%08x\n", prx_ret);
+                }
+                else if (prx_ret == 0)
+                {
+                    final_printf("plugin_load exit successful 0x%08x\n", prx_ret);
+                    *load_count += 1;
+                    load_success = true;
+                }
+            }
+            else
+            {
+                final_printf("Unable to find plugin_load or plugin_unload!\n");
+                load_success = false;
+                continue;
+            }
+            char plugin_entry[128] = {0};
+            if (ModuleName && load_success)
             {
                 snprintf(plugin_entry, sizeof(plugin_entry), "%u. %s\n", *load_count, *ModuleName);
             }
@@ -289,7 +322,7 @@ int32_t attr_module_hidden module_start(size_t argc, const void *args)
     {
         if (load_count > 0)
         {
-            char notify_msg[128];
+            char notify_msg[128] = {0};
             // trim newline
             size_t PluginLen = strlen(g_PluginDetails) - 1;
             if (g_PluginDetails[PluginLen] == '\n')

@@ -20,7 +20,7 @@ s32 sceVideoOutSetFlipRate_hook(s32 handle, s32 fliprate)
                         handle, 1);
 }
 
-s32 attr_module_hidden module_start(s64 argc, const void *args)
+s32 attr_public plugin_load(s32 argc, const char* argv[])
 {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
@@ -29,9 +29,19 @@ s32 attr_module_hidden module_start(s64 argc, const void *args)
     return 0;
 }
 
-s32 attr_module_hidden module_stop(s64 argc, const void *args)
+s32 attr_public plugin_unload(s32 argc, const char* argv[])
 {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     UNHOOK(sceVideoOutSetFlipRate);
+    return 0;
+}
+
+s32 attr_module_hidden module_start(s64 argc, const void *args)
+{
+    return 0;
+}
+
+s32 attr_module_hidden module_stop(s64 argc, const void *args)
+{
     return 0;
 }

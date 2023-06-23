@@ -9,16 +9,28 @@ attr_public const char *g_pluginDesc = "Example Plugin";
 attr_public const char *g_pluginAuth = "(null)";
 attr_public uint32_t g_pluginVersion = 0x00000100; // 1.00
 
-int32_t attr_module_hidden module_start(size_t argc, const void *args) {
+int32_t attr_public plugin_load(int32_t argc, const char* argv[]) {
     final_printf("[GoldHEN] %s Plugin Started.\n", g_pluginName);
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
-    Notify(TEX_ICON_SYSTEM, "Hello from %s", g_pluginName);
+    char msg[128] = {0};
+    snprintf(msg, sizeof(msg),  "Hello from %s", g_pluginName);
+    NotifyStatic(TEX_ICON_SYSTEM, msg);
     return 0;
 }
 
-int32_t attr_module_hidden module_stop(size_t argc, const void *args) {
+int32_t attr_public plugin_unload(int32_t argc, const char* argv[]) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] %s Plugin Ended.\n", g_pluginName);
+    return 0;
+}
+
+s32 attr_module_hidden module_start(s64 argc, const void *args)
+{
+    return 0;
+}
+
+s32 attr_module_hidden module_stop(s64 argc, const void *args)
+{
     return 0;
 }
