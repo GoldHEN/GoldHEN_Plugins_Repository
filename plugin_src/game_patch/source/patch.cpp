@@ -25,7 +25,7 @@ char* unescape(const char *s) {
                     break;
                 case 'x':
                     {
-                        char hex_string[3];
+                        char hex_string[3] = {0};
                         u32 val = 0;
                         hex_string[0] = s[++i];
                         hex_string[1] = s[++i];
@@ -134,7 +134,7 @@ constexpr u64 djb2_hash(const char *str) {
 u64 patch_hash_calc(const char *title, const char *name, const char *app_ver,
                     const char *title_id, const char *elf) {
     u64 output_hash = 0;
-    char hash_str[256];
+    char hash_str[256] = {0};
     snprintf(hash_str, sizeof(hash_str), "%s%s%s%s%s", title, name, app_ver,
              title_id, elf);
     output_hash = djb2_hash(hash_str);
@@ -273,7 +273,7 @@ void patch_data1(const char* patch_type_str, u64 addr, const char *value, uint32
                 sys_proc_rw(addr + i, nop_byte, sizeof(nop_byte));
             }
             u8 jump_32[] = { 0xe9, 0x00, 0x00, 0x00, 0x00 };
-            s32 target_jmp = (s32) (jump_target - addr - 5);
+            s32 target_jmp = (s32) (jump_target - addr - sizeof(jump_32));
             s32 target_return = (s32) (addr) - (code_cave_end);
             sys_proc_rw(jump_target, bytearray, bytearray_size);
             sys_proc_rw(addr, jump_32, sizeof(jump_32));

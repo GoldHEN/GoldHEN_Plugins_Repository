@@ -55,7 +55,8 @@ void get_key_init(void)
 
     if (res)
     {
-        final_printf("file %s not found\nerror: 0x%08x", input_file, res);
+        final_printf("file %s not found\n", input_file);
+        final_printf("error: 0x%08x\n", res);
         return;
     }
 
@@ -86,7 +87,7 @@ void get_key_init(void)
             debug_printf("AppElf: \"%s\"\n", AppElfData);
 
             u64 hashout = patch_hash_calc(TitleData, NameData, AppVerData, input_file, AppElfData);
-            char settings_path[MAX_PATH_];
+            char settings_path[MAX_PATH_] = {0};
             snprintf(settings_path, sizeof(settings_path), BASE_PATH_PATCH_SETTINGS "/0x%016lx.txt", hashout);
             final_printf("Settings path: %s\n", settings_path);
             s32 res = Read_File(settings_path, &buffer2, &size2, 0);
@@ -239,7 +240,7 @@ void make_folders(void)
 }
 
 extern "C" {
-s32 attr_module_hidden module_start(s64 argc, const void *args) {
+s32 attr_public plugin_load(s32 argc, const char* argv[]) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
@@ -265,11 +266,19 @@ s32 attr_module_hidden module_start(s64 argc, const void *args) {
     NotifyStatic(TEX_ICON_SYSTEM, "Unable to get process info from sys_sdk_proc_info");
     return -1;
 }
+
+s32 attr_public plugin_unload(s32 argc, const char* argv[]) {
+    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
+    return 0;
 }
 
-extern "C" {
-s32 attr_module_hidden module_stop(s64 argc, const void *args) {
-    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
+s32 attr_module_hidden module_start(s64 argc, const void *args)
+{
+    return 0;
+}
+
+s32 attr_module_hidden module_stop(s64 argc, const void *args)
+{
     return 0;
 }
 }
