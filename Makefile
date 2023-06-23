@@ -9,13 +9,8 @@ else
 	DEBUG_FLAG=DEBUG=0
 endif
 
-ifeq ($(LOG), PRINTF)
-	LOG_TYPE=PRINTF=1
-	LOG_MSG=libc:printf
-else
-	LOG_TYPE=
-	LOG_MSG=GoldHEN:SDK:KernelLog
-endif
+LOG_TYPE=PRINTF=1
+LOG_MSG=libc:printf
 
 all: build hashes
 

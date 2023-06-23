@@ -244,10 +244,6 @@ export GOLDHEN_SDK=[directory of installation]
 ```
 3. Run `make` in the root of the repository or `make` individually; built binaries can be found in `bin/plugins`.
 
-# Troubleshooting log crashes
-
-If you ran into crashes related to print logging (usually during VA args assignment clearing stack) you can try building with printf `make LOG=PRINTF`.
-
 <!-- Win32 build script not up to date-->
 ### Windows
 
