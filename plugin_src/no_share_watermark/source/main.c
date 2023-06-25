@@ -15,9 +15,6 @@ attr_public const char *g_pluginName = "no_share_watermark";
 attr_public const char *g_pluginDesc = "Removes arbitrary limitations from share feature in games";
 attr_public const char *g_pluginAuth = "illusion";
 attr_public u32 g_pluginVersion = 0x00000100; // 1.00
-#define SCE_SYSMODULE_SCREEN_SHOT 0x009c
-#define SCE_SYSMODULE_VIDEO_RECORDING 0x0085
-#define SCE_SYSMODULE_REMOTE_PLAY 0x00b6
 
 HOOK_INIT(sceScreenShotSetOverlayImage);
 HOOK_INIT(sceScreenShotSetOverlayImageWithOrigin);
@@ -66,9 +63,9 @@ s32 attr_public plugin_load(s32 argc, const char* argv[]) {
     final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
     final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
     boot_ver();
-    sceSysmoduleLoadModule(SCE_SYSMODULE_SCREEN_SHOT);
-    sceSysmoduleLoadModule(SCE_SYSMODULE_VIDEO_RECORDING);
-    sceSysmoduleLoadModule(SCE_SYSMODULE_REMOTE_PLAY);
+    sceSysmoduleLoadModule(ORBIS_SYSMODULE_SCREEN_SHOT);
+    sceSysmoduleLoadModule(ORBIS_SYSMODULE_VIDEO_RECORDING);
+    sceSysmoduleLoadModule(ORBIS_SYSMODULE_REMOTE_PLAY);
     HOOK32(sceScreenShotSetOverlayImage);
     HOOK32(sceScreenShotSetOverlayImageWithOrigin);
     HOOK32(sceVideoRecordingSetInfo);
