@@ -11,6 +11,10 @@ on:
       - '**/*.txt'
   workflow_dispatch:
 
+# for release create
+permissions:
+  contents: write
+
 concurrency:
   group: ${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
@@ -176,11 +180,10 @@ jobs:
         echo "</details>" >> hash.md
 
     - name: Create Release
-      working-directory: bin/plugins
       if: |
         github.event_name == 'workflow_dispatch' &&
         github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
+      working-directory: bin/plugins
       env:
-        GITHUB_TOKEN: ${{ secrets.my_token }}
-      run: |
-        gh release create ${{ env.commit_ver }} ${{ env.ZIP_NAME }}.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release create ${{ env.commit_ver }} ${{ env.ZIP_NAME }}.zip --target ${{ GITHUB.SHA }} -t "${{ env.commit_ver }}" -F hash.md
