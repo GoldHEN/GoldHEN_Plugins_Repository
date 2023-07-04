@@ -13,7 +13,7 @@ Plugins allows you to customize your games like never before!
 
 While we make every effort to deliver high quality products, we do not guarantee that our products are free from defects. Our software is provided **as is** and you use the software at your own risk.
 
-# Getting Started
+# Quick Start
 
 - Load [GoldHEN 2.3](https://github.com/GoldHEN/GoldHEN/releases/latest) or newer on your PS4.
 - Enable option to load plugins in Plugins Menu.
@@ -93,6 +93,18 @@ Author(s):
 - [illusion](https://github.com/illusion0001)
 
 Removes framerate limit for games using system function `sceVideoOutSetFlipRate`.
+
+### FrameTime Logger
+
+Plugin filename: `frame_logger.prx`
+
+Author(s):
+- [illusion](https://github.com/illusion0001)
+
+  - Log frametime statistics.
+  - Press `L3 + L1 + Triangle` to start capturing data.
+  - Press `L3 + R3 + L1 + R1 + Square` to stop plugin.
+  - Logs data to `/data/frame_logger/`.
 
 ### GamePad helper Plugin
 
