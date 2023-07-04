@@ -97,24 +97,15 @@ u8 *hexstrtochar2(const char *hexstr, s64 *size) {
     return data;
 }
 
-void sys_proc_rw(u64 address, void *data, u64 length) {
-    struct proc_rw process_rw_data;
-    process_rw_data.address = address;
-    process_rw_data.data = data;
-    process_rw_data.length = length;
-    process_rw_data.write_flags = 1;
-#if (__FINAL__) == 0
-    debug_printf("process_rw_data: %p\n", &process_rw_data);
-    debug_printf("address: 0x%lx\n", process_rw_data.address);
-    debug_printf("hex_dump: ");
-    hex_dump(process_rw_data.data, process_rw_data.length);
-    debug_printf("length: 0x%lx\n", process_rw_data.length);
-    s32 ret = sys_sdk_proc_rw(&process_rw_data);
-    debug_printf("sys_sdk_proc_rw: returned 0x%08x\n", ret);
-#else
-    sys_sdk_proc_rw(&process_rw_data);
-#endif
-    return;
+void sys_proc_rw(u64 Address, void *Data, u64 Length)
+{
+    if (!Address || !Length)
+    {
+        final_printf("No target (0x%lx) or length (%li) provided!\n", Address, Length);
+        return;
+    }
+    sceKernelMprotect((void*)Address, Length, VM_PROT_ALL);
+    memcpy((void*)Address, Data, Length);
 }
 
 bool hex_prefix(const char *str)

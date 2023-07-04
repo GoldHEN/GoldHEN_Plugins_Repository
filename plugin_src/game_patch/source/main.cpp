@@ -45,13 +45,11 @@ void get_key_init(void)
 {
     u32 patch_lines = 0;
     u32 patch_items = 0;
-    char *buffer = nullptr;
-    char *buffer2 = nullptr;
-    u64 size = 0;
-    u64 size2 = 0;
+    char *patch_buffer = nullptr;
+    u64 patch_size = 0;
     char input_file[MAX_PATH_] = {0};
     snprintf(input_file, sizeof(input_file), BASE_PATH_PATCH_XML "/%s.xml", g_titleid);
-    s32 res = Read_File(input_file, &buffer, &size, 0);
+    s32 res = Read_File(input_file, &patch_buffer, &patch_size, 0);
 
     if (res)
     {
@@ -60,21 +58,23 @@ void get_key_init(void)
         return;
     }
 
-    if (buffer)
+    if (patch_buffer && patch_size)
     {
         mxml_node_t *node, *tree = NULL;
-        tree = mxmlLoadString(NULL, buffer, MXML_NO_CALLBACK);
+        tree = mxmlLoadString(NULL, patch_buffer, MXML_NO_CALLBACK);
 
         if (!tree)
         {
-            final_printf("XML: could not parse XML:\n%s\n", buffer);
-            free(buffer);
+            final_printf("XML: could not parse XML:\n%s\n", patch_buffer);
+            free(patch_buffer);
             return;
         }
 
         for (node = mxmlFindElement(tree, tree, "Metadata", NULL, NULL, MXML_DESCEND); node != NULL;
              node = mxmlFindElement(node, tree, "Metadata", NULL, NULL, MXML_DESCEND))
         {
+            char* settings_buffer = nullptr;
+            u64 settings_size = 0;
             bool PRX_patch = false;
             const char *TitleData = GetXMLAttr(node, "Title");
             const char *NameData = GetXMLAttr(node, "Name");
@@ -89,13 +89,24 @@ void get_key_init(void)
             u64 hashout = patch_hash_calc(TitleData, NameData, AppVerData, input_file, AppElfData);
             char settings_path[MAX_PATH_] = {0};
             snprintf(settings_path, sizeof(settings_path), BASE_PATH_PATCH_SETTINGS "/0x%016lx.txt", hashout);
-            final_printf("Settings path: %s\n", settings_path);
-            s32 res = Read_File(settings_path, &buffer2, &size2, 0);
-            if (res == ORBIS_KERNEL_ERROR_ENOENT) {
+            sceKernelChmod(settings_path, 0777);
+            s32 res = Read_File(settings_path, &settings_buffer, &settings_size, 0);
+            final_printf("settings_path: %s, 0x%08x\n", settings_path, res);
+            if (res == ORBIS_KERNEL_ERROR_ENOENT)
+            {
                 debug_printf("file %s not found, initializing false. ret: 0x%08x\n", settings_path, res);
                 u8 false_data[] = {'0', '\n'};
                 Write_File(settings_path, false_data, sizeof(false_data));
-            } else if (buffer2[0] == '1' && !strcmp(g_game_elf, AppElfData)) {
+                continue;
+            }
+            if (!settings_buffer || !settings_size)
+            {
+                final_printf("Settings 0x%016lx has no data!\n", hashout);
+                final_printf("File size %li bytes\n", settings_size);
+                continue;
+            }
+            if (settings_buffer[0] == '1' && !strcmp(g_game_elf, AppElfData))
+            {
                 s32 ret_cmp = strcmp(g_game_ver, AppVerData);
                 if (!ret_cmp)
                 {
@@ -197,11 +208,15 @@ void get_key_init(void)
                     }
                 }
             }
+            if (settings_buffer)
+            {
+                free(settings_buffer);
+            }
         }
 
         mxmlDelete(node);
         mxmlDelete(tree);
-        free(buffer);
+        free(patch_buffer);
 
         if (patch_items > 0 && patch_lines > 0)
         {
@@ -213,15 +228,11 @@ void get_key_init(void)
             NotifyStatic(TEX_ICON_SYSTEM, msg);
         }
     }
-    else // if (!buffer)
+    else // if (!patch_buffer && !patch_size)
     {
         char msg[128] = {0};
         snprintf(msg, sizeof(msg), "File %s\nis empty", input_file);
         NotifyStatic(TEX_ICON_SYSTEM, msg);
-    }
-    if (buffer2)
-    {
-        free(buffer2);
     }
 }
 
