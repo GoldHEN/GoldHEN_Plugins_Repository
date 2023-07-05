@@ -1,4 +1,4 @@
-ifeq ($(DEBUG), 1)
+ifeq ($(DEBUG),1)
 	TYPE=debug
 	DEBUG_FLAG=DEBUG=1
 else
