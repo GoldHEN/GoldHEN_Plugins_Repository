@@ -21,7 +21,7 @@ build_sdk:
 BUILD_PRX=bin/plugins/prx_$(TYPE)
 BUILD_ELF=bin/plugins/elf_$(TYPE)
 
-$(BUILD_PRX) $(BUILD_ELF): build_sdk
+$(BUILD_PRX): build_sdk
 	@rm -rf $(BUILD_PRX) $(BUILD_ELF)
 	@mkdir -p $(BUILD_PRX) $(BUILD_ELF)
 	@echo "[+] building plugins"
@@ -33,7 +33,7 @@ $(BUILD_PRX) $(BUILD_ELF): build_sdk
 		fi; \
 	done
 
-build: $(BUILD_PRX) $(BUILD_ELF)
+build: $(BUILD_PRX)
 
 hashes:
 	@echo "MD5:" > $(BUILD_PRX)/md5.txt
