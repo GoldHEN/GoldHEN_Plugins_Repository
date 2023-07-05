@@ -1,6 +1,3 @@
-DEBUG ?= 0
-LOG ?= KLOG
-
 ifeq ($(DEBUG), 1)
 	TYPE = debug
 	DEBUG_FLAG = DEBUG=1
@@ -49,4 +46,3 @@ hashes: $(BUILD_PRX)
 clean:
 	@echo "[+] Cleaning build files"
 	@rm -rf $(BUILD_DIR)
-
