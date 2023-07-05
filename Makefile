@@ -6,7 +6,7 @@ else
 	DEBUG_FLAG=DEBUG=0
 endif
 
-LOG_TYPEPRINTF=1
+LOG_TYPE=PRINTF=1
 LOG_MSG=libc:printf
 
 BUILD_DIR=bin/plugins
