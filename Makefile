@@ -1,9 +1,9 @@
 ifeq ($(DEBUG), 1)
-	TYPE = debug
-	DEBUG_FLAG = DEBUG=1
+	TYPE=debug
+	DEBUG_FLAG=DEBUG=1
 else
-	TYPE = final
-	DEBUG_FLAG = DEBUG=0
+	TYPE=final
+	DEBUG_FLAG=DEBUG=0
 endif
 
 LOG_TYPE = PRINTF=1
