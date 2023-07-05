@@ -6,12 +6,12 @@ else
 	DEBUG_FLAG=DEBUG=0
 endif
 
-LOG_TYPE = PRINTF=1
-LOG_MSG = libc:printf
+LOG_TYPEPRINTF=1
+LOG_MSG=libc:printf
 
-BUILD_DIR = bin/plugins
-BUILD_PRX = $(BUILD_DIR)/prx_$(TYPE)
-BUILD_ELF = $(BUILD_DIR)/elf_$(TYPE)
+BUILD_DIR=bin/plugins
+BUILD_PRX=$(BUILD_DIR)/prx_$(TYPE)
+BUILD_ELF=$(BUILD_DIR)/elf_$(TYPE)
 
 .PHONY: all build_sdk build hashes clean
 
