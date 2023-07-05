@@ -27,7 +27,7 @@ $(BUILD_PRX): build_sdk
 	@echo "[+] Building plugins"
 	@for dir in plugin_src/*; do \
 		if [ -f "$$dir/Makefile" ]; then \
-			@echo "[+] Building dir: $$dir"; \
+			echo "[+] Building dir: $$dir"; \
 			make -C "$$dir" clean || exit 1; \
 			make -C "$$dir" $(DEBUG_FLAG) $(LOG_TYPE) || exit 1; \
 		fi; \
