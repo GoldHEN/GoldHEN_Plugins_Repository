@@ -49,18 +49,10 @@ jobs:
         echo "llvm_path=$RUNNER_TOOL_CACHE/llvm" >> $GITHUB_ENV
         echo "OO_PS4_TOOLCHAIN=$GITHUB_WORKSPACE/OpenOrbis/PS4Toolchain" >> $GITHUB_ENV
         echo "commit_ver=1.$(git rev-list HEAD --count)" >> $GITHUB_ENV
+        echo "commit_hash=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
 
-    - name: Cache OpenOrbis Toolchain
-      id: cache-oosdk
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.OO_PS4_TOOLCHAIN }}
-        key: ${{ runner.os }}-oosdk
-
-    # temporary release until 0.53 is released
     - name: Download OpenOrbis Toolchain
-      if: steps.cache-oosdk.outputs.cache-hit != 'true'
-      run: curl -sL https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/download/0.0.1.416/toolchain.tar.gz | tar xz -C ./
+      run: curl -sL https://github.com/illusion0001/OpenOrbis-PS4-Toolchain/releases/latest/download/toolchain.tar.gz | tar xz -C ./
 
     - name: Cache LLVM and Clang (${{ env.llvm_ver }})
       id: cache-llvm
@@ -92,38 +84,36 @@ jobs:
     - name: Build (Debug)
       run: make DEBUG=1
 
-    - name: Push module artifact (Release prx)
+    - name: Upload modules (Release prx)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_prx_final
-        path: bin/plugins/prx_final/*
+        name: goldplugins_${{ env.commit_ver }}-${{ env.commit_hash }}_prx_final
+        path: bin/plugins/prx_final/*.prx
         if-no-files-found: error
 
-    - name: Push module artifact (Release elf)
+    - name: Upload modules (Release elf symbols)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_elf_final
+        name: goldplugins_${{ env.commit_ver }}-${{ env.commit_hash }}_elf_final
         path: bin/plugins/elf_final/*.elf
         if-no-files-found: error
 
-    - name: Push module artifact (Debug prx)
+    - name: Upload modules (Debug prx)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_prx_debug
-        path: bin/plugins/prx_debug/*
+        name: goldplugins_${{ env.commit_ver }}-${{ env.commit_hash }}_prx_debug
+        path: bin/plugins/prx_debug/*.prx
         if-no-files-found: error
 
-    - name: Push module artifact (Debug elf)
+    - name: Upload modules (Debug elf symbols)
       uses: actions/upload-artifact@v3
       with:
-        name: goldplugins_${{ env.commit_ver }}_elf_debug
+        name: goldplugins_${{ env.commit_ver }}-${{ env.commit_hash }}_elf_debug
         path: bin/plugins/elf_debug/*.elf
         if-no-files-found: error
 
     - name: Prepare Release
-      if: |
-        github.event_name == 'workflow_dispatch' &&
-        github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
+      if: github.event_name == 'workflow_dispatch'
       run: |
         # Excluding non user related plugins from release
         BUILD=plugins
@@ -150,8 +140,7 @@ jobs:
         cat $BUILD/$BUILD_MD5
         cat $BUILD/$BUILD_SHA256
         # Create zip
-        commit_hash=$(echo ${GITHUB_SHA} | cut -c1-8)
-        ZIP_NAME=GoldPlugins-${{ env.commit_ver }}-$commit_hash
+        ZIP_NAME=GoldPlugins-${{ env.commit_ver }}-${{ env.commit_hash }}
         CFG=plugins.ini
         echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
         echo "; Note: lines starting with semicolon are for comments." > $CFG
@@ -180,9 +169,7 @@ jobs:
         echo "</details>" >> hash.md
 
     - name: Create Release
-      if: |
-        github.event_name == 'workflow_dispatch' &&
-        github.repository == 'GoldHEN/GoldHEN_Plugins_Repository'
+      if: github.event_name == 'workflow_dispatch'
       working-directory: bin/plugins
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
