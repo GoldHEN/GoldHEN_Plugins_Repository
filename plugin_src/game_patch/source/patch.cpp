@@ -329,6 +329,30 @@ void patch_data1(const char *patch_type_str, u64 addr, const char *value, uint32
         free(bytearray);
         break;
     }
+    case djb2_hash("patchCall"):
+    case djb2_hash("mask_patchCall"):
+    {
+        u8 call_bytes[5] = {0};
+        memcpy(call_bytes, (void *)addr, sizeof(call_bytes));
+        if (call_bytes[0] == 0xe8 || call_bytes[0] == 0xe9)
+        {
+            int32_t branch_target = *(int32_t *)(call_bytes + 1);
+            if (branch_target)
+            {
+                uintptr_t branched_call = addr + branch_target + sizeof(call_bytes);
+                final_printf("0x%016lx: 0x%08x -> 0x%016lx\n", addr, branch_target, branched_call);
+                s64 bytearray_size = 0;
+                u8 *bytearray = hexstrtochar2(value, &bytearray_size);
+                if (!bytearray)
+                {
+                    break;
+                }
+                sys_proc_rw(branched_call, bytearray, bytearray_size);
+                free(bytearray);
+            }
+        }
+        break;
+    }
     default:
     {
         final_printf("Patch type: '%s (#%.16lx) not found or unsupported\n", patch_type_str, patch_type);
