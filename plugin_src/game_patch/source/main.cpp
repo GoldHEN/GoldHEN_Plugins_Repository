@@ -110,16 +110,16 @@ void get_key_init(void)
                 s32 ret_cmp = strcmp(g_game_ver, AppVerData);
                 if (!ret_cmp)
                 {
-                    debug_printf("App ver %s == %s\n", g_game_ver, AppVerData);
+                    final_printf("App ver %s == %s\n", g_game_ver, AppVerData);
                 }
-                else if (!startsWith(AppVerData, "mask") || !startsWith(AppVerData, "all"))
+                else if (startsWith(AppVerData, "mask") || startsWith(AppVerData, "all"))
                 {
-                    debug_printf("App ver masked: %s\n", AppVerData);
+                    final_printf("App ver masked: %s\n", AppVerData);
                 }
                 else if (ret_cmp)
                 {
-                    debug_printf("App ver %s != %s\n", g_game_ver, AppVerData);
-                    debug_printf("Skipping patch entry\n");
+                    final_printf("App ver %s != %s\n", g_game_ver, AppVerData);
+                    final_printf("Skipping patch entry\n");
                     continue;
                 }
                 patch_items++;
@@ -136,13 +136,13 @@ void get_key_init(void)
                     const char *gameValue = GetXMLAttr(Line_node, "Value");
                     const char *gameOffset = nullptr;
                     // starts with `mask`
-                    if (!startsWith(gameType, "mask"))
+                    if (startsWith(gameType, "mask"))
                     {
                         use_mask = true;
                     }
                     if (use_mask)
                     {
-                        if (!startsWith(gameType, "mask_jump32"))
+                        if (startsWith(gameType, "mask_jump32"))
                         {
                             const char* gameJumpTarget = GetXMLAttr(Line_node, "Target");
                             const char* gameJumpSize = GetXMLAttr(Line_node, "Size");
@@ -260,7 +260,7 @@ s32 attr_public plugin_load(s32 argc, const char* argv[]) {
     CurrentModuleInfo.size = sizeof(OrbisKernelModuleInfo);
     if(!get_module_info(CurrentModuleInfo, "0", &g_module_base, &g_module_size) && (!g_module_base || !g_module_size))
     {
-        final_printf("Could not find module info for current process\n");
+        NotifyStatic(TEX_ICON_SYSTEM, "Could not find module info for current process");
         return -1;
     }
     final_printf("Module start: 0x%lx 0x%x\n", g_module_base, g_module_size);

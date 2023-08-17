@@ -78,9 +78,9 @@ bool simple_get_bool(const char* val)
     {
         return true;
     }
-    if (!startsWith(val, "on") ||
-        !startsWith(val, "true") ||
-        !startsWith(val, "1"))
+    if (startsWith(val, "on") ||
+        startsWith(val, "true") ||
+        startsWith(val, "1"))
     {
         return true;
     }
