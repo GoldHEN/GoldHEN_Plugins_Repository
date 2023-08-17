@@ -114,8 +114,6 @@ s32 get_module_info(OrbisKernelModuleInfo moduleInfo, const char* name, uint64_t
     return 0;
 }
 
-constexpr u32 MAX_PATTERN_LENGTH = 256;
-
 u32 pattern_to_byte(const char* pattern, uint8_t* bytes)
 {
     u32 count = 0;
@@ -156,7 +154,8 @@ u8* PatternScan(uint64_t module_base, uint32_t module_size, const char* signatur
     {
         return nullptr;
     }
-    u8 patternBytes[MAX_PATTERN_LENGTH];
+    constexpr u32 MAX_PATTERN_LENGTH = 256;
+    u8 patternBytes[MAX_PATTERN_LENGTH] = { 0 };
     s32 patternLength = pattern_to_byte(signature, patternBytes);
     if (!patternLength || patternLength >= MAX_PATTERN_LENGTH)
     {
