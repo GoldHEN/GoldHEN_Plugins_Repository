@@ -21,10 +21,15 @@ set GH_SDK=%GOLDHEN_SDK%
 
 rem usually you won't need to change anything below this line
 set DEFS=-D_BSD_SOURCE=1 -D__BSD_VISIBLE=1 -D__PS4__=1 -DOO=1 -D__OPENORBIS__=1 -D__OOPS4__=1 -D__FINAL__=1
-set LIBS=-lGoldHEN_Hook -lkernel -lc -lc++ -lSceVideoOut -lSceScreenShot -lSceVideoRecording -lSceSysmodule -lSceSystemService 
-set COMMONFLAGS=--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot "%OO_PS4_TOOLCHAIN%" -isystem "%OO_PS4_TOOLCHAIN%\include" -I"%GOLDHEN_SDK%\include" -Wno-c99-designator %DEFS%
-set CXXFLAGS=-fexceptions -fcxx-exceptions -isystem "%OO_PS4_TOOLCHAIN%\include\c++\v1"
+set LIBS=-lGoldHEN_Hook -lkernel -lc -lc++ -lSceVideoOut -lSceScreenShot -lSceVideoRecording -lSceSysmodule -lSceSystemService -lSceUserService -lScePad -lSceGnmDriver -lSceRemoteplay
+set COMMONFLAGS=--target=x86_64-pc-freebsd12-elf -fPIC -funwind-tables -isysroot "%OO_PS4_TOOLCHAIN%" -isystem "%OO_PS4_TOOLCHAIN%\include" -I"common" -I"%GOLDHEN_SDK%\include" -Wno-c99-designator %DEFS%
+set CXXFLAGS=%COMMONFLAGS% -fexceptions -fcxx-exceptions -isystem "%OO_PS4_TOOLCHAIN%\include\c++\v1"
 set LDFLAGS=-m elf_x86_64 -pie -e _init --script "%OO_PS4_TOOLCHAIN%\link.x" --eh-frame-hdr -L"%OO_PS4_TOOLCHAIN%\lib" -L%GH_SDK% %LIBS%
+
+rem set default if git failed
+set COMMIT=???
+set BRANCH=???
+set VER=0
 
 set datetimef=%DATE% %TIME%
 for /f %%i in ('git rev-parse HEAD') do set COMMIT=%%i
@@ -48,6 +53,13 @@ for /D %%G in ("plugin_src\*") do (
         %CC% %COMMONFLAGS% -I"%%G\include" -c "%%f" -o "%%G\build\%%~nf.c.o"
         set OBJS=!OBJS! "%%G\build\%%~nf.c.o"
     )
+
+    rem build CPP
+    for %%f in ("%%G\source\*.cpp") do (
+        %CXX% %CXXFLAGS% -I"%%G\include" -c "%%f" -o "%%G\build\%%~nf.c.o"
+        set OBJS=!OBJS! "%%G\build\%%~nf.c.o"
+    )
+
     rem ugly but works, get the *name* of the directory
     for %%f in ("%%G") do set PLUGIN_NAME=%%~nxf
 
