@@ -1,51 +1,50 @@
-// Author: jocover @ https://github.com/jocover
-// Repository: https://github.com/GoldHEN/GoldHEN_Plugins_Repository
-
+#include <Common.h>
+#include <orbis/Pad.h>
 #include "plugin_common.h"
-#include "Common.h"
 
-attr_public const char *g_pluginName = "button_swap";
-attr_public const char *g_pluginDesc = "Swap X and O in Asia PS4";
-attr_public const char *g_pluginAuth = "jocover";
-attr_public u32 g_pluginVersion = 0x00000100; // 1.00
+static float hue = 0.0f;
+static bool running = true;
 
-s32 (*sceSystemServiceParamGetInt)(s32 paramId, s32 *value);
+void hsv_to_rgb(float h, uint8_t *r, uint8_t *g, uint8_t *b) {
+    int i = (int)(h / 60.0f) % 6;
+    float f = (h / 60.0f) - (int)(h / 60.0f);
+    uint8_t q = (uint8_t)(255 * (1.0f - f));
+    uint8_t t = (uint8_t)(255 * f);
 
-HOOK_INIT(sceSystemServiceParamGetInt);
-
-s32 sceSystemServiceParamGetInt_hook(s32 paramId, s32 *value) {
-    s32 ret = 0;
-    ret = HOOK_CONTINUE(sceSystemServiceParamGetInt, s32(*)(s32, s32 *), paramId, value);
-    // swap X and O around in Asia PS4
-    if (paramId == 1000) {
-        *value = !*value;
+    switch (i) {
+        case 0: *r = 255; *g = t;   *b = 0;   break;
+        case 1: *r = q;   *g = 255; *b = 0;   break;
+        case 2: *r = 0;   *g = 255; *b = t;   break;
+        case 3: *r = 0;   *g = q;   *b = 255; break;
+        case 4: *r = t;   *g = 0;   *b = 255; break;
+        case 5: *r = 255; *g = 0;   *b = q;   break;
     }
-    return ret;
 }
 
-s32 attr_public plugin_load(s32 argc, const char* argv[]) {
-    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
-    final_printf("[GoldHEN] Plugin Author(s): %s\n", g_pluginAuth);
-    boot_ver();
-    s32 h = 0;
-    sys_dynlib_load_prx("libSceSystemService.sprx", &h);
-    sys_dynlib_dlsym(h, "sceSystemServiceParamGetInt", &sceSystemServiceParamGetInt);
-    HOOK32(sceSystemServiceParamGetInt);
+void* rainbow_thread(void* arg) {
+    OrbisPadColor color;
+    color.a = 255;
+    while (running) {
+        int handle = scePadGetHandle(0, 0, 0);
+        if (handle > 0) {
+            hsv_to_rgb(hue, &color.r, &color.g, &color.b);
+            scePadSetLightBar(handle, &color);
+            hue += 2.0f;
+            if (hue >= 360.0f) hue = 0.0f;
+        }
+        sceKernelUsleep(30000);
+    }
+    return NULL;
+}
+
+int module_start(size_t argc, const void *args) {
+    sceKernelLoadStartModule("libScePad.sprx", 0, NULL, 0, NULL, NULL);
+    OrbisPthread thread;
+    scePthreadCreate(&thread, NULL, rainbow_thread, NULL, "rainbow_thread");
     return 0;
 }
 
-s32 attr_public plugin_unload(s32 argc, const char* argv[]) {
-    final_printf("[GoldHEN] <%s\\Ver.0x%08x> %s\n", g_pluginName, g_pluginVersion, __func__);
-    UNHOOK(sceSystemServiceParamGetInt);
-    return 0;
-}
-
-s32 attr_module_hidden module_start(s64 argc, const void *args)
-{
-    return 0;
-}
-
-s32 attr_module_hidden module_stop(s64 argc, const void *args)
-{
+int module_stop(size_t argc, const void *args) {
+    running = false;
     return 0;
 }
